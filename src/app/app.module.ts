@@ -18,7 +18,6 @@ import { WebviewDirective } from './directives/webview.directive';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
-import { WindowsFrameComponent } from './layout/windows-frame/windows-frame.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -29,8 +28,7 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent,
     HomeComponent,
-    WebviewDirective,
-    WindowsFrameComponent
+    WebviewDirective
   ],
   imports: [
     BrowserModule,
