@@ -1,7 +1,17 @@
+@import "./styles/theme";
+
 /* You can add global styles to this file, and also import other style files */
 html, body {
   margin: 0;
   padding: 0;
-
   height: 100%;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: $background-primary-night !important;
 }

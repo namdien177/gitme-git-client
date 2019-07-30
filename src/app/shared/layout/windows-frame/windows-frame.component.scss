@@ -1,0 +1,40 @@
+:host {
+  display: flex;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  align-items: center;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+
+  strong {
+    color: white;
+
+    span {
+      color: red;
+    }
+  }
+
+  nav {
+    ul {
+      list-style: none;
+
+      li {
+        float: left;
+        margin-left: 0.5em;
+
+        img {
+          width: 16px;
+          cursor: pointer;
+
+          #min {
+            padding: 10px;
+          }
+        }
+      }
+    }
+  }
+}

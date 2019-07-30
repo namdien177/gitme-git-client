@@ -15,8 +15,9 @@ function createWindow() {
   win = new BrowserWindow({
     x: 0,
     y: 0,
-    width: size.width,
-    height: size.height,
+    width: size.width > 1280 ? 1280 : size.width,
+    height: size.height > 720 ? 720 : size.height,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -24,7 +25,7 @@ function createWindow() {
 
   if (serve) {
     require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`)
+      electron: require(`${ __dirname }/node_modules/electron`)
     });
     win.loadURL('http://localhost:4200');
   } else {

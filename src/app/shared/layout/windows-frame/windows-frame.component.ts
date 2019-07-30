@@ -7,9 +7,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WindowsFrameComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
 
+  minimizeWindows() {
+
+  }
+
+  closeWindows() {
+
+  }
 }
