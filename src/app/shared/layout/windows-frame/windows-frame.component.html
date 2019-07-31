@@ -1,19 +1,19 @@
 <header class="vw-100">
   <strong><span>GIT</span>me</strong>
 
-  <nav>
-    <ul class="m-0 p-0">
-      <li>
-        <img (click)="minimizeWindows()"
-             alt="minimize"
-             id="minimizeBtn"
-             src="assets/icons/minimize.svg">
-      </li>
-      <li>
-        <img (click)="closeWindows()"
-             alt="closeBtn"
-             src="assets/icons/times.svg">
-      </li>
-    </ul>
+  <nav class="nav-frame">
+    <div class="col-auto">
+      <span class="text-muted">
+        Beta v0.2
+      </span>
+    </div>
+    <div class="col functionaries">
+      <div (click)="minimizeWindows()" class="clickable-btn minimize-btn">
+        <i class="fas fa-minus"></i>
+      </div>
+      <div (click)="closeWindows()" class="clickable-btn close-btn">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
   </nav>
 </header>

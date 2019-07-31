@@ -16,12 +16,12 @@ import { ElectronService } from './shared/services/electron.service';
 import { WebviewDirective } from './shared/directives/webview.directive';
 
 import { AppComponent } from './app.component';
-import { HomeComponent } from './features/home/home.component';
 import { WindowsFrameComponent } from './shared/layout/windows-frame/windows-frame.component';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { AppConfig } from '../environments/environment';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+import { LocalStorageService } from './shared/services/localStorage.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -31,13 +31,12 @@ export function HttpLoaderFactory(http: HttpClient) {
 const declareComps = [
   AppComponent,
   WindowsFrameComponent,
-  HomeComponent,
   WebviewDirective
 ];
 
 @NgModule({
   declarations: [
-    ...declareComps
+    ...declareComps,
   ],
   imports: [
     BrowserModule,
@@ -55,7 +54,7 @@ const declareComps = [
     AkitaNgRouterStoreModule.forRoot(),
     MDBBootstrapModule.forRoot()
   ],
-  providers: [ElectronService],
+  providers: [ElectronService, LocalStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

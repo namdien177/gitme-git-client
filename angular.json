@@ -152,11 +152,11 @@
   "defaultProject": "angular-electron",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "app",
+      "prefix": "gitme",
       "styleext": "scss"
     },
     "@schematics/angular:directive": {
-      "prefix": "app"
+      "prefix": "gitme"
     }
   },
   "cli": {
