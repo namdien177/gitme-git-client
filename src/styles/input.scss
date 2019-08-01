@@ -1,0 +1,17 @@
+@import "src/styles/theme";
+
+.form-control-dark {
+  outline: none !important;
+  background-color: $background-primary-night !important;
+  border-color: $background-primary-lighter-night !important;
+  color: white !important;
+  box-shadow: none !important;
+
+  &.hover:hover {
+    border-color: whitesmoke !important;
+  }
+
+  &.focus:focus {
+    border-color: white !important;
+  }
+}

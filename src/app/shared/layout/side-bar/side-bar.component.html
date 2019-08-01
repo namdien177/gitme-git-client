@@ -1,3 +1,33 @@
-<p>
-  side-bar works!
-</p>
+<div class="container-fluid">
+  <div class="row mt-2 pl-2 pr-2 mb-2">
+    <label class="col m-0 pl-0 d-flex">
+      <input class="form-control form-control-dark align-self-center"
+             mdbInput
+             placeholder="Find repository"
+             type="text">
+    </label>
+    <div class="col-auto p-0 d-flex">
+      <button class="rounded-btn bg-success align-self-center" type="button">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="col-12 block-repo selected-repos">
+    <h5 class="title-block">
+      Selected Repository
+    </h5>
+    <small class="text-muted">
+      No repo selected
+    </small>
+  </div>
+
+  <div class="col-12 h-100 block-repo list-repositories">
+    <h5 class="title-block">
+      Available Repositories
+    </h5>
+    <div class="list">
+      <gitme-repository-item></gitme-repository-item>
+    </div>
+  </div>
+</div>

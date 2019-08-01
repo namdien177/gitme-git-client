@@ -1,5 +1,6 @@
 
 :host {
   display: grid;
-  grid-template-rows: 32px auto;
+  grid-template-rows: 32px max-content auto;
+  height: 100%;
 }

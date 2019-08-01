@@ -1,0 +1,38 @@
+@import "src/styles/theme";
+
+.container-fluid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, max-content) auto;
+  height: 100%;
+  grid-gap: 1rem;
+}
+
+.block-repo {
+  position: relative;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  &:not(:first-child) {
+    padding-top: 1.25rem;
+  }
+
+  .title-block {
+    position: absolute;
+    top: -1rem;
+    left: 0;
+    transform: translateY(50%);
+
+    font-size: 0.8rem;
+    color: #c3c3c3;
+    user-select: none;
+  }
+
+  &.list-repositories {
+    .list-repo {
+      overflow: auto;
+    }
+  }
+}
