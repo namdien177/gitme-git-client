@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'gitme-repository-item',
@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RepositoryItemComponent implements OnInit {
 
-  constructor() { }
+  @Input() info;
+
+  pullTitle = '4 Pull request';
+  pushTitle = '4 Push request';
+  changesTitle = '4 changes';
+
+  constructor() {
+  }
 
   ngOnInit() {
   }
-
 }

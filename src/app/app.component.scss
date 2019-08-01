@@ -1,6 +1,15 @@
-
 :host {
   display: grid;
-  grid-template-rows: 32px max-content auto;
-  height: 100%;
+  grid-template-areas: 'frame' 'body';
+  grid-template-columns: 1fr;
+  grid-template-rows: 32px auto;
+  grid-gap: 0;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  position: relative;
+
+  .router-ng {
+    grid-area: body;
+  }
 }

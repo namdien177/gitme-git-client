@@ -96,7 +96,8 @@
     "animate.css": "^3.7.2",
     "chart.js": "^2.5.0",
     "hammerjs": "^2.0.8",
-    "node-machine-id": "^1.1.12"
+    "node-machine-id": "^1.1.12",
+    "xterm": "^3.14.5"
   },
   "akitaCli": {
     "customFolderName": "true",

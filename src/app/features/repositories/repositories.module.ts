@@ -6,6 +6,7 @@ import { RepositoriesComponent } from './repositories.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SideBarModule } from '../../shared/layout/side-bar/side-bar.module';
 import { CoreModule } from '../../shared/modules/core.module';
+import { XTerminalModule } from '../../shared/layout/x-terminal/x-terminal.module';
 
 const declareComps = [
   RepositoriesComponent,
@@ -19,6 +20,7 @@ const declareComps = [
   imports: [
     CommonModule,
     SideBarModule,
+    XTerminalModule,
     CoreModule,
     RepositoriesRoutingModule
   ]

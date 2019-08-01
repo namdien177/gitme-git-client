@@ -1,3 +1,15 @@
+@import "src/styles/theme";
+
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 11100;
+  height: 32px;
+  background-color: $background-primary-night;
+}
+
 header {
   display: flex;
   align-items: center;

@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <div class="row mt-2 pl-2 pr-2 mb-2">
+  <div class="d-flex search-ng">
     <label class="col m-0 pl-0 d-flex">
       <input class="form-control form-control-dark align-self-center"
              mdbInput
@@ -13,20 +13,34 @@
     </div>
   </div>
 
-  <div class="col-12 block-repo selected-repos">
+  <div class="col-12 block-repo selected-repos current-ng">
     <h5 class="title-block">
       Selected Repository
     </h5>
-    <small class="text-muted">
-      No repo selected
-    </small>
+    <!--    <small class="text-muted">-->
+    <!--      No repo selected-->
+    <!--    </small>-->
+    <gitme-repository-item></gitme-repository-item>
   </div>
 
-  <div class="col-12 h-100 block-repo list-repositories">
+  <div class="col-12 block-repo list-repositories">
     <h5 class="title-block">
       Available Repositories
     </h5>
-    <div class="list">
+    <div class="list-repos">
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
+      <gitme-repository-item></gitme-repository-item>
       <gitme-repository-item></gitme-repository-item>
     </div>
   </div>

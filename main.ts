@@ -14,11 +14,13 @@ function createWindow() {
 
   // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
+    x: size.width / 2 - (size.width > 1280 ? 1280 : size.width) / 2,
+    y: size.height / 2 - (size.height > 720 ? 720 : size.height) / 2,
     width: size.width > 1280 ? 1280 : size.width,
     height: size.height > 720 ? 720 : size.height,
     frame: false,
+    minHeight: 620,
+    minWidth: 720,
     webPreferences: {
       nodeIntegration: true,
     },

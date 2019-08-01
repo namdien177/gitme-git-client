@@ -3,36 +3,45 @@
 .container-fluid {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(2, max-content) auto;
-  height: 100%;
+  grid-template-rows: 44px 4rem auto;
+  height: calc(100vh - 64px);
   grid-gap: 1rem;
+  padding-top: 15px;
+
+  .current-ng {
+    padding-right: 10px;
+  }
+
+  .list-repositories {
+    padding-bottom: 0;
+    padding-right: 0;
+
+    .list-repos {
+      padding-right: 4px;
+      overflow: auto;
+      padding-bottom: 1rem;
+      height: 100%;
+    }
+  }
 }
 
 .block-repo {
   position: relative;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 1.7rem;
+  padding-left: 0;
+  min-height: 2.3rem;
   display: flex;
   flex-direction: column;
 
-  &:not(:first-child) {
-    padding-top: 1.25rem;
-  }
-
   .title-block {
     position: absolute;
-    top: -1rem;
     left: 0;
-    transform: translateY(50%);
+    top: calc(1.7rem / 2);
+    transform: translateY(-50%);
+    margin: 0;
 
     font-size: 0.8rem;
     color: #c3c3c3;
     user-select: none;
-  }
-
-  &.list-repositories {
-    .list-repo {
-      overflow: auto;
-    }
   }
 }

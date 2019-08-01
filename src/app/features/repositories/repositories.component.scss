@@ -3,16 +3,21 @@
 
   display: grid;
   grid-template-areas: 'sidebar-ng router-ng' 'terminal terminal';
-  grid-template-rows: minmax(520px, max-content) auto;
+  grid-template-rows: minmax(520px, calc(100vh - 64px)) max-content;
   grid-template-columns: minmax(250px, 350px) auto;
   grid-gap: 0;
   height: 100%;
 
   .sidebar-ng {
     grid-area: sidebar-ng;
+
   }
 
   .router-ng {
     grid-area: router-ng;
+  }
+
+  .x-terminal {
+    grid-area: terminal;
   }
 }
