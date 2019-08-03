@@ -3,8 +3,6 @@ import { XTerminalStore } from './x-terminal.store';
 import { XTerminalQuery } from './x-terminal.query';
 import { IDisposable as xtermIDisposable, Terminal } from 'xterm';
 import * as os from 'os';
-import * as pty from 'node-pty';
-import { IDisposable as ptyIDisposable } from 'node-pty';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -14,7 +12,9 @@ export class XTerminalService {
 
   private isResizing: Subject<any> = new Subject<any>();
 
-  private ptyDataListener: ptyIDisposable = null;
+  private pty;
+
+  private ptyDataListener = null;
   private xtermDataListener: xtermIDisposable = null;
   private xtermResizeListener: xtermIDisposable = null;
 
@@ -22,6 +22,8 @@ export class XTerminalService {
     private xTerminalStore: XTerminalStore,
     private xTerminalQuery: XTerminalQuery,
   ) {
+    this.pty = window.require('node-pty');
+
     this.isResizing.pipe(
       debounceTime(20),
     ).subscribe(event => {
@@ -48,9 +50,11 @@ export class XTerminalService {
     });
     terminal.open(terminalDOM);
 
-    const ptyProc = pty.spawn(os.platform() === 'win32' ? 'powershell.exe' : process.env.SHELL || '/bin/bash', [], {
+    const ptyProc = this.pty.spawn(os.platform() === 'win32' ? 'powershell.exe' : process.env.SHELL || '/bin/bash', [], {
       cols: terminal.cols,
-      rows: terminal.rows
+      rows: terminal.rows,
+      cwd: process.cwd(),
+      env: process.env
     });
 
     this.xTerminalStore.update({
@@ -61,7 +65,10 @@ export class XTerminalService {
 
   closeTerminal(terminalDOM: HTMLElement) {
     if (!!this.xTerminalQuery.getValue().terminal) {
-      this.xTerminalQuery.getValue().terminal.dispose();
+      this.xTerminalStore.update({
+        terminal: null,
+        pty: null
+      });
     }
   }
 
@@ -91,7 +98,7 @@ export class XTerminalService {
     this.isResizing.next(event);
   }
 
-  private startListenerTerminal(terminalInstance: Terminal, ptyInstance: pty.IPty) {
+  private startListenerTerminal(terminalInstance: Terminal, ptyInstance) {
     this.xtermDataListener = terminalInstance.onData((data: string) => {
       ptyInstance.write(data);
     });

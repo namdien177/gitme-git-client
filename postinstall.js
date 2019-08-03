@@ -4,6 +4,7 @@ const f_angular = 'node_modules/@angular-devkit/build-angular/src/angular-cli-fi
 
 fs.readFile(f_angular, 'utf8', function (err, data) {
   if (err) {
+    console.log('deaddddddddddddddddddd');
     return console.log(err);
   }
   var result = data.replace(/target: "electron-renderer",/g, '');
@@ -11,6 +12,7 @@ fs.readFile(f_angular, 'utf8', function (err, data) {
   var result = result.replace(/return \{/g, 'return {target: "electron-renderer",');
 
   fs.writeFile(f_angular, result, 'utf8', function (err) {
+    console.log('deaddddddddddddddddddd2');
     if (err) return console.log(err);
   });
 });
