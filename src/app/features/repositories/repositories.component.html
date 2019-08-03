@@ -1,6 +1,18 @@
 <div class="repo-container">
   <gitme-side-bar class="sidebar-ng"></gitme-side-bar>
-  <div class="router-ng">
+  <div class="router-ng container-fluid">
+    <div class="top-bar col-12 row overflow-scroll">
+      <div class="changes btn-raw selected">
+        Changes
+      </div>
+      <div class="history-chanegs btn-raw">
+        History
+      </div>
+      <div class="btn-raw setting btn-circle">
+        <i class="fas fa-cog"></i>
+      </div>
+    </div>
+
     <router-outlet></router-outlet>
   </div>
   <gitme-x-terminal class="x-terminal"></gitme-x-terminal>

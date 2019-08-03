@@ -11,7 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { ElectronService } from './shared/services/electron.service';
+import { ElectronService } from './services/sysem/electron.service';
 
 import { WebviewDirective } from './shared/directives/webview.directive';
 
@@ -21,7 +21,7 @@ import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { AppConfig } from '../environments/environment';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
-import { LocalStorageService } from './shared/services/localStorage.service';
+import { LocalStorageService } from './services/sysem/localStorage.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

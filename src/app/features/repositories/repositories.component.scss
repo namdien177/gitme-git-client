@@ -1,3 +1,5 @@
+@import "src/styles/theme";
+
 .repo-container {
   position: relative;
 
@@ -15,6 +17,42 @@
 
   .router-ng {
     grid-area: router-ng;
+
+    .top-bar {
+      height: 44px;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: visible;
+
+      > .btn-raw:not(.setting) {
+        margin-right: 0.5rem;
+        min-width: 120px;
+      }
+
+      > .btn-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+      }
+
+      .btn-raw {
+        border: none;
+        background-color: transparent;
+        color: $background-primary-lighter-hover-night;
+
+        &:hover, &.selected {
+          background-color: $background-primary-lighter-hover-night;
+          color: white;
+        }
+      }
+    }
+
+    &.container-fluid {
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
   }
 
   .x-terminal {

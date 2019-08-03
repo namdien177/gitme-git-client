@@ -3,6 +3,7 @@ import { XTerminalStore } from './x-terminal.store';
 import { XTerminalQuery } from './x-terminal.query';
 import { IDisposable as xtermIDisposable, Terminal } from 'xterm';
 import * as os from 'os';
+import * as nodePty from 'node-pty';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -12,7 +13,7 @@ export class XTerminalService {
 
   private isResizing: Subject<any> = new Subject<any>();
 
-  private pty;
+  private pty: typeof nodePty;
 
   private ptyDataListener = null;
   private xtermDataListener: xtermIDisposable = null;

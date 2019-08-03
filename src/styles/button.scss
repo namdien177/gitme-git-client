@@ -1,4 +1,4 @@
-button.rounded-btn {
+.rounded-btn {
   border-radius: 50%;
   font-size: 0.8rem;
   line-height: 0.8rem;
@@ -8,4 +8,17 @@ button.rounded-btn {
   border: none;
   min-height: 2.2rem;
   min-width: 2.2rem;
+}
+
+.btn-raw {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  line-height: 0.9rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
 }
