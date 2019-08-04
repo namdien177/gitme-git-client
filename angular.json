@@ -6,6 +6,12 @@
     "angular-electron": {
       "root": "",
       "sourceRoot": "src",
+      "prefix": "gitme",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "projectType": "application",
       "architect": {
         "build": {

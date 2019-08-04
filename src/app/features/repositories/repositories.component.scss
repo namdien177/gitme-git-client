@@ -1,23 +1,20 @@
-.repo-container {
+@import "src/styles/theme";
+
+:host {
   position: relative;
 
   display: grid;
-  grid-template-areas: 'sidebar-ng router-ng' 'terminal terminal';
-  grid-template-rows: minmax(520px, calc(100vh - 64px)) max-content;
-  grid-template-columns: minmax(250px, 350px) auto;
+  grid-template-areas: 'navigation-bar' 'router-ng';
+  grid-template-rows: 76px auto;
+  grid-template-columns: 1fr;
   grid-gap: 0;
   height: 100%;
-
-  .sidebar-ng {
-    grid-area: sidebar-ng;
-
-  }
 
   .router-ng {
     grid-area: router-ng;
   }
 
-  .x-terminal {
-    grid-area: terminal;
+  .navigation-bar {
+    grid-area: navigation-bar;
   }
 }

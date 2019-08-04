@@ -1,47 +1,57 @@
 @import "src/styles/theme";
 
+:host {
+  position: fixed;
+  top: 108px;
+  left: 0;
+  bottom: 0;
+  width: 300px;
+  background-color: $background-secondary-night;
+  z-index: 10050;
+  box-shadow: $shadow-light;
+  padding: 0;
+}
+
 .container-fluid {
   display: grid;
+  grid-template-areas: 'search' 'action' 'list';
   grid-template-columns: 1fr;
-  grid-template-rows: 44px 4rem auto;
-  height: calc(100vh - 64px);
+  grid-template-rows: max-content max-content auto;
+  height: 100%;
   grid-gap: 1rem;
-  padding-top: 15px;
+  padding: 0;
 
-  .current-ng {
-    padding-right: 10px;
+  .repoAction {
+    grid-area: action;
+    padding: 0 1rem;
   }
 
   .list-repositories {
-    padding-bottom: 0;
-    padding-right: 0;
+    grid-area: list;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
 
-    .list-repos {
-      padding-right: 4px;
-      overflow: auto;
-      padding-bottom: 1rem;
-      height: 100%;
+    .repo {
+      margin-bottom: 0.5rem;
     }
   }
-}
 
-.block-repo {
-  position: relative;
-  padding-top: 1.7rem;
-  padding-left: 0;
-  min-height: 2.3rem;
-  display: flex;
-  flex-direction: column;
+  .search-repositories {
+    grid-area: search;
+    display: flex;
+    flex-direction: column;
 
-  .title-block {
-    position: absolute;
-    left: 0;
-    top: calc(1.7rem / 2);
-    transform: translateY(-50%);
-    margin: 0;
+    input.search {
+      background: transparent;
+      border: none;
+      box-shadow: none;
 
-    font-size: 0.8rem;
-    color: #c3c3c3;
-    user-select: none;
+      :focus {
+        background: rgba(0, 0, 0, 0.2);
+      }
+    }
   }
 }

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
-import { ElectronService } from '../services/electron.service';
-import { LocalStorageService } from '../services/localStorage.service';
+import { ElectronService } from '../../services/sysem/electron.service';
+import { LocalStorageService } from '../../services/sysem/localStorage.service';
 
 const importModules = [];
 const exportModules = [];
