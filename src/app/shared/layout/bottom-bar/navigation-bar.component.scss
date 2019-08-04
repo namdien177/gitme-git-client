@@ -1,0 +1,99 @@
+@import "src/styles/theme";
+
+:host {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-areas: 'selection branches actions';
+  grid-template-columns: 301px 301px minmax(200px, auto);
+  grid-template-rows: 1fr;
+  grid-gap: 0;
+  box-shadow: $shadow-light;
+
+  .function {
+    background-color: $background-secondary-night;
+    cursor: pointer;
+    user-select: none;
+
+    &:not(:last-child) {
+      border-right: 1px solid $background-primary-night;
+    }
+
+    display: grid;
+    align-items: center;
+    padding: 1rem;
+
+    &.repo-selection {
+      padding: 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto 50px;
+      grid-template-rows: 100%;
+      grid-gap: 0;
+      position: relative;
+
+      > * {
+        padding: 0.5rem;
+      }
+
+      .repo-name {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .repo-setting {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
+
+    &.repo-branches, &.repo-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+
+      .title {
+        display: grid;
+        grid-template-columns: auto max-content;
+        grid-gap: 0.5rem;
+        width: 100%;
+
+        .text-nowrap {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .status, .title-secondary {
+      font-size: 0.7rem;
+      line-height: 0.7rem;
+      display: flex;
+      align-items: center;
+
+      .badge {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.6rem;
+        line-height: 0.6rem;
+
+        &:not(:first-child) {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+  }
+}

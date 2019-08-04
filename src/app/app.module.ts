@@ -22,6 +22,7 @@ import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { AppConfig } from '../environments/environment';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/sysem/localStorage.service';
+import { NavigationBarComponent } from './shared/layout/bottom-bar/navigation-bar.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

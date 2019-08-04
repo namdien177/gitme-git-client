@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { RepositoriesRoutingModule } from './repositories-routing.module';
 import { RepositoriesComponent } from './repositories.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { SideBarModule } from '../../shared/layout/side-bar/side-bar.module';
 import { CoreModule } from '../../shared/modules/core.module';
 import { XTerminalModule } from '../../shared/layout/x-terminal/x-terminal.module';
 import { RepoChangesComponent } from './dashboard/repo-changes/repo-changes.component';
 import { RepoHistoryComponent } from './repo-history/repo-history.component';
 import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
+import { NavigationBarModule } from '../../shared/layout/bottom-bar/navigation-bar.module';
+import { RepoBranchesComponent } from './repo-branches/repo-branches.component';
 
 const declareComps = [
   RepositoriesComponent,
@@ -21,14 +22,15 @@ const declareComps = [
     ...declareComps,
     RepoChangesComponent,
     RepoHistoryComponent,
-    RepoSettingsComponent
+    RepoSettingsComponent,
+    RepoBranchesComponent
   ],
   imports: [
     CommonModule,
-    SideBarModule,
     XTerminalModule,
     CoreModule,
-    RepositoriesRoutingModule
+    RepositoriesRoutingModule,
+    NavigationBarModule
   ]
 })
 export class RepositoriesModule {
