@@ -23,6 +23,7 @@ import { AppConfig } from '../environments/environment';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/sysem/localStorage.service';
 import { NavigationBarComponent } from './shared/layout/bottom-bar/navigation-bar.component';
+import { RepoAddComponent } from './features/repo-add/repo-add.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -38,6 +39,7 @@ const declareComps = [
 @NgModule({
   declarations: [
     ...declareComps,
+    RepoAddComponent,
   ],
   imports: [
     BrowserModule,
