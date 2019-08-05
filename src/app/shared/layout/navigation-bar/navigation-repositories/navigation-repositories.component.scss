@@ -6,9 +6,8 @@
   left: 0;
   bottom: 0;
   width: 300px;
-  background-color: $background-secondary-night;
+  background-color: $background-primary-night-selected;
   z-index: 10050;
-  box-shadow: $shadow-light;
   padding: 0;
 }
 
@@ -49,7 +48,7 @@
       border: none;
       box-shadow: none;
 
-      :focus {
+      &:focus {
         background: rgba(0, 0, 0, 0.2);
       }
     }

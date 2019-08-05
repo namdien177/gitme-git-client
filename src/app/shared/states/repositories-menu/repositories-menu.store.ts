@@ -3,7 +3,8 @@ import { Store, StoreConfig } from '@datorama/akita';
 
 export interface RepositoriesMenuState {
   is_available: boolean;
-  is_open: boolean;
+  is_repository_open: boolean;
+  is_branch_open: boolean;
   repo?: {
     id: string,
     provider: string,
@@ -13,7 +14,8 @@ export interface RepositoriesMenuState {
 export function createInitialState(): RepositoriesMenuState {
   return {
     is_available: true,
-    is_open: true
+    is_repository_open: false,
+    is_branch_open: false
   };
 }
 

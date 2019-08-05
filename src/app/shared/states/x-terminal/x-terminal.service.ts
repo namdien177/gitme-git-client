@@ -3,17 +3,17 @@ import { XTerminalStore } from './x-terminal.store';
 import { XTerminalQuery } from './x-terminal.query';
 import { IDisposable as xtermIDisposable, Terminal } from 'xterm';
 import * as os from 'os';
-import * as nodePty from 'node-pty';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { nodePty, TypeNodePTY } from '../../types/types.electron';
 
 @Injectable({ providedIn: 'root' })
 export class XTerminalService {
 
   private isResizing: Subject<any> = new Subject<any>();
 
-  private pty: typeof nodePty;
+  private pty: TypeNodePTY;
 
   private ptyDataListener = null;
   private xtermDataListener: xtermIDisposable = null;
@@ -23,7 +23,7 @@ export class XTerminalService {
     private xTerminalStore: XTerminalStore,
     private xTerminalQuery: XTerminalQuery,
   ) {
-    this.pty = window.require('node-pty');
+    this.pty = nodePty;
 
     this.isResizing.pipe(
       debounceTime(20),

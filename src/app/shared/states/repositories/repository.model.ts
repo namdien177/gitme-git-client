@@ -1,11 +1,7 @@
-import { ID } from '@datorama/akita';
-
 export interface Repository {
-  id: ID;
+  id: number;
 }
 
 export function createRepository(params: Partial<Repository>) {
-  return {
-
-  } as Repository;
+  return {} as Repository;
 }

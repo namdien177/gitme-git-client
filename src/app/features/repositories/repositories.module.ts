@@ -9,8 +9,7 @@ import { XTerminalModule } from '../../shared/layout/x-terminal/x-terminal.modul
 import { RepoChangesComponent } from './dashboard/repo-changes/repo-changes.component';
 import { RepoHistoryComponent } from './repo-history/repo-history.component';
 import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
-import { NavigationBarModule } from '../../shared/layout/bottom-bar/navigation-bar.module';
-import { RepoBranchesComponent } from './repo-branches/repo-branches.component';
+import { NavigationBarModule } from '../../shared/layout/navigation-bar/navigation-bar.module';
 
 const declareComps = [
   RepositoriesComponent,
@@ -23,8 +22,8 @@ const declareComps = [
     RepoChangesComponent,
     RepoHistoryComponent,
     RepoSettingsComponent,
-    RepoBranchesComponent
   ],
+  exports: [],
   imports: [
     CommonModule,
     XTerminalModule,
