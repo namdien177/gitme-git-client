@@ -4,9 +4,9 @@
   position: relative;
 
   display: grid;
-  grid-template-areas: 'navigation-bar' 'router-ng';
-  grid-template-rows: 76px auto;
-  grid-template-columns: 1fr;
+  grid-template-areas: 'navigation-bar router-ng';
+  grid-template-rows: 1fr;
+  grid-template-columns: 300px auto;
   grid-gap: 0;
   height: 100%;
 

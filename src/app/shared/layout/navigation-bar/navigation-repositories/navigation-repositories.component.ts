@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery } from '../../states/repositories-menu';
+import { RepositoriesMenuQuery } from '../../../states/repositories-menu';
 
 @Component({
-  selector: 'gitme-side-bar',
-  templateUrl: './side-bar.component.html',
-  styleUrls: ['./side-bar.component.scss']
+  selector: 'gitme-navigation-repositories',
+  templateUrl: './navigation-repositories.component.html',
+  styleUrls: ['./navigation-repositories.component.scss']
 })
-export class SideBarComponent implements OnInit {
+export class NavigationRepositoriesComponent implements OnInit {
 
   // repositories: Observable<RepositoriesState>;
 

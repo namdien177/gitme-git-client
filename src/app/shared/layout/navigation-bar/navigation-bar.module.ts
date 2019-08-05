@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CoreModule } from '../../modules/core.module';
 import { NavigationBarComponent } from './navigation-bar.component';
-import { SideBarModule } from '../side-bar/side-bar.module';
+import { NavigationRepositoryModule } from './navigation-repositories/navigation-repository.module';
+import { NavigationBranchModule } from './navigation-branches/navigation-branch.module';
 
 const declareComps = [
   NavigationBarComponent,
@@ -18,7 +19,8 @@ const declareComps = [
   imports: [
     CommonModule,
     CoreModule,
-    SideBarModule
+    NavigationRepositoryModule,
+    NavigationBranchModule
   ],
 })
 export class NavigationBarModule {

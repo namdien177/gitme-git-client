@@ -1,4 +1,11 @@
 <div class="container-fluid">
+  <div class="search-repositories">
+    <input class="form-control search"
+           mdbInput
+           placeholder="Find local repo"
+           type="text">
+    <hr class="m-0 p-0">
+  </div>
 
   <div class="repoAction">
     <button [color]="'success'"
@@ -13,8 +20,8 @@
   </div>
 
   <div class="list-repositories">
-<!--    <gitme-repository-item *ngFor="let repo of repositories | async"-->
-<!--      class="repo"></gitme-repository-item>-->
+    <!--    <gitme-repository-item *ngFor="let repo of repositories | async"-->
+    <!--      class="repo"></gitme-repository-item>-->
     <gitme-repository-item class="repo"></gitme-repository-item>
     <gitme-repository-item class="repo"></gitme-repository-item>
     <gitme-repository-item class="repo"></gitme-repository-item>
@@ -40,13 +47,5 @@
     <gitme-repository-item class="repo"></gitme-repository-item>
     <gitme-repository-item class="repo"></gitme-repository-item>
     <gitme-repository-item class="repo"></gitme-repository-item>
-  </div>
-
-  <div class="search-repositories">
-    <input class="form-control search"
-           mdbInput
-           placeholder="Find local repo"
-           type="text">
-    <hr class="m-0 p-0">
   </div>
 </div>

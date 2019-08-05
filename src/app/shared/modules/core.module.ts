@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { ElectronService } from '../../services/sysem/electron.service';
 import { LocalStorageService } from '../../services/sysem/localStorage.service';
+import { ClickOutSideDirective, OverCountedDirective, ReactiveEllipsisDirective, SimpleEllipsisDirective } from '../directives';
 
 const importModules = [];
 const exportModules = [];
 
 const reExportModules = [
-  MDBBootstrapModule
+  MDBBootstrapModule,
 ];
 
 const providers = [
@@ -16,7 +17,12 @@ const providers = [
   LocalStorageService
 ];
 
-const declareComps = [];
+const declareComps = [
+  ClickOutSideDirective,
+  OverCountedDirective,
+  SimpleEllipsisDirective,
+  ReactiveEllipsisDirective
+];
 
 @NgModule({
   declarations: [
@@ -32,7 +38,8 @@ const declareComps = [];
   ],
   exports: [
     ...exportModules,
-    ...reExportModules
+    ...reExportModules,
+    ClickOutSideDirective
   ]
 })
 export class CoreModule {

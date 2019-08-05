@@ -18,12 +18,12 @@ import { WebviewDirective } from './shared/directives/webview.directive';
 import { AppComponent } from './app.component';
 import { WindowsFrameComponent } from './shared/layout/windows-frame/windows-frame.component';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
-import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
+// import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { AppConfig } from '../environments/environment';
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/sysem/localStorage.service';
-import { NavigationBarComponent } from './shared/layout/bottom-bar/navigation-bar.component';
 import { RepoAddComponent } from './features/repo-add/repo-add.component';
+import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
