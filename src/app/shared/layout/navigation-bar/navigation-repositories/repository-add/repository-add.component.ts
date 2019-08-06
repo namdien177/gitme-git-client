@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { RepositoryState } from '../../../../states/repository';
-import { electronNG, electronNGTypeOf, nodePty, nodePtyTypeOf } from '../../../../types/types.electron';
+import { electronNG, nodePty, nodePtyTypeOf } from '../../../../types/types.electron';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'gitme-repository-add',
@@ -14,21 +15,38 @@ export class RepositoryAddComponent implements OnInit {
     cancel: boolean
   }> = new EventEmitter<any>();
 
-  private readonly pty: nodePtyTypeOf;
-  private readonly electron: electronNGTypeOf;
+  formRegisterRepository: FormGroup;
 
-  constructor() {
+  private readonly pty: nodePtyTypeOf;
+  private readonly electron: typeof electronNG.remote; // must use remote to access render time
+
+  constructor(
+    private formBuilder: FormBuilder
+  ) {
     this.pty = nodePty;
-    this.electron = electronNG;
+    this.electron = electronNG.remote;
+  }
+
+  get repo_https() {
+    return this.formRegisterRepository.get('repo_https');
+  }
+
+  get repo_dir() {
+    return this.formRegisterRepository.get('repo_dir');
   }
 
   ngOnInit() {
     console.log(this.pty);
-    console.log(this.electron);
+    console.log(this.electron.dialog);
+    this.formRegisterRepository = this.formBuilder.group({
+      repo_https: [''],
+      repo_dir: ['']
+    });
   }
 
   chooseDirectory() {
-    this.electron.dialog.showOpenDialog({
+    this.electron.dialog.showOpenDialog(this.electron.getCurrentWindow(), {
+      title: 'Choose clone repository',
       properties: ['openDirectory']
     }, (dir) => {
       console.log(dir);
