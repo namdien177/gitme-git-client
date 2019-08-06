@@ -2,16 +2,18 @@
      [class.open]="isRepositoryBoxOpen"
      appIsClickOutside
      class="function repo-selection">
-  <div (click)="toggleRepositoryBox()" class="repo-name">
-    <div class="title-secondary text-muted">
-      Current Repository
+  <div class="inner-title feature-right">
+    <div (click)="toggleRepositoryBox()" class="main-function">
+      <div class="title-secondary text-muted">
+        Current Repository
+      </div>
+      <div class="title">
+        gitme-git-client
+      </div>
     </div>
-    <div class="title">
-      gitme-git-client
+    <div class="right-feature">
+      <i class="fas fa-cog"></i>
     </div>
-  </div>
-  <div class="repo-setting">
-    <i class="fas fa-cog"></i>
   </div>
 
   <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"
@@ -22,14 +24,14 @@
      [class.open]="isBranchBoxOpen"
      appIsClickOutside
      class="function repo-branches">
-  <div (click)="toggleBranchBox()" class="cursor-pointer">
+  <div (click)="toggleBranchBox()" class="inner-title raw">
     <div class="title-secondary text-muted">
       Current Branch
     </div>
-    <div class="title">
-    <span class="text-nowrap">
-      branch Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, id!
-    </span>
+    <div class="title feature-right">
+      <span class="text-nowrap">
+        branch Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, id!
+      </span>
       <div class="status">
         <div class="badge badge-pill badge-secondary bg-info pull-request">
           <i class="fas fa-angle-down"></i>
@@ -47,17 +49,19 @@
 </div>
 
 <div class="function repo-actions">
-  <div class="title-secondary text-muted">
-    git fetch origin
-  </div>
-  <div class="title">
+  <div class="inner-title raw">
+    <div class="title-secondary text-muted">
+      git fetch origin
+    </div>
+    <div class="title feature-right">
     <span class="text-nowrap">
       Fetch remote data
     </span>
-    <div class="status">
-      <div class="badge badge-pill badge-secondary bg-warning changes">
-        <i class="fas fa-file-invoice"></i>
-        2
+      <div class="status">
+        <div class="badge badge-pill badge-secondary bg-warning changes">
+          <i class="fas fa-file-invoice"></i>
+          2
+        </div>
       </div>
     </div>
   </div>
