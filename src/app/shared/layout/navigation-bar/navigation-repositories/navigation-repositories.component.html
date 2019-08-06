@@ -8,7 +8,8 @@
   </div>
 
   <div class="repoAction">
-    <button [color]="'success'"
+    <button (click)="addRepositoryDialogOn()"
+            [color]="'success'"
             [size]="'sm'"
             class="btn-block"
             mdbBtn
@@ -49,3 +50,6 @@
     <gitme-repository-item class="repo"></gitme-repository-item>
   </div>
 </div>
+
+<gitme-repository-add (closeStatus)="addRepositoryDialogListener($event)"
+                      *ngIf="isAddRepositoryDialogOn"></gitme-repository-add>

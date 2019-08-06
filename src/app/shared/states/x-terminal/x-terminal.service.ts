@@ -6,14 +6,14 @@ import * as os from 'os';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { nodePty, TypeNodePTY } from '../../types/types.electron';
+import { nodePty, nodePtyTypeOf } from '../../types/types.electron';
 
 @Injectable({ providedIn: 'root' })
 export class XTerminalService {
 
   private isResizing: Subject<any> = new Subject<any>();
 
-  private pty: TypeNodePTY;
+  private pty: nodePtyTypeOf;
 
   private ptyDataListener = null;
   private xtermDataListener: xtermIDisposable = null;

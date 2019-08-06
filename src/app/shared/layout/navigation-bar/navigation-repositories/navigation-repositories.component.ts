@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RepositoriesMenuQuery } from '../../../states/repositories-menu';
 import { RepositoriesQuery, RepositoriesState } from '../../../states/repositories';
+import { RepositoryQuery, RepositoryService, RepositoryState } from '../../../states/repository';
 
 @Component({
   selector: 'gitme-navigation-repositories',
@@ -10,10 +11,13 @@ import { RepositoriesQuery, RepositoriesState } from '../../../states/repositori
 export class NavigationRepositoriesComponent implements OnInit {
 
   repositories: RepositoriesState = [];
+  isAddRepositoryDialogOn = false;
 
   constructor(
-    private repositoryQuery: RepositoriesQuery,
-    private repoMenu: RepositoriesMenuQuery
+    private repositoriesQuery: RepositoriesQuery,
+    private repoMenu: RepositoriesMenuQuery,
+    private repositoryQuery: RepositoryQuery,
+    private repositoryService: RepositoryService,
   ) {
   }
 
@@ -22,10 +26,22 @@ export class NavigationRepositoriesComponent implements OnInit {
       console.log(e);
     });
 
-    this.repositoryQuery.selectAll().pipe().subscribe(listRepos => {
+    this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
       this.repositories = listRepos;
       console.log(listRepos);
-    })
+    });
   }
 
+  addRepositoryDialogOn() {
+    this.isAddRepositoryDialogOn = true;
+  }
+
+  addRepositoryDialogListener(closeStatus: { repository: RepositoryState; cancel: boolean }) {
+    console.log(closeStatus);
+    if (closeStatus.cancel) {
+      this.isAddRepositoryDialogOn = false;
+      return;
+    }
+    console.log(closeStatus);
+  }
 }

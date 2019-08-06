@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { NavigationRepositoriesComponent } from './navigation-repositories.component';
 import { RepositoryItemComponent } from '../../../components/repository-item/repository-item.component';
 import { CoreModule } from '../../../modules/core.module';
+import { RepositoryAddComponent } from './repository-add/repository-add.component';
 
 const declareComps = [
   NavigationRepositoriesComponent,
   RepositoryItemComponent,
+  RepositoryAddComponent
 ];
 
 @NgModule({
@@ -17,6 +19,7 @@ const declareComps = [
     CommonModule,
     CoreModule
   ],
+  providers: [],
   exports: [
     ...declareComps
   ]
