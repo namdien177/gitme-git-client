@@ -4,12 +4,15 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { ElectronService } from '../../services/sysem/electron.service';
 import { LocalStorageService } from '../../services/sysem/localStorage.service';
 import { ClickOutSideDirective, OverCountedDirective, ReactiveEllipsisDirective, SimpleEllipsisDirective } from '../directives';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const importModules = [];
 const exportModules = [];
 
 const reExportModules = [
   MDBBootstrapModule,
+  FormsModule,
+  ReactiveFormsModule
 ];
 
 const providers = [

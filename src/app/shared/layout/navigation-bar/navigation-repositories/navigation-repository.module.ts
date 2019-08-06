@@ -4,6 +4,7 @@ import { NavigationRepositoriesComponent } from './navigation-repositories.compo
 import { RepositoryItemComponent } from '../../../components/repository-item/repository-item.component';
 import { CoreModule } from '../../../modules/core.module';
 import { RepositoryAddComponent } from './repository-add/repository-add.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const declareComps = [
   NavigationRepositoriesComponent,
@@ -17,7 +18,7 @@ const declareComps = [
   ],
   imports: [
     CommonModule,
-    CoreModule
+    CoreModule,
   ],
   providers: [],
   exports: [
