@@ -10,6 +10,12 @@
   grid-gap: 0;
   box-shadow: $shadow-light;
 
+  > * {
+    &:not(:last-child) {
+      border-bottom: 1px solid $background-primary-night;
+    }
+  }
+
   .function {
     background-color: $background-secondary-night;
     user-select: none;
