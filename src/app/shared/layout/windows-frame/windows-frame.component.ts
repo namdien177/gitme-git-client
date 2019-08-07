@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ElectronService } from '../../../services/sysem/electron.service';
+import { ElectronService } from '../../../services/system/electron.service';
 
 @Component({
   selector: 'app-windows-frame',

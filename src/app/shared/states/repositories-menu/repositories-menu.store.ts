@@ -14,7 +14,7 @@ export interface RepositoriesMenuState {
 export function createInitialState(): RepositoriesMenuState {
   return {
     is_available: true,
-    is_repository_open: false,
+    is_repository_open: true,
     is_branch_open: false
   };
 }

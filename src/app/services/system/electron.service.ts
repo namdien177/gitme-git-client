@@ -4,18 +4,19 @@ import { Injectable } from '@angular/core';
 import { BrowserWindow, ipcRenderer, remote, webFrame } from 'electron';
 import { machineIdSync } from 'node-machine-id';
 import * as childProcess from 'child_process';
-import * as fs from 'fs';
 import * as os from 'os';
 import { LocalStorageService } from './localStorage.service';
+import { ELECTRON_APPS_UUID } from '../../common/define.common';
+import { electronNG, fsNode } from '../../shared/types/types.electron';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ElectronService {
 
   ipcRenderer: typeof ipcRenderer;
   webFrame: typeof webFrame;
   remote: typeof remote;
   childProcess: typeof childProcess;
-  fs: typeof fs;
+  fs: typeof fsNode;
   os: typeof os;
 
   private window: BrowserWindow;
@@ -26,13 +27,13 @@ export class ElectronService {
   ) {
     // Conditional imports
     if (this.isElectron()) {
-      this.ipcRenderer = window.require('electron').ipcRenderer;
-      this.webFrame = window.require('electron').webFrame;
-      this.remote = window.require('electron').remote;
-      this.window = window.require('electron').remote.getCurrentWindow();
+      this.ipcRenderer = electronNG.ipcRenderer;
+      this.webFrame = electronNG.webFrame;
+      this.remote = electronNG.remote;
+      this.window = electronNG.remote.getCurrentWindow();
 
       this.childProcess = window.require('child_process');
-      this.fs = window.require('fs');
+      this.fs = fsNode;
       this.machine_id = machineIdSync();
       this.setupUUID();
     }
@@ -53,12 +54,17 @@ export class ElectronService {
   }
 
   private setupUUID() {
-    const keyName = 'uuid';
-    if (this.localStorage.isSet(keyName)) {
-      this.localStorage.set(keyName, this.machine_id);
+    if (!this.localStorage.isAvailable(ELECTRON_APPS_UUID)) {
+      // warning first time access
+      console.warn('First time accessing application!');
+      console.warn('Automatically retrieve UUID machine');
+      this.localStorage.set(ELECTRON_APPS_UUID, this.machine_id);
     } else {
-      if (this.localStorage.get(keyName) !== this.machine_id) {
-        // warning first time access
+      if (this.localStorage.get(ELECTRON_APPS_UUID) !== this.machine_id) {
+        // warning sign in from unknown machine
+        console.warn('Detecting unknown machine!');
+        console.warn('Automatically retrieve and replace current UUID machine');
+        this.localStorage.set(ELECTRON_APPS_UUID, this.machine_id);
       }
     }
   }

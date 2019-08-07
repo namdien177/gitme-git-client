@@ -11,7 +11,7 @@ import { RepositoryQuery, RepositoryService, RepositoryState } from '../../../st
 export class NavigationRepositoriesComponent implements OnInit {
 
   repositories: RepositoriesState = [];
-  isAddRepositoryDialogOn = false;
+  isAddRepositoryDialogOn = true;
 
   constructor(
     private repositoriesQuery: RepositoriesQuery,
@@ -28,7 +28,6 @@ export class NavigationRepositoriesComponent implements OnInit {
 
     this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
       this.repositories = listRepos;
-      console.log(listRepos);
     });
   }
 
@@ -37,7 +36,6 @@ export class NavigationRepositoriesComponent implements OnInit {
   }
 
   addRepositoryDialogListener(closeStatus: { repository: RepositoryState; cancel: boolean }) {
-    console.log(closeStatus);
     if (closeStatus.cancel) {
       this.isAddRepositoryDialogOn = false;
       return;

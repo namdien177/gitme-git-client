@@ -11,13 +11,62 @@
   background: rgba(0, 0, 0, 0.2);
 
   .body-modal {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto max-content;
+    grid-gap: 1rem;
     width: 450px;
-    height: 500px;
-    display: flex;
-    flex-direction: column;
+    height: max-content;
+    min-height: 350px;
     background: $background-primary-lighter-night;
     padding: 15px;
     border-radius: 0.5rem;
     box-shadow: $shadow-light;
+  }
+}
+
+.setup-form {
+  position: relative;
+
+  .first-step-repo {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.action-form {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.custom-form-control-feature {
+  display: grid;
+  grid-template-columns: auto 38px;
+  grid-template-rows: 1fr;
+  grid-gap: 0;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+
+  .illuminate_area {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding-left: 0.75rem;
+    overflow: auto;
+    white-space: nowrap;
+
+    &:hover {
+      background: $background-primary-night-selected;
+    }
+  }
+
+  .directory_copy {
+    display: grid;
+    place-content: center;
+
+    &:hover {
+      background: $background-primary-night-selected;
+    }
   }
 }
