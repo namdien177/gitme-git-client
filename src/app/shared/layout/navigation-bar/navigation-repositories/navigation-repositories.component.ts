@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery } from '../../../states/repositories-menu';
+import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/repositories-menu';
 import { RepositoriesQuery, RepositoriesState } from '../../../states/repositories';
-import { RepositoryQuery, RepositoryService, RepositoryState } from '../../../states/repository';
+import { RepositoryQuery, RepositoryService } from '../../../states/repository';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'gitme-navigation-repositories',
@@ -11,20 +12,23 @@ import { RepositoryQuery, RepositoryService, RepositoryState } from '../../../st
 export class NavigationRepositoriesComponent implements OnInit {
 
   repositories: RepositoriesState = [];
-  isAddRepositoryDialogOn = true;
+  isAddRepositoryDialogOn: Observable<boolean>;
 
   constructor(
     private repositoriesQuery: RepositoriesQuery,
-    private repoMenu: RepositoriesMenuQuery,
+    private repositoriesMenuQuery: RepositoriesMenuQuery,
+    private repositoriesMenuService: RepositoriesMenuService,
     private repositoryQuery: RepositoryQuery,
     private repositoryService: RepositoryService,
   ) {
   }
 
   ngOnInit() {
-    this.repoMenu.select().subscribe(e => {
+    this.repositoriesMenuQuery.select().subscribe(e => {
       console.log(e);
     });
+
+    this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_add_open);
 
     this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
       this.repositories = listRepos;
@@ -32,14 +36,6 @@ export class NavigationRepositoriesComponent implements OnInit {
   }
 
   addRepositoryDialogOn() {
-    this.isAddRepositoryDialogOn = true;
-  }
-
-  addRepositoryDialogListener(closeStatus: { repository: RepositoryState; cancel: boolean }) {
-    if (closeStatus.cancel) {
-      this.isAddRepositoryDialogOn = false;
-      return;
-    }
-    console.log(closeStatus);
+    this.repositoriesMenuService.openRepositoryAddDialog();
   }
 }

@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as process from 'process';
 import * as child_process from 'child_process';
+import * as util from 'util';
 
 /**
  * Node-Pty instance in angular compile runtime
@@ -26,6 +27,7 @@ export type electronNGTypeOf = typeof electron;
 /**
  * NodeJS packages
  */
+export const utilNode: typeof util = window.require('util');
 export const cryptoNode: typeof crypto = window.require('crypto');
 export const zlibNode: typeof zlib = window.require('zlib');
 export const fsNode: typeof fs = window.require('fs');

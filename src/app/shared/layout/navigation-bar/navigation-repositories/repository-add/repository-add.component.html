@@ -32,10 +32,12 @@
     </div>
   </form>
   <div class="action-form">
-    <button [size]="'sm'" class="btn-warning bg-transparent mr-1" mdbBtn>
+    <button (click)="cancelAdding(true)"
+            [size]="'sm'"
+            class="btn-warning bg-transparent mr-1" mdbBtn>
       Cancel
     </button>
-    <button [size]="'sm'" class="btn-default bg-transparent mr-1" mdbBtn>
+    <button (click)="test()" [size]="'sm'" class="btn-default bg-transparent mr-1" mdbBtn>
       Previous
     </button>
     <button [size]="'sm'" class="btn-info" mdbBtn>

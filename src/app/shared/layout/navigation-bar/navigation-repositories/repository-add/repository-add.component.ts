@@ -3,6 +3,9 @@ import { RepositoryState } from '../../../../states/repository';
 import { electronNG, nodePty, nodePtyTypeOf, osNode } from '../../../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UtilityService } from '../../../../utilities/utility.service';
+import { RepositoriesMenuService } from '../../../../states/repositories-menu';
+import { GitPackService } from '../../../../../services/features/git-pack.service';
+import { FileSystemService } from '../../../../../services/system/fileSystem.service';
 
 @Component({
   selector: 'gitme-repository-add',
@@ -36,6 +39,9 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
   constructor(
     private formBuilder: FormBuilder,
     private utilityService: UtilityService,
+    private repositoriesMenuService: RepositoriesMenuService,
+    private gitPackService: GitPackService,
+    private fileSystemService: FileSystemService,
     private cd: ChangeDetectorRef
   ) {
     this.pty = nodePty;
@@ -88,10 +94,7 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
 
   cancelAdding(isOutSide: boolean = false) {
     if (isOutSide) {
-      this.closeStatus.emit({
-        repository: null,
-        cancel: true
-      });
+      this.repositoriesMenuService.closeRepositoryAddDialog();
     }
   }
 
@@ -121,5 +124,37 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
       this.repo_dir_display.setValue(dirDisplay);
       this.cd.detectChanges();
     }
+  }
+
+  test() {
+    // const safeHTTPS = this.repo_https.value;
+    // const directory = this.utilityService.directorySafePath(this.repo_dir.value);
+    //
+    // if (!safeHTTPS) {
+    //   return;
+    // }
+    // const credentials: GitCredentials = {
+    //   username: 'do.hoangnam9x@gmail.com',
+    //   password: 'CA8Z2joN4MEu'
+    // };
+    // this.gitPackService.cloneTo(safeHTTPS, directory, credentials)
+    // .then(data => {
+    //     console.log(data);
+    //   },
+    //   err => {
+    //     console.log(err);
+    //   });
+
+    console.log('start');
+    this.fileSystemService.getFileContext(
+      'test',
+      '/user/'
+    ).then(resolve => {
+      console.log(resolve);
+    }, error => {
+      console.log(error);
+    }).finally(() => {
+      console.log('done');
+    });
   }
 }

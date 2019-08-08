@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GitCredentials } from '../model/git-credentials.model';
 
 
 @Injectable()
@@ -66,10 +67,19 @@ export class UtilityService {
     let finalDir = '';
     strSplit.forEach(arrDir => {
       if (arrDir.includes(' ')) {
-        finalDir += '\'' + arrDir + '\'' + '\\';
+        if (arrDir.indexOf('\'') === -1) {
+          finalDir += '\'' + arrDir + '\'';
+        } else {
+          if (arrDir.indexOf('\'') === 0) {
+            finalDir += '\'' + arrDir;
+          } else if (arrDir.charAt(arrDir.length - 1) !== '\'') {
+            finalDir += arrDir + '\'';
+          }
+        }
       } else {
-        finalDir += arrDir + '\\';
+        finalDir += arrDir;
       }
+      finalDir += '\\';
     });
     return finalDir;
   }
@@ -87,5 +97,24 @@ export class UtilityService {
     console.log(strSplit);
     console.log(removeDotGit);
     return removeDotGit;
+  }
+
+  addCredentialsToRemote(remoteURL: string, credentials: GitCredentials, isHTTPS: boolean = true) {
+    if (isHTTPS) {
+      const splitStr = remoteURL.split('//');
+      const userSafe = this.gitStringSafe(credentials.username);
+      const pwdSafe = this.gitStringSafe(credentials.password);
+      let remoteCredentials = '';
+      splitStr.forEach((stringRemote, index) => {
+        remoteCredentials += stringRemote;
+        if (index !== splitStr.length - 1) {
+          remoteCredentials += '//';
+        }
+        if (index === 0) {
+          remoteCredentials += userSafe + ':' + pwdSafe + '@';
+        }
+      });
+      return remoteCredentials;
+    }
   }
 }

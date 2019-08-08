@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';
 import { UtilityService } from '../utilities/utility.service';
+import { GitPackService } from '../../services/features/git-pack.service';
 
 const importModules = [];
 const exportModules = [];
@@ -21,7 +22,8 @@ const providers = [
   LocalStorageService,
   SecurityService,
   FileSystemService,
-  UtilityService
+  UtilityService,
+  GitPackService
 ];
 
 const declareComps = [

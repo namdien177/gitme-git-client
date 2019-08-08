@@ -51,5 +51,4 @@
   </div>
 </div>
 
-<gitme-repository-add (closeStatus)="addRepositoryDialogListener($event)"
-                      *ngIf="isAddRepositoryDialogOn"></gitme-repository-add>
+<gitme-repository-add *ngIf="isAddRepositoryDialogOn | async"></gitme-repository-add>
