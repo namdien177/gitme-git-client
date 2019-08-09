@@ -20,7 +20,7 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
   }> = new EventEmitter<any>();
 
   formRegisterRepository: FormGroup;
-  repo_add_step1_verified = false;
+  directoryVerified = false;
   illuminateValue_dir: string = osNode.homedir();
 
   private readonly pty: nodePtyTypeOf;
@@ -35,6 +35,7 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
       password: ''
     }]
   };
+  isExistingAccount = true;
 
   constructor(
     private formBuilder: FormBuilder,

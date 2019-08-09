@@ -1,6 +1,6 @@
 <div class="body-modal">
   <form [formGroup]="formRegisterRepository" class="setup-form">
-    <div class="first-step-repo">
+    <div class="repository_directory">
       <div class="form-group">
         <label for="repo_https">Repository HTTP</label>
         <input class="form-control form-control-dark"
@@ -22,12 +22,48 @@
             <i class="fas fa-copy"></i>
           </div>
         </div>
-        <span *ngIf="repo_add_step1_verified" class="text-success">
-        Repository directory is clean
-      </span>
-        <span *ngIf="!repo_add_step1_verified" class="text-danger">
-        Repository directory is not clean!
-      </span>
+      </div>
+      <hr>
+      <h5>Repository credentials</h5>
+      <div class="row mb-3">
+        <div class="col">
+          <button (click)="isExistingAccount = true"
+                  [class.bg-dark]="!isExistingAccount"
+                  [class.bg-success]="isExistingAccount"
+                  block="true"
+                  class="text-white"
+                  mdbBtn size="sm">
+            Stored Account
+          </button>
+        </div>
+        <div class="col">
+          <button (click)="isExistingAccount = false"
+                  [class.bg-dark]="isExistingAccount"
+                  [class.bg-success]="!isExistingAccount"
+                  block="true"
+                  class="text-white"
+                  color="dark" mdbBtn size="sm">
+            New Account
+          </button>
+        </div>
+      </div>
+      <div class="card bg-transparent stored-account">
+        <div class="card-body row">
+          <div class="col-auto">
+            <div class="account-avatar">
+              <img alt="" src="">
+            </div>
+          </div>
+          <div class="col">
+            123
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="repository_account">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="form-control form-control-dark" id="username" name="username" type="text">
       </div>
     </div>
   </form>
@@ -37,11 +73,8 @@
             class="btn-warning bg-transparent mr-1" mdbBtn>
       Cancel
     </button>
-    <button (click)="test()" [size]="'sm'" class="btn-default bg-transparent mr-1" mdbBtn>
-      Previous
-    </button>
-    <button [size]="'sm'" class="btn-info" mdbBtn>
-      Setup account
+    <button [disabled]="!directoryVerified" [size]="'sm'" class="btn-info" mdbBtn>
+      Clone
     </button>
   </div>
 </div>
