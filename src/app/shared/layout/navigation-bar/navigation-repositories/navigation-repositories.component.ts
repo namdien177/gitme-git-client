@@ -13,6 +13,7 @@ export class NavigationRepositoriesComponent implements OnInit {
 
   repositories: RepositoriesState = [];
   isAddRepositoryDialogOn: Observable<boolean>;
+  isAddRepositoryActionOn = false;
 
   constructor(
     private repositoriesQuery: RepositoriesQuery,
@@ -24,7 +25,7 @@ export class NavigationRepositoriesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.repositoriesMenuQuery.select().subscribe(e => {
+    this.repositoryQuery.select().subscribe(e => {
       console.log(e);
     });
 
@@ -36,6 +37,7 @@ export class NavigationRepositoriesComponent implements OnInit {
   }
 
   addRepositoryDialogOn() {
+    this.isAddRepositoryActionOn = false;
     this.repositoriesMenuService.openRepositoryAddDialog();
   }
 }

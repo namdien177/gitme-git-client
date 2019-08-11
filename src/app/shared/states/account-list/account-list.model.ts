@@ -1,11 +1,11 @@
-import { ID } from '@datorama/akita';
-
 export interface AccountList {
-  id: ID;
+  id_local?: number;
+  username: string;
+  password: string;
+
+  [key: string]: any;
 }
 
 export function createAccountList(params: Partial<AccountList>) {
-  return {
-
-  } as AccountList;
+  return {} as AccountList;
 }

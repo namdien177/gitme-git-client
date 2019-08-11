@@ -74,14 +74,16 @@ export class FileSystemService {
    * @param data will be stringify when write to file if extension is .txt
    * @param directoryPath extra path to append. Must include slash to front and end
    * @param extension currently only accepting .txt or .json file. Much prefer `.json`.
+   * @param useRoot pre-appending %appdata% into the path
    */
   createFile(
     fileName: string,
     data: object | string,
     directoryPath: string = '/',
-    extension: '.json' | '.txt' = '.json'
+    extension: '.json' | '.txt' = '.json',
+    useRoot = true
   ) {
-    const rootStoreDir = this.ROOT;
+    const rootStoreDir = useRoot ? this.ROOT : '';
     const fileFullName = fileName + extension;
     const finalDir = rootStoreDir + directoryPath + fileFullName;
     if (!this.isDirectoryExist(rootStoreDir + directoryPath)) {
@@ -122,11 +124,7 @@ export class FileSystemService {
     const finalDir = rootStoreDir + directoryPath + fileFullName;
 
     if (!this.isFileExist(finalDir)) {
-      return new Promise((resolve, reject) => reject(new Object({
-        status: false,
-        message: 'File not exist', // for debugging purpose
-        value: null
-      })));
+      return this.promiseReturn(null, 'File not exist', false);
     }
 
     const readPromises = this.util.promisify(this.fs.readFile);
@@ -176,24 +174,43 @@ export class FileSystemService {
     const fileFullName = fileName + extension;
     const finalDir = rootStoreDir + directoryPath + fileFullName;
     if (!this.isDirectoryExist(rootStoreDir + directoryPath) || !this.isFileExist(finalDir)) {
-      return new Promise((resolve, reject) => reject(new Object({
-        status: false,
-        message: 'File or Directory is not existed' // for debugging purpose
-      })));
+      return this.promiseReturn(null, 'File or Directory is not existed', false);
     }
     const writePromises = this.util.promisify(this.fs.writeFile);
     const writeDataStatus = this.parsingData(data, extension);
     if (!writeDataStatus.valid) {
-      return new Promise((resolve, reject) => reject(new Object({
-        status: false,
-        message: writeDataStatus.data // for debugging purpose
-      })));
+      return this.promiseReturn(null, writeDataStatus.data, false);
     }
     return writePromises(finalDir, writeDataStatus.data);
   }
 
-  saveFileData() {
+  saveFileData(
+    fileName: string,
+    data: object | string,
+    directoryPath: string = '/',
+    extension: '.json' | '.txt' = '.json',
+    isForcing = true,
+    useRoot = true
+  ) {
+    const rootStoreDir = useRoot ? this.ROOT : '';
+    const fileFullName = fileName + extension;
+    const finalDir = rootStoreDir + directoryPath + fileFullName;
 
+    if (!this.isDirectoryExist(rootStoreDir + directoryPath)) {
+      if (isForcing) {
+        // @ts-ignore
+        this.fs.mkdirSync(rootStoreDir + directoryPath, { recursive: true });
+      } else {
+        return this.promiseReturn(null, 'File or Directory is not existed', false);
+      }
+    }
+
+    const writePromises = this.util.promisify(this.fs.writeFile);
+    const writeDataStatus = this.parsingData(data, extension);
+    if (!writeDataStatus.valid) {
+      return this.promiseReturn(null, writeDataStatus.data, false);
+    }
+    return writePromises(finalDir, writeDataStatus.data);
   }
 
   private parsingData(data: object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
@@ -215,5 +232,21 @@ export class FileSystemService {
       valid: true,
       data: writeData
     };
+  }
+
+  private promiseReturn(value: any, message: string, status: boolean = true): Promise<{ status: boolean, message: string, value: any }> {
+    if (status) {
+      return new Promise((resolve, reject) => resolve({
+        status: status,
+        message: message, // for debugging purpose
+        value: value
+      }));
+    } else {
+      return new Promise((resolve, reject) => reject({
+        status: status,
+        message: message, // for debugging purpose
+        value: value
+      }));
+    }
   }
 }

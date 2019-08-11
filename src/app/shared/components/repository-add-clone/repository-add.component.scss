@@ -8,7 +8,7 @@
   bottom: 0;
   display: grid;
   place-content: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: $transparent-backdrop;
 
   .body-modal {
     display: grid;
@@ -78,4 +78,31 @@
       background: $background-primary-night-selected;
     }
   }
+}
+
+.stored-account {
+  margin-bottom: 0.5rem;
+
+  .body-content {
+    padding: 0.5rem;
+    font-size: 12px;
+  }
+
+  .account-avatar {
+    overflow: hidden;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+}
+
+.register-new {
+  font-size: 12px;
 }

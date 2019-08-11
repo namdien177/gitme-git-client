@@ -6,10 +6,6 @@ export interface RepositoriesMenuState {
   is_repository_open: boolean;
   is_repository_add_open: boolean;
   is_branch_open: boolean;
-  repo?: {
-    id: string,
-    provider: string,
-  };
 }
 
 export function createInitialState(): RepositoriesMenuState {

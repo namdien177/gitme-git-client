@@ -1,11 +1,11 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { RepositoryState } from '../../../../states/repository';
-import { electronNG, nodePty, nodePtyTypeOf, osNode } from '../../../../types/types.electron';
+import { electronNG, nodePty, nodePtyTypeOf, osNode } from '../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { UtilityService } from '../../../../utilities/utility.service';
-import { RepositoriesMenuService } from '../../../../states/repositories-menu';
-import { GitPackService } from '../../../../../services/features/git-pack.service';
-import { FileSystemService } from '../../../../../services/system/fileSystem.service';
+import { UtilityService } from '../../utilities/utility.service';
+import { RepositoriesMenuService } from '../../states/repositories-menu';
+import { GitPackService } from '../../../services/features/git-pack.service';
+import { FileSystemService } from '../../../services/system/fileSystem.service';
+import { Repository } from '../../states/repositories';
 
 @Component({
   selector: 'gitme-repository-add',
@@ -15,14 +15,14 @@ import { FileSystemService } from '../../../../../services/system/fileSystem.ser
 export class RepositoryAddComponent implements OnInit, AfterViewInit {
 
   @Output() closeStatus: EventEmitter<{
-    repository: RepositoryState,
+    repository: Repository,
     cancel: boolean
   }> = new EventEmitter<any>();
 
   formRegisterRepository: FormGroup;
   directoryVerified = false;
   illuminateValue_dir: string = osNode.homedir();
-
+  isExistingAccount = true;
   private readonly pty: nodePtyTypeOf;
   private readonly electron: typeof electronNG.remote;
   private formFieldBuilder = {
@@ -35,7 +35,6 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
       password: ''
     }]
   };
-  isExistingAccount = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -146,16 +145,25 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
     //     console.log(err);
     //   });
 
-    console.log('start');
-    this.fileSystemService.getFileContext(
-      'test',
-      '/user/'
-    ).then(resolve => {
-      console.log(resolve);
-    }, error => {
-      console.log(error);
-    }).finally(() => {
-      console.log('done');
-    });
+    // console.log('start');
+    // this.fileSystemService.getFileContext(
+    //   'test',
+    //   '/user/'
+    // ).then(resolve => {
+    //   console.log(resolve);
+    // }, error => {
+    //   console.log(error);
+    // }).finally(() => {
+    //   console.log('done');
+    // });
+
+    this.gitPackService.allBranches('D:\\Projects\\Acomici\\acomici.com').then(
+      resolve => {
+        console.log(resolve);
+      },
+      reject => {
+        console.log(reject);
+      }
+    );
   }
 }

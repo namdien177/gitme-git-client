@@ -58,11 +58,6 @@ export class RepositoriesMenuService {
   }
 
   selectRepo(repo_id, repo_provider) {
-    this.repositoriesMenuStore.update({
-      repo: {
-        id: repo_id,
-        provider: repo_provider
-      }
-    });
+
   }
 }

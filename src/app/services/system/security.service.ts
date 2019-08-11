@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { cryptoNode, electronNG } from '../../shared/types/types.electron';
 import * as crypto from 'crypto';
 import { LocalStorageService } from './localStorage.service';
-import { ELECTRON_APPS_UUID } from '../../common/define.common';
+import { DefineCommon } from '../../common/define.common';
 
 @Injectable()
 export class SecurityService {
@@ -16,7 +16,7 @@ export class SecurityService {
   constructor(
     private localStorageService: LocalStorageService
   ) {
-    this.secretUUID = localStorageService.get(ELECTRON_APPS_UUID);
+    this.secretUUID = localStorageService.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME);
     this.instanceElectron = electronNG.remote;
     this.cryptoNode = cryptoNode;
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { RepositoryState, RepositoryStore } from './repository.store';
+import { RepositoryStore } from './repository.store';
 import { RepositoryQuery } from './repository.query';
+import { Repository } from '../repositories';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryService {
@@ -11,7 +12,7 @@ export class RepositoryService {
   ) {
   }
 
-  setRepository(repository: RepositoryState) {
+  setRepository(repository: Repository) {
     this.repositoryStore.update(repository);
   }
 
