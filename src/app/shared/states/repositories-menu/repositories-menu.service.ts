@@ -39,20 +39,40 @@ export class RepositoriesMenuService {
     });
   }
 
-  openRepositoryAddDialog() {
+  openRepositoryCloneDialog() {
     const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
     if (currentRepoOpen) {
       this.repositoriesMenuStore.update({
-        is_repository_add_open: true
+        is_repository_clone_open: true
       });
     }
   }
 
-  closeRepositoryAddDialog() {
+  closeRepositoryCloneDialog() {
     const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
     if (currentRepoOpen) {
       this.repositoriesMenuStore.update({
-        is_repository_add_open: false
+        is_repository_clone_open: false
+      });
+    }
+  }
+
+  openRepositoryAddLocalDialog() {
+    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+
+    if (currentRepoOpen) {
+      this.repositoriesMenuStore.update({
+        is_repository_addLocal_open: true
+      });
+    }
+  }
+
+  closeRepositoryAddLocalDialog() {
+    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+
+    if (currentRepoOpen) {
+      this.repositoriesMenuStore.update({
+        is_repository_addLocal_open: false
       });
     }
   }

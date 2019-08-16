@@ -16,7 +16,8 @@
   </div>
 
   <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"
-                                 class="list-repositories"></gitme-navigation-repositories>
+                                 class="list-repositories">
+  </gitme-navigation-repositories>
 </div>
 
 <div (isOutside)="clickOutSide($event, 'branches')"

@@ -1,29 +1,23 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { electronNG, nodePty, nodePtyTypeOf, osNode } from '../../types/types.electron';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { electronNG, osNode } from '../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UtilityService } from '../../utilities/utility.service';
 import { RepositoriesMenuService } from '../../states/repositories-menu';
 import { GitPackService } from '../../../services/features/git-pack.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
-import { Repository } from '../../states/repositories';
 
 @Component({
-  selector: 'gitme-repository-add',
-  templateUrl: './repository-add.component.html',
-  styleUrls: ['./repository-add.component.scss']
+  selector: 'gitme-repository-clone',
+  templateUrl: './repository-clone.component.html',
+  styleUrls: ['./repository-clone.component.scss']
 })
-export class RepositoryAddComponent implements OnInit, AfterViewInit {
-
-  @Output() closeStatus: EventEmitter<{
-    repository: Repository,
-    cancel: boolean
-  }> = new EventEmitter<any>();
+export class RepositoryCloneComponent implements OnInit, AfterViewInit {
 
   formRegisterRepository: FormGroup;
   directoryVerified = false;
   illuminateValue_dir: string = osNode.homedir();
   isExistingAccount = true;
-  private readonly pty: nodePtyTypeOf;
+
   private readonly electron: typeof electronNG.remote;
   private formFieldBuilder = {
     repo_https: [''],
@@ -44,7 +38,6 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
     private fileSystemService: FileSystemService,
     private cd: ChangeDetectorRef
   ) {
-    this.pty = nodePty;
     this.electron = electronNG.remote;
   }
 
@@ -94,7 +87,7 @@ export class RepositoryAddComponent implements OnInit, AfterViewInit {
 
   cancelAdding(isOutSide: boolean = false) {
     if (isOutSide) {
-      this.repositoriesMenuService.closeRepositoryAddDialog();
+      this.repositoriesMenuService.closeRepositoryCloneDialog();
     }
   }
 

@@ -33,4 +33,34 @@ export class GitPackService {
       console.log(reject);
     });
   }
+
+  isGitProject(directory: string) {
+    directory = this.utilities.directorySafePath(directory);
+    // directory = 'D:\\Projects\\Acomici\\acomici.com';
+    return git(directory).checkIsRepo();
+    // .then(value => {
+    //   if (value) {
+    //     git(directory).updateServerInfo().then(
+    //       val => console.log(val)
+    //     );
+    //     git(directory).status().then(
+    //       val => console.log(val)
+    //     );
+    //     // git(directory).show().then(
+    //     //   val => console.log(val)
+    //     // );
+    //     git(directory).branchLocal().then(
+    //       val => console.log(val)
+    //     );
+    //     git(directory).getRemotes(true).then(
+    //       val => console.log(val)
+    //     );
+    //     git(directory).branch(['-r']).then(
+    //       val => console.log(val)
+    //     );
+    //   }
+    //
+    //   return value;
+    // });
+  }
 }

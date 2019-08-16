@@ -12,8 +12,9 @@ import { Observable } from 'rxjs';
 export class NavigationRepositoriesComponent implements OnInit {
 
   repositories: RepositoriesState = [];
-  isAddRepositoryDialogOn: Observable<boolean>;
   isAddRepositoryActionOn = false;
+  isCloneRepositoryDialogOn: Observable<boolean>;
+  isAddRepositoryDialogOn: Observable<boolean>;
 
   constructor(
     private repositoriesQuery: RepositoriesQuery,
@@ -29,15 +30,21 @@ export class NavigationRepositoriesComponent implements OnInit {
       console.log(e);
     });
 
-    this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_add_open);
+    this.isCloneRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_clone_open);
+    this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_addLocal_open);
 
     this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
       this.repositories = listRepos;
     });
   }
 
-  addRepositoryDialogOn() {
+  cloneRepositoryDialogOn() {
     this.isAddRepositoryActionOn = false;
-    this.repositoriesMenuService.openRepositoryAddDialog();
+    this.repositoriesMenuService.openRepositoryCloneDialog();
+  }
+
+  addRepositoryDialog() {
+    this.isAddRepositoryActionOn = false;
+    this.repositoriesMenuService.openRepositoryAddLocalDialog();
   }
 }

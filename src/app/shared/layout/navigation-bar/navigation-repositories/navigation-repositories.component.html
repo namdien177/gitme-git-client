@@ -8,9 +8,9 @@
   </div>
 
   <div class="add-new-repository">
-    <button [color]="'success'"
+    <button (click)="isAddRepositoryActionOn = true"
+            [color]="'success'"
             [size]="'sm'"
-            (click)="isAddRepositoryActionOn = true"
             class="btn-block"
             mdbBtn
             rounded="true"
@@ -19,17 +19,17 @@
       New Repository
     </button>
 
-    <div class="add-new-repository-type" *ngIf="isAddRepositoryActionOn">
-      <div class="backdrop" (click)="isAddRepositoryActionOn = false"></div>
+    <div *ngIf="isAddRepositoryActionOn" class="add-new-repository-type">
+      <div (click)="isAddRepositoryActionOn = false" class="backdrop background-opacity-black"></div>
       <div class="choose-type-action">
-        <div (click)="addRepositoryDialogOn()" class="type">
+        <div (click)="cloneRepositoryDialogOn()" class="type">
           Clone from internet
           <br>
           <small class="text-muted">
             Currently supporting GitHub and GitLab
           </small>
         </div>
-        <div class="type">
+        <div (click)="addRepositoryDialog()" class="type">
           Add from local machine
           <br>
           <small class="text-muted">
@@ -78,4 +78,7 @@
   </div>
 </div>
 
-<gitme-repository-add *ngIf="isAddRepositoryDialogOn | async"></gitme-repository-add>
+<gitme-repository-clone *ngIf="isCloneRepositoryDialogOn | async">
+</gitme-repository-clone>
+<gitme-repository-add-local *ngIf="isAddRepositoryDialogOn | async">
+</gitme-repository-add-local>

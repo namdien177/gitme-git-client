@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RepositoryAddComponent } from './repository-add.component';
+import { RepositoryCloneComponent } from './repository-clone.component';
 
 describe('RepoAddComponent', () => {
-  let component: RepositoryAddComponent;
-  let fixture: ComponentFixture<RepositoryAddComponent>;
+  let component: RepositoryCloneComponent;
+  let fixture: ComponentFixture<RepositoryCloneComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [RepositoryAddComponent]
+      declarations: [RepositoryCloneComponent]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RepositoryAddComponent);
+    fixture = TestBed.createComponent(RepositoryCloneComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
