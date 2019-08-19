@@ -4,7 +4,7 @@ import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/states/account-list';
 
 @Injectable()
-export class GitPackService {
+export class GitService {
 
   constructor(
     private utilities: UtilityService

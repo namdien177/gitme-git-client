@@ -3,7 +3,7 @@ import { electronNG, osNode } from '../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UtilityService } from '../../utilities/utility.service';
 import { RepositoriesMenuService } from '../../states/repositories-menu';
-import { GitPackService } from '../../../services/features/git-pack.service';
+import { GitService } from '../../../services/features/git.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 
 @Component({
@@ -34,7 +34,7 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
     private formBuilder: FormBuilder,
     private utilityService: UtilityService,
     private repositoriesMenuService: RepositoriesMenuService,
-    private gitPackService: GitPackService,
+    private gitPackService: GitService,
     private fileSystemService: FileSystemService,
     private cd: ChangeDetectorRef
   ) {

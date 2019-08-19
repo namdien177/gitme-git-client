@@ -4,10 +4,14 @@
       {{repository?.name}}
     </div>
     <div class="status">
-      <div [title]="pullTitle" class="pull">
+      <div *ngIf="(repositoryObserve | async)?.behind > 0"
+           [title]="(repositoryObserve | async)?.behind + pullTitle"
+           class="pull">
         <div class="circle-status bg-info"></div>
       </div>
-      <div [title]="pushTitle" class="push">
+      <div *ngIf="(repositoryObserve | async)?.ahead > 0"
+           [title]="(repositoryObserve | async)?.ahead + pushTitle"
+           class="push">
         <div class="circle-status bg-success"></div>
       </div>
       <div *ngIf="(repositoryObserve | async)?.files.length > 0"

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Repository } from '../../states/repositories';
-import { GitPackService } from '../../../services/features/git-pack.service';
+import { GitService } from '../../../services/features/git.service';
 import { SecurityService } from '../../../services/system/security.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { StatusSummary } from '../../model/StatusSummary';
@@ -16,12 +16,12 @@ export class RepositoryItemComponent implements OnInit {
   @Input() repository: Repository;
   repositoryObserve: Observable<StatusSummary>;
 
-  pullTitle = '4 Pull request';
-  pushTitle = '4 Push request';
-  changesTitle = ' changes';
+  pullTitle = ' Pull request';
+  pushTitle = ' Push request';
+  changesTitle = ' File changes';
 
   constructor(
-    private gitService: GitPackService,
+    private gitService: GitService,
     private securityService: SecurityService,
     private fileSystem: FileSystemService
   ) {
@@ -42,6 +42,13 @@ export class RepositoryItemComponent implements OnInit {
       (resolve: StatusSummary) => {
         console.log(resolve);
         this.repositoryObserve = of(resolve);
+      }
+    );
+    this.gitService.git(this.repository.directory).raw(
+      ['remote show origin']
+    ).then(
+      resolve => {
+        console.log(resolve);
       }
     );
   }
