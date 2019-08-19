@@ -11,6 +11,8 @@ import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
 import * as moment from 'moment';
+import { RepositoriesService } from '../../shared/states/repositories';
+import { AccountListService } from '../../shared/states/account-list';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService {
@@ -28,10 +30,12 @@ export class ElectronService {
   constructor(
     private localStorage: LocalStorageService,
     private securityService: SecurityService,
-    private fileService: FileSystemService
+    private fileService: FileSystemService,
+    private repositoriesList: RepositoriesService,
+    private accountList: AccountListService
   ) {
     // Conditional imports
-    if (this.isElectron()) {
+    if (ElectronService.isElectron()) {
       this.ipcRenderer = electronNG.ipcRenderer;
       this.webFrame = electronNG.webFrame;
       this.remote = electronNG.remote;
@@ -42,7 +46,12 @@ export class ElectronService {
       this.machine_id = machineIdSync();
       this.setupUUID();
       this.initializeDatabase();
+      console.log(this.securityService.randomID);
     }
+  }
+
+  static isElectron() {
+    return window && window.process && window.process.type;
   }
 
   initializeDatabase() {
@@ -50,8 +59,8 @@ export class ElectronService {
      * Loading the configuration file
      */
     const configDefaultName = this.machine_id;
-    if (this.fileService.isFileExist(DefineCommon.DIR_CONFIG(configDefaultName))) {
-      // load to memory
+    if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
+      // load to memory repos and other settings
       console.log('Loading config from local machine');
       this.setupApplicationConfiguration(
         this.fileService.getFileContext(
@@ -79,17 +88,11 @@ export class ElectronService {
     }
   }
 
-  isElectron() {
-    return window && window.process && window.process.type;
-  }
-
   closeApplication() {
-    console.log('close');
     this.window.close();
   }
 
   minimizeApplication() {
-    console.log('minimize');
     this.window.minimize();
   }
 
@@ -110,6 +113,15 @@ export class ElectronService {
   }
 
   private setupApplicationConfiguration(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
+    fileContext.then(contextStatus => {
+      const dataOutput = contextStatus.value;
+      if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
+        this.repositoriesList.addNew(dataOutput.repositories);
+      }
 
+      if (!!dataOutput.credentials && Array.isArray(dataOutput.credentials)) {
+        this.accountList.addNew(dataOutput.credentials);
+      }
+    });
   }
 }

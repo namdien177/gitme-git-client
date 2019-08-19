@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationRepositoriesComponent } from './navigation-repositories.component';
 import { RepositoryItemComponent } from '../../../components/repository-item/repository-item.component';
@@ -24,6 +24,9 @@ const declareComps = [
   providers: [],
   exports: [
     ...declareComps
+  ],
+  schemas: [
+    NO_ERRORS_SCHEMA
   ]
 })
 export class NavigationRepositoryModule {

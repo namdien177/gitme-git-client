@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
-import { AccountList } from '../../shared/states/account-list';
+import { Account } from '../../shared/states/account-list';
 
 @Injectable()
 export class GitPackService {
@@ -11,7 +11,11 @@ export class GitPackService {
   ) {
   }
 
-  cloneTo(cloneURL: string, directory: string, credentials?: AccountList) {
+  git(dir?) {
+    return git(dir);
+  }
+
+  cloneTo(cloneURL: string, directory: string, credentials?: Account) {
     let urlRemote = cloneURL;
     directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);
     if (credentials) {

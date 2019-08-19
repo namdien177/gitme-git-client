@@ -1,10 +1,10 @@
 export interface Repository {
-  id?: number;
-  id_local?: number;
+  id: string;
+  id_remote?: string;
   name?: string;
   directory?: string;
-}
-
-export function createRepository(params: Partial<Repository>) {
-  return {} as Repository;
+  credential?: {
+    id_credential: string;
+    name?: string
+  };
 }

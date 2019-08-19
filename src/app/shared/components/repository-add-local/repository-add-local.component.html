@@ -39,124 +39,12 @@
       </div>
     </div>
     <ng-container *ngIf="isExistingAccount">
-      <div class="card bg-transparent stored-account">
-        <div class="card-body body-content row m-0">
-          <div class="col-auto">
-            <div class="account-avatar">
-              <img alt=""
-                   src="https://nvzaqa.bn.files.1drv.com/y4mYLUEthiaB_9EF0AaRx5FMxDXEn6DgRuDp8xcmXydtg2hwIRSZnV7r57PCOKn5n48VEidRtpEs95WNxYE8QCHwfeIo_43qJI4o_I5DRcQikCL-f4dhHgQO0ouif7EszbmtZ9ubA44c-VjA9zU19rAa1Y8IY82rP5vPcSt1Cvf5HibKSFsXGBt1woCx_uHHTQPBHste6sCpFt1x9hH5UMuzA?width=281&height=179&cropmode=none">
-            </div>
-          </div>
-          <div class="col row">
-            <div class="col">
-              <div class="col-12">
-                Onaya [JVB]
-              </div>
-              <div class="col-12">
-                do.hoangnam9x@gmail.com
-              </div>
-            </div>
-            <div class="col-auto acomi-checkbox-control">
-              <input class="acomi-input-box" hidden id="cbx" name="account" type="radio"/>
-              <label class="cbx" for="cbx">
-                <span>
-                  <svg height="10px" viewbox="0 0 12 10" width="12px">
-                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                  </svg>
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card bg-transparent stored-account">
-        <div class="card-body body-content row m-0">
-          <div class="col-auto">
-            <div class="account-avatar">
-              <img alt=""
-                   src="https://nvzaqa.bn.files.1drv.com/y4mYLUEthiaB_9EF0AaRx5FMxDXEn6DgRuDp8xcmXydtg2hwIRSZnV7r57PCOKn5n48VEidRtpEs95WNxYE8QCHwfeIo_43qJI4o_I5DRcQikCL-f4dhHgQO0ouif7EszbmtZ9ubA44c-VjA9zU19rAa1Y8IY82rP5vPcSt1Cvf5HibKSFsXGBt1woCx_uHHTQPBHste6sCpFt1x9hH5UMuzA?width=281&height=179&cropmode=none">
-            </div>
-          </div>
-          <div class="col row">
-            <div class="col">
-              <div class="col-12">
-                Onaya [JVB]
-              </div>
-              <div class="col-12">
-                do.hoangnam9x@gmail.com
-              </div>
-            </div>
-            <div class="col-auto acomi-checkbox-control">
-              <input class="acomi-input-box" hidden id="cbx1" name="account" type="radio"/>
-              <label class="cbx" for="cbx1">
-                <span>
-                  <svg height="10px" viewbox="0 0 12 10" width="12px">
-                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                  </svg>
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card bg-transparent stored-account">
-        <div class="card-body body-content row m-0">
-          <div class="col-auto">
-            <div class="account-avatar">
-              <img alt=""
-                   src="https://nvzaqa.bn.files.1drv.com/y4mYLUEthiaB_9EF0AaRx5FMxDXEn6DgRuDp8xcmXydtg2hwIRSZnV7r57PCOKn5n48VEidRtpEs95WNxYE8QCHwfeIo_43qJI4o_I5DRcQikCL-f4dhHgQO0ouif7EszbmtZ9ubA44c-VjA9zU19rAa1Y8IY82rP5vPcSt1Cvf5HibKSFsXGBt1woCx_uHHTQPBHste6sCpFt1x9hH5UMuzA?width=281&height=179&cropmode=none">
-            </div>
-          </div>
-          <div class="col row">
-            <div class="col">
-              <div class="col-12">
-                Onaya [JVB]
-              </div>
-              <div class="col-12">
-                do.hoangnam9x@gmail.com
-              </div>
-            </div>
-            <div class="col-auto acomi-checkbox-control">
-              <input class="acomi-input-box" hidden id="cbx2" name="account" type="radio"/>
-              <label class="cbx" for="cbx2">
-                <span>
-                  <svg height="10px" viewbox="0 0 12 10" width="12px">
-                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                  </svg>
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
+      <gitme-credential-list></gitme-credential-list>
     </ng-container>
 
     <ng-container *ngIf="!isExistingAccount">
-      <div class="register-new">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input class="form-control form-control-dark"
-                 id="username"
-                 name="username"
-                 placeholder="Username"
-                 type="text">
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input class="form-control form-control-dark"
-                 id="password"
-                 name="username"
-                 placeholder="password"
-                 type="password">
-        </div>
-        <small class="text-muted">
-          Credentials is needed to perform action with private repository. After successfully authorized, the account
-          will be saved and you are no longer needed to re-enter your credentials.
-        </small>
-        <small class="text-danger">
-          Account information will be stored locally. Be aware!
-        </small>
-      </div>
+      <gitme-credential-input (isCredentialsValid)="credentialsFormValid = $event">
+      </gitme-credential-input>
     </ng-container>
   </div>
   <div class="d-flex flex-end--ng">

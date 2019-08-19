@@ -17,6 +17,7 @@ export class RepositoryAddLocalComponent implements OnInit {
   directoryVerified = false;
   illuminateValue_dir: string = osNode.homedir();
   isExistingAccount = true;
+  credentialsFormValid = false;
 
   private readonly electron: typeof electronNG.remote;
   private formFieldBuilder = {

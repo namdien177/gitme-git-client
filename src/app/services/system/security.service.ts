@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { cryptoNode, electronNG } from '../../shared/types/types.electron';
+import { cryptoNode, electronNG, uuidNode } from '../../shared/types/types.electron';
 import * as crypto from 'crypto';
 import { LocalStorageService } from './localStorage.service';
 import { DefineCommon } from '../../common/define.common';
@@ -21,21 +21,27 @@ export class SecurityService {
     this.cryptoNode = cryptoNode;
   }
 
+  get randomID() {
+    const genUUID: string = uuidNode();
+    return genUUID;
+  }
+
   encryptAES(password) {
-    const secret = this.secretUUID.slice(0, 16);
-    if (password.length > 50) {
-      return false;
+    const secret = this.secretUUID.slice(0, 32);
+    if (password.length > 50 || password.length < 2) {
+      return null;
     }
     const iv = crypto.randomBytes(this.IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
     let encrypted = cipher.update(password);
 
     encrypted = Buffer.concat([encrypted, cipher.final()]);
+
     return iv.toString('hex') + ':' + encrypted.toString('hex');
   }
 
   decryptAES(encryptedAES) {
-    const secret = this.secretUUID.slice(0, 16);
+    const secret = this.secretUUID.slice(0, 32);
     const textParts = encryptedAES.split(':');
     const iv = Buffer.from(textParts.shift(), 'hex');
     const encryptedText = Buffer.from(textParts.join(':'), 'hex');
@@ -43,6 +49,7 @@ export class SecurityService {
     let decrypted = decipher.update(encryptedText);
 
     decrypted = Buffer.concat([decrypted, decipher.final()]);
+
     return decrypted.toString();
   }
 }

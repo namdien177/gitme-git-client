@@ -1,5 +1,5 @@
 import { Repository } from '../states/repositories';
-import { AccountList } from '../states/account-list';
+import { Account } from '../states/account-list';
 
 export class AppConfig {
   app_key: string;
@@ -9,5 +9,5 @@ export class AppConfig {
     [key: string]: any;
   };
   repositories: Repository[];
-  credentials: AccountList[];
+  credentials: Account[];
 }

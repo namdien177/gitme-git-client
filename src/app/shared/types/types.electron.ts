@@ -8,6 +8,8 @@ import * as os from 'os';
 import * as process from 'process';
 import * as child_process from 'child_process';
 import * as util from 'util';
+import * as uuid from 'uniqid';
+import * as path from 'path';
 
 /**
  * Node-Pty instance in angular compile runtime
@@ -34,3 +36,5 @@ export const fsNode: typeof fs = window.require('fs');
 export const osNode: typeof os = window.require('os');
 export const child_processNode: typeof child_process = window.require('child_process');
 export const processNode: typeof process = window.require('process');
+export const uuidNode: typeof uuid = window.require('uniqid');
+export const pathNode: typeof path = window.require('path');

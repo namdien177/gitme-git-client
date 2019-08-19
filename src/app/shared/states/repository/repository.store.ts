@@ -5,7 +5,7 @@ import { Repository } from '../repositories';
 export function createInitialState(): Repository {
   return {
     id: null,
-    id_local: null,
+    id_remote: null,
     name: null,
     directory: null,
   };

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AccountList } from '../states/account-list';
+import { Account } from '../states/account-list';
 
 
 @Injectable()
@@ -99,7 +99,7 @@ export class UtilityService {
     return removeDotGit;
   }
 
-  addCredentialsToRemote(remoteURL: string, credentials: AccountList, isHTTPS: boolean = true) {
+  addCredentialsToRemote(remoteURL: string, credentials: Account, isHTTPS: boolean = true) {
     if (isHTTPS) {
       const splitStr = remoteURL.split('//');
       const userSafe = this.gitStringSafe(credentials.username);

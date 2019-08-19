@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import { RepositoriesStore, RepositoriesState } from './repositories.store';
-import { NgEntityService } from '@datorama/akita-ng-entity-service';
+import { RepositoriesStore } from './repositories.store';
+import { Repository } from './repository.model';
 
 @Injectable({ providedIn: 'root' })
-export class RepositoriesService extends NgEntityService<RepositoriesState> {
+export class RepositoriesService {
 
   constructor(protected store: RepositoriesStore) {
-    super(store);
+  }
+
+  addNew(arr: Repository[]) {
+    this.store.add(arr, { prepend: true });
   }
 
 }

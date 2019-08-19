@@ -4,9 +4,9 @@
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-areas: 'selection' 'branches' 'actions';
+  grid-template-areas: 'selection' 'branches' 'actions' 'commit' 'files';
   grid-template-columns: 300px;
-  grid-template-rows: repeat(3, 80px) auto;
+  grid-template-rows: repeat(3, 80px) max-content auto;
   grid-gap: 0;
   box-shadow: $shadow-light;
 
@@ -105,6 +105,7 @@
     }
 
     &.repo-branches {
+      grid-area: branches;
       position: fixed;
       top: calc(80px + 32px); // plus with win frame
       left: 0;
@@ -120,6 +121,14 @@
       background-color: $background-primary-night-selected;
     }
   }
+}
+
+.repo-commit {
+  grid-area: commit;
+}
+
+.repo-files-commit {
+  grid-area: files;
 }
 
 .cursor-pointer {

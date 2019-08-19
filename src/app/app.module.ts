@@ -36,7 +36,7 @@ const declareComps = [
 
 @NgModule({
   declarations: [
-    ...declareComps,
+    ...declareComps
   ],
   imports: [
     BrowserModule,

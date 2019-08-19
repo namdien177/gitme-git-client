@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { electronNG, fsNode, utilNode } from '../../shared/types/types.electron';
+import { electronNG, fsNode, pathNode, utilNode } from '../../shared/types/types.electron';
 import { UtilityService } from '../../shared/utilities/utility.service';
+import { DefineCommon } from '../../common/define.common';
 
 @Injectable({ providedIn: 'root' })
 export class FileSystemService {
 
   private readonly fsNODE: typeof fsNode;
+  private readonly pathNODE: typeof pathNode;
   private readonly utilNODE: typeof utilNode;
   private readonly appELECTRON: typeof electronNG.remote.app;
 
@@ -17,11 +19,15 @@ export class FileSystemService {
     this.fsNODE = fsNode;
     this.appELECTRON = electronNG.remote.app;
     this.utilNODE = utilNode;
-    this.ROOT = this.app.getPath('userData');
+    this.ROOT = DefineCommon.ROOT;
   }
 
   get fs() {
     return this.fsNODE;
+  }
+
+  get path() {
+    return this.pathNODE;
   }
 
   get util() {
@@ -49,10 +55,12 @@ export class FileSystemService {
   /**
    * Check if file exist.
    * If it's not a file, or not exist, return false
+   * Input file must include extension
    * @param directoryPath raw absolute path
    */
   isFileExist(directoryPath: string) {
-    const safePath = this.utilitiesService.directorySafePath(directoryPath);
+    let safePath = this.utilitiesService.directorySafePath(directoryPath);
+    safePath = safePath.slice(0, safePath.length - 1);
     const existingFile = this.fs.existsSync(safePath);
     if (existingFile) {
       return this.fs.lstatSync(safePath).isFile();
@@ -211,6 +219,25 @@ export class FileSystemService {
       return this.promiseReturn(null, writeDataStatus.data, false);
     }
     return writePromises(finalDir, writeDataStatus.data);
+  }
+
+  fileList(dir, excludeDirs?): string[] {
+    const _ = this;
+    return this.fs.readdirSync(dir).reduce(function (list, file) {
+      const name = _.path.join(dir, file);
+      if (_.fs.statSync(name).isDirectory()) {
+        if (excludeDirs && excludeDirs.length) {
+          excludeDirs = excludeDirs.map(d => _.path.normalize(d));
+          const idx = name.indexOf(_.path.sep);
+          const directory = name.slice(0, idx === -1 ? name.length : idx);
+          if (excludeDirs.indexOf(directory) !== -1) {
+            return list;
+          }
+        }
+        return list.concat(_.fileList(name, excludeDirs));
+      }
+      return list.concat([name]);
+    }, []);
   }
 
   private parsingData(data: object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {

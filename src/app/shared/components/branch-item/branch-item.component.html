@@ -1,7 +1,11 @@
 <div class="card">
   <div class="card-body row">
+    <div class="remote-status">
+      <i class="fas fa-code-branch"></i>
+    </div>
     <div class="name">
-      {{repository?.name}}
+      This is some text within a card body. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae excepturi
+      fuga incidunt non, pariatur perspiciatis saepe similique tenetur voluptatem? Nisi.
     </div>
     <div class="status">
       <div [title]="pullTitle" class="pull">
@@ -10,9 +14,7 @@
       <div [title]="pushTitle" class="push">
         <div class="circle-status bg-success"></div>
       </div>
-      <div *ngIf="(repositoryObserve | async)?.files.length > 0"
-           [title]="(repositoryObserve | async)?.files.length + changesTitle"
-           class="changes">
+      <div [title]="changesTitle" class="changes">
         <div class="circle-status bg-warning"></div>
       </div>
     </div>

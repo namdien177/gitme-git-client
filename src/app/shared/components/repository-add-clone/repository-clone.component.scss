@@ -80,29 +80,6 @@
   }
 }
 
-.stored-account {
-  margin-bottom: 0.5rem;
-
-  .body-content {
-    padding: 0.5rem;
-    font-size: 12px;
-  }
-
-  .account-avatar {
-    overflow: hidden;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-
-    img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-  }
-}
-
 .register-new {
   font-size: 12px;
 }

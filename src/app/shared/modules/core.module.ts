@@ -8,6 +8,8 @@ import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';
 import { UtilityService } from '../utilities/utility.service';
 import { GitPackService } from '../../services/features/git-pack.service';
+import { CredentialInputComponent } from '../components/credential-input/credential-input.component';
+import { CredentialListComponent } from '../components/credential-list/credential-list.component';
 
 const importModules = [];
 const exportModules = [];
@@ -30,12 +32,14 @@ const declareComps = [
   ClickOutSideDirective,
   OverCountedDirective,
   SimpleEllipsisDirective,
-  ReactiveEllipsisDirective
+  ReactiveEllipsisDirective,
+  CredentialInputComponent,
 ];
 
 @NgModule({
   declarations: [
-    ...declareComps
+    ...declareComps,
+    CredentialListComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +52,9 @@ const declareComps = [
   exports: [
     ...exportModules,
     ...reExportModules,
-    ClickOutSideDirective
+    ClickOutSideDirective,
+    CredentialInputComponent,
+    CredentialListComponent
   ]
 })
 export class CoreModule {

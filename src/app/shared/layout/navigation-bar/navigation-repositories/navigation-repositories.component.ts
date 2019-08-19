@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/repositories-menu';
-import { RepositoriesQuery, RepositoriesState } from '../../../states/repositories';
+import { RepositoriesQuery, Repository } from '../../../states/repositories';
 import { RepositoryQuery, RepositoryService } from '../../../states/repository';
 import { Observable } from 'rxjs';
 
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class NavigationRepositoriesComponent implements OnInit {
 
-  repositories: RepositoriesState = [];
+  repositories: Repository[] = [];
   isAddRepositoryActionOn = false;
   isCloneRepositoryDialogOn: Observable<boolean>;
   isAddRepositoryDialogOn: Observable<boolean>;

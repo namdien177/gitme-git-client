@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { AccountListStore, AccountListState } from './account-list.store';
-import { NgEntityService } from '@datorama/akita-ng-entity-service';
+import { AccountListStore } from './account-list.store';
+import { Account } from './account-list.model';
 
 @Injectable({ providedIn: 'root' })
-export class AccountListService extends NgEntityService<AccountListState> {
+export class AccountListService {
 
   constructor(protected store: AccountListStore) {
-    super(store);
   }
 
+  addNew(arrData: Account[]) {
+    this.store.add(arrData, { prepend: true });
+  }
 }
