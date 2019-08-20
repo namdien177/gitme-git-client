@@ -44,12 +44,15 @@ export class RepositoryItemComponent implements OnInit {
         this.repositoryObserve = of(resolve);
       }
     );
-    this.gitService.git(this.repository.directory).raw(
-      ['remote show origin']
-    ).then(
+
+    this.gitService.allBranches('D:\\Projects\\Acomici\\acomici.com').then(
       resolve => {
         console.log(resolve);
+      },
+      reject => {
+        console.log(reject);
       }
     );
+
   }
 }

@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/states/account-list';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/states/repository-branches';
 
 @Injectable()
 export class GitService {
 
   constructor(
-    private utilities: UtilityService
+    private utilities: UtilityService,
+    private repositoryBranchesService: RepositoryBranchesService
   ) {
   }
 
@@ -24,18 +26,21 @@ export class GitService {
     return git().clone(urlRemote, directory);
   }
 
-  allBranches(directory: string, credentials?: { username: string, password: string }) {
+  async allBranches(directory: string, credentials?: { username: string, password: string }) {
     directory = this.utilities.directorySafePath(directory);
-    console.log(directory);
-    // return git(directory).fetch(
-    //   'https://do.hoangnam9x%40gmail.com:CA8Z2joN4MEu@gitlab.com/manhjin/acomici.com.git'
-    // );
-    return git(directory).pull('origin', '', ['https://do.hoangnam9x%40gmail.com:CA8Z2joN4MEu@gitlab.com/manhjin/acomici.com.git']).then(resolve => {
-      console.log(resolve);
-      return git(directory).branch(['-r']);
-    }, reject => {
-      console.log(reject);
+    const branchAll = await this.git(directory).branch(['-a']);
+    const branchRemote = await this.git(directory).branch(['-r']);
+    const branchMerged: RepositoryBranchSummary[] = [];
+
+    Object.keys(branchRemote.branches).forEach(branchName => {
+      const viewBranch: RepositoryBranchSummary = branchRemote.branches[branchName];
+      const arrSplitName = viewBranch.name.split('origin/');
+      if (arrSplitName.length > 1 && arrSplitName[1] === branchAll.current) {
+        Object.assign(viewBranch, { ...viewBranch }, { current: true });
+      }
+      branchMerged.push(viewBranch);
     });
+    this.repositoryBranchesService.refreshList(branchMerged);
   }
 
   isGitProject(directory: string) {
