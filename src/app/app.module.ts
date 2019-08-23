@@ -25,37 +25,37 @@ import { CoreModule } from './shared/modules/core.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 const declareComps = [
-  AppComponent,
-  WindowsFrameComponent,
-  WebviewDirective
+    AppComponent,
+    WindowsFrameComponent,
+    WebviewDirective
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps
-  ],
-  imports: [
-    BrowserModule,
-    CoreModule,
-    HttpClientModule,
-    AppRoutingModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: (HttpLoaderFactory),
-        deps: [HttpClient]
-      }
-    }),
-    AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
-    AkitaNgRouterStoreModule.forRoot(),
-    MDBBootstrapModule.forRoot()
-  ],
-  providers: [ElectronService, LocalStorageService],
-  bootstrap: [AppComponent]
+    declarations: [
+        ...declareComps
+    ],
+    imports: [
+        BrowserModule,
+        CoreModule,
+        HttpClientModule,
+        AppRoutingModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: (HttpLoaderFactory),
+                deps: [HttpClient]
+            }
+        }),
+        AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
+        AkitaNgRouterStoreModule.forRoot(),
+        MDBBootstrapModule.forRoot()
+    ],
+    providers: [ElectronService, LocalStorageService],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

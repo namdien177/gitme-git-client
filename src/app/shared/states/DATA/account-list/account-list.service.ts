@@ -5,10 +5,10 @@ import { Account } from './account-list.model';
 @Injectable({ providedIn: 'root' })
 export class AccountListService {
 
-  constructor(protected store: AccountListStore) {
-  }
+    constructor(protected store: AccountListStore) {
+    }
 
-  addNew(arrData: Account[]) {
-    this.store.add(arrData, { prepend: true });
-  }
+    addNew(arrData: Account[]) {
+        this.store.add(arrData, { prepend: true });
+    }
 }

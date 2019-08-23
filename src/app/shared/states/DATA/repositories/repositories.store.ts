@@ -9,9 +9,9 @@ export interface RepositoriesState extends EntityState<Repository> {
 @StoreConfig({ name: 'repositories' })
 export class RepositoriesStore extends EntityStore<RepositoriesState> {
 
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
 }
 

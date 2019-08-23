@@ -12,25 +12,25 @@ import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
 import { NavigationBarModule } from '../../shared/layout/navigation-bar/navigation-bar.module';
 
 const declareComps = [
-  RepositoriesComponent,
-  DashboardComponent,
+    RepositoriesComponent,
+    DashboardComponent,
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps,
-    RepoChangesComponent,
-    RepoHistoryComponent,
-    RepoSettingsComponent,
-  ],
-  exports: [],
-  imports: [
-    CommonModule,
-    XTerminalModule,
-    CoreModule,
-    RepositoriesRoutingModule,
-    NavigationBarModule
-  ]
+    declarations: [
+        ...declareComps,
+        RepoChangesComponent,
+        RepoHistoryComponent,
+        RepoSettingsComponent,
+    ],
+    exports: [],
+    imports: [
+        CommonModule,
+        XTerminalModule,
+        CoreModule,
+        RepositoriesRoutingModule,
+        NavigationBarModule
+    ]
 })
 export class RepositoriesModule {
 }

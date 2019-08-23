@@ -13,13 +13,13 @@ type Predicate = (oldValues: Array<any>, newValues: Array<any>) => boolean;
  * @param label
  */
 export function type<T>(label: T | ''): T {
-  if (typeCache[label as string]) {
-    throw new Error(`Action type "${ label }" is not unqiue"`);
-  }
+    if (typeCache[label as string]) {
+        throw new Error(`Action type "${ label }" is not unqiue"`);
+    }
 
-  typeCache[label as string] = true;
+    typeCache[label as string] = true;
 
-  return label as T;
+    return label as T;
 }
 
 /**
@@ -31,14 +31,14 @@ export function type<T>(label: T | ''): T {
  * @param conditions
  */
 export function distinctChanges(
-  oldValues: Array<any>,
-  newValues: Array<any>,
-  conditions: Predicate[]
+    oldValues: Array<any>,
+    newValues: Array<any>,
+    conditions: Predicate[]
 ): boolean {
-  if (conditions.every(cond => cond(oldValues, newValues))) {
-    return false;
-  }
-  return true;
+    if (conditions.every(cond => cond(oldValues, newValues))) {
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -47,11 +47,11 @@ export function distinctChanges(
  * @param val
  */
 export function isObject(val: any) {
-  if (val === null) {
-    return false;
-  }
+    if (val === null) {
+        return false;
+    }
 
-  return typeof val === 'function' || typeof val === 'object';
+    return typeof val === 'function' || typeof val === 'object';
 }
 
 /**
@@ -60,10 +60,10 @@ export function isObject(val: any) {
  * @param s
  */
 export function capitalize(s: string) {
-  if (!s || typeof s !== 'string') {
-    return s;
-  }
-  return s && s[0].toUpperCase() + s.slice(1);
+    if (!s || typeof s !== 'string') {
+        return s;
+    }
+    return s && s[0].toUpperCase() + s.slice(1);
 }
 
 /**
@@ -72,10 +72,10 @@ export function capitalize(s: string) {
  * @param s
  */
 export function uncapitalize(s: string) {
-  if (!s || typeof s !== 'string') {
-    return s;
-  }
-  return s && s[0].toLowerCase() + s.slice(1);
+    if (!s || typeof s !== 'string') {
+        return s;
+    }
+    return s && s[0].toLowerCase() + s.slice(1);
 }
 
 /**
@@ -85,30 +85,30 @@ export function uncapitalize(s: string) {
  * @param preservePath
  */
 export function flattenObject(ob: any, preservePath: boolean = false): any {
-  const toReturn = {};
+    const toReturn = {};
 
-  for (const i in ob) {
-    if (!ob.hasOwnProperty(i)) {
-      continue;
-    }
-
-    if (typeof ob[i] === 'object') {
-      const flatObject = flattenObject(ob[i], preservePath);
-      for (const x in flatObject) {
-        if (!flatObject.hasOwnProperty(x)) {
-          continue;
+    for (const i in ob) {
+        if (!ob.hasOwnProperty(i)) {
+            continue;
         }
 
-        const path = preservePath ? i + '.' + x : x;
+        if (typeof ob[i] === 'object') {
+            const flatObject = flattenObject(ob[i], preservePath);
+            for (const x in flatObject) {
+                if (!flatObject.hasOwnProperty(x)) {
+                    continue;
+                }
 
-        toReturn[path] = flatObject[x];
-      }
-    } else {
-      toReturn[i] = ob[i];
+                const path = preservePath ? i + '.' + x : x;
+
+                toReturn[path] = flatObject[x];
+            }
+        } else {
+            toReturn[i] = ob[i];
+        }
     }
-  }
 
-  return toReturn;
+    return toReturn;
 }
 
 /**
@@ -118,6 +118,6 @@ export function flattenObject(ob: any, preservePath: boolean = false): any {
  * @param culture
  */
 export function localeDateString(dateString: string, culture: string = 'en-EN'): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(culture);
+    const date = new Date(dateString);
+    return date.toLocaleDateString(culture);
 }

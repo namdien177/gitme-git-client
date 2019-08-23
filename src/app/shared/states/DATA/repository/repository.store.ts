@@ -3,22 +3,22 @@ import { Store, StoreConfig } from '@datorama/akita';
 import { Repository } from '../repositories';
 
 export function createInitialState(): Repository {
-  return {
-    id: null,
-    id_remote: null,
-    name: null,
-    directory: null,
-    selected: false
-  };
+    return {
+        id: null,
+        id_remote: null,
+        name: null,
+        directory: null,
+        selected: false
+    };
 }
 
 @Injectable({ providedIn: 'root' })
 @StoreConfig({ name: 'repository', resettable: true })
 export class RepositoryStore extends Store<Repository> {
 
-  constructor() {
-    super(createInitialState());
-  }
+    constructor() {
+        super(createInitialState());
+    }
 
 }
 

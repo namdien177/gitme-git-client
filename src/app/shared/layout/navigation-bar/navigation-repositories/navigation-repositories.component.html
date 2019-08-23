@@ -1,59 +1,57 @@
 <div class="container-fluid">
-  <div class="search-repositories">
-    <input class="form-control search"
-           mdbInput
-           placeholder="Find local repo"
-           type="text">
-    <hr class="m-0 p-0">
-  </div>
-
-  <div class="add-new-repository">
-    <button (click)="isAddRepositoryActionOn = true"
-            [color]="'success'"
-            [size]="'sm'"
-            class="btn-block"
-            mdbBtn
-            rounded="true"
-            type="button">
-      <i class="fas fa-plus"></i>
-      New Repository
-    </button>
-
-    <div *ngIf="isAddRepositoryActionOn" class="add-new-repository-type">
-      <div (click)="isAddRepositoryActionOn = false" class="backdrop background-opacity-black"></div>
-      <div class="choose-type-action">
-        <div (click)="cloneRepositoryDialogOn()" class="type">
-          Clone from internet
-          <br>
-          <small class="text-muted">
-            Currently supporting GitHub and GitLab
-          </small>
-        </div>
-        <div (click)="addRepositoryDialog()" class="type">
-          Add from local machine
-          <br>
-          <small class="text-muted">
-            Add existing repository to manage
-          </small>
-        </div>
-        <div class="type">
-          Make a new repository
-          <br>
-          <small class="text-muted">
-            Add existing folder as a repository
-          </small>
-        </div>
-      </div>
+    <div class="search-repositories">
+        <input class="form-control search"
+               mdbInput
+               placeholder="Find local repo"
+               type="text">
+        <hr class="m-0 p-0">
     </div>
-  </div>
 
-  <div class="list-repositories">
-    <!--    <gitme-repository-item *ngFor="let repo of repositories | async"-->
-    <!--      class="repo"></gitme-repository-item>-->
-    <gitme-repository-item *ngFor="let repo of repositories"
-                           [repository]="repo"
-                           class="repo"></gitme-repository-item>
-  </div>
+    <div class="add-new-repository">
+        <button (click)="isAddRepositoryActionOn = true"
+                [color]="'success'"
+                [size]="'sm'"
+                class="btn-block"
+                mdbBtn
+                rounded="true"
+                type="button">
+            <i class="fas fa-plus"></i>
+            New Repository
+        </button>
+
+        <div *ngIf="isAddRepositoryActionOn" class="add-new-repository-type">
+            <div (click)="isAddRepositoryActionOn = false" class="backdrop background-opacity-black"></div>
+            <div class="choose-type-action">
+                <div (click)="cloneRepositoryDialogOn()" class="type">
+                    Clone from internet
+                    <br>
+                    <small class="text-muted">
+                        Currently supporting GitHub and GitLab
+                    </small>
+                </div>
+                <div (click)="addRepositoryDialog()" class="type">
+                    Add from local machine
+                    <br>
+                    <small class="text-muted">
+                        Add existing repository to manage
+                    </small>
+                </div>
+                <div class="type">
+                    Make a new repository
+                    <br>
+                    <small class="text-muted">
+                        Add existing folder as a repository
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-repositories">
+        <gitme-repository-item *ngFor="let repo of (repositories | async)"
+                               [repository]="repo"
+                               class="repo"></gitme-repository-item>
+    </div>
 </div>
 
 <gitme-repository-clone *ngIf="isCloneRepositoryDialogOn | async">

@@ -2,25 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../services/system/electron.service';
 
 @Component({
-  selector: 'app-windows-frame',
-  templateUrl: './windows-frame.component.html',
-  styleUrls: ['./windows-frame.component.scss']
+    selector: 'app-windows-frame',
+    templateUrl: './windows-frame.component.html',
+    styleUrls: ['./windows-frame.component.scss']
 })
 export class WindowsFrameComponent implements OnInit {
 
-  constructor(
-    private electronServices: ElectronService
-  ) {
-  }
+    constructor(
+        private electronServices: ElectronService
+    ) {
+    }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
-  minimizeWindows() {
-    this.electronServices.minimizeApplication();
-  }
+    minimizeWindows() {
+        this.electronServices.minimizeApplication();
+    }
 
-  closeWindows() {
-    this.electronServices.closeApplication();
-  }
+    closeWindows() {
+        this.electronServices.closeApplication();
+    }
 }

@@ -1,15 +1,24 @@
 import { Component, OnInit } from '@angular/core';
+import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
+import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'gitme-repo-branches',
-  templateUrl: './navigation-branches.component.html',
-  styleUrls: ['./navigation-branches.component.scss']
+    selector: 'gitme-repo-branches',
+    templateUrl: './navigation-branches.component.html',
+    styleUrls: ['./navigation-branches.component.scss']
 })
 export class NavigationBranchesComponent implements OnInit {
 
-  constructor() { }
+    branches: Observable<RepositoryBranchSummary[]>;
 
-  ngOnInit() {
-  }
+    constructor(
+        private repositoryBranchesService: RepositoryBranchesService,
+        private repositoriesBranchesQuery: RepositoryBranchesQuery
+    ) {
+        this.branches = this.repositoriesBranchesQuery.selectAll();
+    }
+
+    ngOnInit() {
+    }
 
 }

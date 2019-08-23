@@ -1,50 +1,52 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/repositories-menu';
-import { RepositoriesQuery, Repository } from '../../../states/repositories';
-import { RepositoryQuery, RepositoryService } from '../../../states/repository';
+import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { RepositoriesQuery, Repository } from '../../../states/DATA/repositories';
 import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'gitme-navigation-repositories',
-  templateUrl: './navigation-repositories.component.html',
-  styleUrls: ['./navigation-repositories.component.scss']
+    selector: 'gitme-navigation-repositories',
+    templateUrl: './navigation-repositories.component.html',
+    styleUrls: ['./navigation-repositories.component.scss']
 })
 export class NavigationRepositoriesComponent implements OnInit {
 
-  repositories: Repository[] = [];
-  isAddRepositoryActionOn = false;
-  isCloneRepositoryDialogOn: Observable<boolean>;
-  isAddRepositoryDialogOn: Observable<boolean>;
+    /**
+     * List of all repository within the system
+     */
+    repositories: Observable<Repository[]>;
+    isAddRepositoryActionOn = false;
+    isCloneRepositoryDialogOn: Observable<boolean>;
+    isAddRepositoryDialogOn: Observable<boolean>;
 
-  constructor(
-    private repositoriesQuery: RepositoriesQuery,
-    private repositoriesMenuQuery: RepositoriesMenuQuery,
-    private repositoriesMenuService: RepositoriesMenuService,
-    private repositoryQuery: RepositoryQuery,
-    private repositoryService: RepositoryService,
-  ) {
-  }
+    constructor(
+        private repositoriesQuery: RepositoriesQuery,
+        private repositoriesMenuQuery: RepositoriesMenuQuery,
+        private repositoriesMenuService: RepositoriesMenuService,
+    ) {
+    }
 
-  ngOnInit() {
-    this.repositoryQuery.select().subscribe(e => {
-      console.log(e);
-    });
+    ngOnInit() {
+        // Retrieve all repositories on local
+        this.repositories = this.repositoriesQuery.selectAll();
+        // get state of cloning dialog
+        this.isCloneRepositoryDialogOn = this.repositoriesMenuQuery.select(
+            status => status.is_repository_clone_open
+        );
+        // get state of adding dialog
+        this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(
+            status => status.is_repository_addLocal_open
+        );
 
-    this.isCloneRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_clone_open);
-    this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(status => status.is_repository_addLocal_open);
 
-    this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
-      this.repositories = listRepos;
-    });
-  }
+    }
 
-  cloneRepositoryDialogOn() {
-    this.isAddRepositoryActionOn = false;
-    this.repositoriesMenuService.openRepositoryCloneDialog();
-  }
+    cloneRepositoryDialogOn() {
+        this.isAddRepositoryActionOn = false;
+        this.repositoriesMenuService.openRepositoryCloneDialog();
+    }
 
-  addRepositoryDialog() {
-    this.isAddRepositoryActionOn = false;
-    this.repositoriesMenuService.openRepositoryAddLocalDialog();
-  }
+    addRepositoryDialog() {
+        this.isAddRepositoryActionOn = false;
+        this.repositoriesMenuService.openRepositoryAddLocalDialog();
+    }
 }

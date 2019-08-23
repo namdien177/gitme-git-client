@@ -11,117 +11,116 @@ import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
 import * as moment from 'moment';
-import { RepositoriesService } from '../../shared/states/repositories';
-import { AccountListService } from '../../shared/states/account-list';
+import { RepositoriesService } from '../../shared/states/DATA/repositories';
+import { AccountListService } from '../../shared/states/DATA/account-list';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService {
 
-  ipcRenderer: typeof ipcRenderer;
-  webFrame: typeof webFrame;
-  remote: typeof remote;
-  childProcess: typeof childProcess;
-  fs: typeof fsNode;
-  os: typeof os;
+    ipcRenderer: typeof ipcRenderer;
+    webFrame: typeof webFrame;
+    remote: typeof remote;
+    childProcess: typeof childProcess;
+    fs: typeof fsNode;
+    os: typeof os;
 
-  private window: BrowserWindow;
-  private readonly machine_id: string;
+    private window: BrowserWindow;
+    private readonly machine_id: string;
 
-  constructor(
-    private localStorage: LocalStorageService,
-    private securityService: SecurityService,
-    private fileService: FileSystemService,
-    private repositoriesList: RepositoriesService,
-    private accountList: AccountListService
-  ) {
-    // Conditional imports
-    if (ElectronService.isElectron()) {
-      this.ipcRenderer = electronNG.ipcRenderer;
-      this.webFrame = electronNG.webFrame;
-      this.remote = electronNG.remote;
-      this.window = electronNG.remote.getCurrentWindow();
+    constructor(
+        private localStorage: LocalStorageService,
+        private securityService: SecurityService,
+        private fileService: FileSystemService,
+        private repositoriesList: RepositoriesService,
+        private accountList: AccountListService
+    ) {
+        // Conditional imports
+        if (ElectronService.isElectron()) {
+            this.ipcRenderer = electronNG.ipcRenderer;
+            this.webFrame = electronNG.webFrame;
+            this.remote = electronNG.remote;
+            this.window = electronNG.remote.getCurrentWindow();
 
-      this.childProcess = window.require('child_process');
-      this.fs = fsNode;
-      this.machine_id = machineIdSync();
-      this.setupUUID();
-      this.initializeDatabase();
-      console.log(this.securityService.randomID);
-    }
-  }
-
-  static isElectron() {
-    return window && window.process && window.process.type;
-  }
-
-  initializeDatabase() {
-    /**
-     * Loading the configuration file
-     */
-    const configDefaultName = this.machine_id;
-    if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
-      // load to memory repos and other settings
-      console.log('Loading config from local machine');
-      this.setupApplicationConfiguration(
-        this.fileService.getFileContext(
-          configDefaultName,
-          DefineCommon.DIR_CONFIG()
-        )
-      );
-    } else {
-      const data = {
-        app_key: this.machine_id,
-        version: DefineCommon.APP_VERSION,
-        first_init: {
-          created_at: moment().valueOf()
-        },
-        repositories: [],
-        credentials: []
-      };
-      this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
-        resolve => {
-          console.log(resolve);
-        }, reject => {
-          console.log(reject);
+            this.childProcess = window.require('child_process');
+            this.fs = fsNode;
+            this.machine_id = machineIdSync();
+            this.setupUUID();
+            this.initializeDatabase();
+            console.log(this.securityService.randomID);
         }
-      );
     }
-  }
 
-  closeApplication() {
-    this.window.close();
-  }
-
-  minimizeApplication() {
-    this.window.minimize();
-  }
-
-  private setupUUID() {
-    if (!this.localStorage.isAvailable(DefineCommon.ELECTRON_APPS_UUID_KEYNAME)) {
-      // warning first time access
-      console.warn('First time accessing application!');
-      console.warn('Automatically retrieve UUID machine');
-      this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);
-    } else {
-      if (this.localStorage.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME) !== this.machine_id) {
-        // warning sign in from unknown machine
-        console.warn('Detecting unknown machine!');
-        console.warn('Automatically retrieve and replace current UUID machine');
-        this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);
-      }
+    static isElectron() {
+        return window && window.process && window.process.type;
     }
-  }
 
-  private setupApplicationConfiguration(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
-    fileContext.then(contextStatus => {
-      const dataOutput = contextStatus.value;
-      if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
-        this.repositoriesList.addNew(dataOutput.repositories);
-      }
+    initializeDatabase() {
+        /**
+         * Loading the configuration file
+         */
+        const configDefaultName = this.machine_id;
+        if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
+            // load to memory repos and other settings
+            this.setupApplicationConfiguration(
+                this.fileService.getFileContext(
+                    configDefaultName,
+                    DefineCommon.DIR_CONFIG()
+                )
+            );
+        } else {
+            const data = {
+                app_key: this.machine_id,
+                version: DefineCommon.APP_VERSION,
+                first_init: {
+                    created_at: moment().valueOf()
+                },
+                repositories: [],
+                credentials: []
+            };
+            this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
+                resolve => {
+                    console.log(resolve);
+                }, reject => {
+                    console.log(reject);
+                }
+            );
+        }
+    }
 
-      if (!!dataOutput.credentials && Array.isArray(dataOutput.credentials)) {
-        this.accountList.addNew(dataOutput.credentials);
-      }
-    });
-  }
+    closeApplication() {
+        this.window.close();
+    }
+
+    minimizeApplication() {
+        this.window.minimize();
+    }
+
+    private setupUUID() {
+        if (!this.localStorage.isAvailable(DefineCommon.ELECTRON_APPS_UUID_KEYNAME)) {
+            // warning first time access
+            console.warn('First time accessing application!');
+            console.warn('Automatically retrieve UUID machine');
+            this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);
+        } else {
+            if (this.localStorage.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME) !== this.machine_id) {
+                // warning sign in from unknown machine
+                console.warn('Detecting unknown machine!');
+                console.warn('Automatically retrieve and replace current UUID machine');
+                this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);
+            }
+        }
+    }
+
+    private setupApplicationConfiguration(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
+        fileContext.then(contextStatus => {
+            const dataOutput = contextStatus.value;
+            if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
+                this.repositoriesList.set(dataOutput.repositories);
+            }
+
+            if (!!dataOutput.credentials && Array.isArray(dataOutput.credentials)) {
+                this.accountList.addNew(dataOutput.credentials);
+            }
+        });
+    }
 }

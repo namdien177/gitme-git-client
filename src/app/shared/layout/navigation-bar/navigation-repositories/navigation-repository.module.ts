@@ -7,27 +7,27 @@ import { RepositoryCloneComponent } from '../../../components/repository-add-clo
 import { RepositoryAddLocalComponent } from '../../../components/repository-add-local/repository-add-local.component';
 
 const declareComps = [
-  NavigationRepositoriesComponent,
-  RepositoryItemComponent,
-  RepositoryAddLocalComponent,
-  RepositoryCloneComponent
+    NavigationRepositoriesComponent,
+    RepositoryItemComponent,
+    RepositoryAddLocalComponent,
+    RepositoryCloneComponent
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-  ],
-  providers: [],
-  exports: [
-    ...declareComps
-  ],
-  schemas: [
-    NO_ERRORS_SCHEMA
-  ]
+    declarations: [
+        ...declareComps
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+    ],
+    providers: [],
+    exports: [
+        ...declareComps
+    ],
+    schemas: [
+        NO_ERRORS_SCHEMA
+    ]
 })
 export class NavigationRepositoryModule {
 }

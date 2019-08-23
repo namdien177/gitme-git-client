@@ -15,47 +15,47 @@ const importModules = [];
 const exportModules = [];
 
 const reExportModules = [
-  MDBBootstrapModule,
-  FormsModule,
-  ReactiveFormsModule
+    MDBBootstrapModule,
+    FormsModule,
+    ReactiveFormsModule
 ];
 
 const providers = [
-  LocalStorageService,
-  SecurityService,
-  FileSystemService,
-  UtilityService,
-  GitService
+    LocalStorageService,
+    SecurityService,
+    FileSystemService,
+    UtilityService,
+    GitService
 ];
 
 const declareComps = [
-  ClickOutSideDirective,
-  OverCountedDirective,
-  SimpleEllipsisDirective,
-  ReactiveEllipsisDirective,
-  CredentialInputComponent,
+    ClickOutSideDirective,
+    OverCountedDirective,
+    SimpleEllipsisDirective,
+    ReactiveEllipsisDirective,
+    CredentialInputComponent,
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps,
-    CredentialListComponent
-  ],
-  imports: [
-    CommonModule,
-    ...importModules,
-    ...reExportModules
-  ],
-  providers: [
-    ...providers
-  ],
-  exports: [
-    ...exportModules,
-    ...reExportModules,
-    ClickOutSideDirective,
-    CredentialInputComponent,
-    CredentialListComponent
-  ]
+    declarations: [
+        ...declareComps,
+        CredentialListComponent
+    ],
+    imports: [
+        CommonModule,
+        ...importModules,
+        ...reExportModules
+    ],
+    providers: [
+        ...providers
+    ],
+    exports: [
+        ...exportModules,
+        ...reExportModules,
+        ClickOutSideDirective,
+        CredentialInputComponent,
+        CredentialListComponent
+    ]
 })
 export class CoreModule {
 }

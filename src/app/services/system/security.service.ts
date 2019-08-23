@@ -7,49 +7,49 @@ import { DefineCommon } from '../../common/define.common';
 @Injectable()
 export class SecurityService {
 
-  private cryptoNode: typeof crypto;
+    private cryptoNode: typeof crypto;
 
-  private instanceElectron: typeof electronNG.remote;
-  private readonly secretUUID: string;
-  private readonly IV_LENGTH = 16; // For AES, this is always 16
+    private instanceElectron: typeof electronNG.remote;
+    private readonly secretUUID: string;
+    private readonly IV_LENGTH = 16; // For AES, this is always 16
 
-  constructor(
-    private localStorageService: LocalStorageService
-  ) {
-    this.secretUUID = localStorageService.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME);
-    this.instanceElectron = electronNG.remote;
-    this.cryptoNode = cryptoNode;
-  }
-
-  get randomID() {
-    const genUUID: string = uuidNode();
-    return genUUID;
-  }
-
-  encryptAES(password) {
-    const secret = this.secretUUID.slice(0, 32);
-    if (password.length > 50 || password.length < 2) {
-      return null;
+    constructor(
+        private localStorageService: LocalStorageService
+    ) {
+        this.secretUUID = localStorageService.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME);
+        this.instanceElectron = electronNG.remote;
+        this.cryptoNode = cryptoNode;
     }
-    const iv = crypto.randomBytes(this.IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
-    let encrypted = cipher.update(password);
 
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    get randomID() {
+        const genUUID: string = uuidNode();
+        return genUUID;
+    }
 
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-  }
+    encryptAES(password) {
+        const secret = this.secretUUID.slice(0, 32);
+        if (password.length > 50 || password.length < 2) {
+            return null;
+        }
+        const iv = crypto.randomBytes(this.IV_LENGTH);
+        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secret), iv);
+        let encrypted = cipher.update(password);
 
-  decryptAES(encryptedAES) {
-    const secret = this.secretUUID.slice(0, 32);
-    const textParts = encryptedAES.split(':');
-    const iv = Buffer.from(textParts.shift(), 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(secret), iv);
-    let decrypted = decipher.update(encryptedText);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
 
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return iv.toString('hex') + ':' + encrypted.toString('hex');
+    }
 
-    return decrypted.toString();
-  }
+    decryptAES(encryptedAES) {
+        const secret = this.secretUUID.slice(0, 32);
+        const textParts = encryptedAES.split(':');
+        const iv = Buffer.from(textParts.shift(), 'hex');
+        const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(secret), iv);
+        let decrypted = decipher.update(encryptedText);
+
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+        return decrypted.toString();
+    }
 }

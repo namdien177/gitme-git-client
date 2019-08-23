@@ -7,23 +7,23 @@ import { NavigationBranchModule } from './navigation-branches/navigation-branch.
 import { NavigationCommitInfoComponent } from './navigation-commit-info/navigation-commit-info.component';
 
 const declareComps = [
-  NavigationBarComponent,
-  NavigationCommitInfoComponent,
+    NavigationBarComponent,
+    NavigationCommitInfoComponent,
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps,
-  ],
-  exports: [
-    ...declareComps
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    NavigationRepositoryModule,
-    NavigationBranchModule
-  ],
+    declarations: [
+        ...declareComps,
+    ],
+    exports: [
+        ...declareComps
+    ],
+    imports: [
+        CommonModule,
+        CoreModule,
+        NavigationRepositoryModule,
+        NavigationBranchModule
+    ],
 })
 export class NavigationBarModule {
 }

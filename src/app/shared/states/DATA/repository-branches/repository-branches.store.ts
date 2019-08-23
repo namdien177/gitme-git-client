@@ -6,12 +6,12 @@ export interface RepositoryBranchesState extends EntityState<RepositoryBranchSum
 }
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'repository-branches', idKey: 'commit' })
+@StoreConfig({ name: 'repository-branches' })
 export class RepositoryBranchesStore extends EntityStore<RepositoryBranchesState, RepositoryBranchSummary> {
 
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
 }
 

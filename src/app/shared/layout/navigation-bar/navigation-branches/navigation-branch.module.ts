@@ -6,22 +6,22 @@ import { BranchItemComponent } from '../../../components/branch-item/branch-item
 import { BranchAddComponent } from '../../../components/branch-add/branch-add.component';
 
 const declareComps = [
-  NavigationBranchesComponent,
-  BranchItemComponent,
-  BranchAddComponent,
+    NavigationBranchesComponent,
+    BranchItemComponent,
+    BranchAddComponent,
 ];
 
 @NgModule({
-  declarations: [
-    ...declareComps
-  ],
-  exports: [
-    ...declareComps
-  ],
-  imports: [
-    CommonModule,
-    CoreModule
-  ]
+    declarations: [
+        ...declareComps
+    ],
+    exports: [
+        ...declareComps
+    ],
+    imports: [
+        CommonModule,
+        CoreModule
+    ]
 })
 export class NavigationBranchModule {
 }
