@@ -1,0 +1,71 @@
+<div class="body-modal">
+    <form [formGroup]="formRegisterRepository" class="setup-form">
+        <div class="repository_directory">
+            <div class="form-group">
+                <label for="repo_https">Repository HTTP</label>
+                <input class="form-control form-control-dark"
+                       formControlName="repo_https"
+                       id="repo_https"
+                       placeholder="http://github.com/namdien177/gitme-git-client..."
+                       type="text">
+                <small class="text-muted">SSH coming soon</small>
+            </div>
+            <div class="form-group">
+                <label>Directory</label>
+                <div class="form-control form-control-dark custom-form-control-feature cursor-pointer">
+                    <div (click)="chooseDirectory()"
+                         [class.text-muted]="!!repo_dir.value"
+                         class="illuminate_area">
+                        {{illuminateValue_dir}}
+                    </div>
+                    <div class="directory_copy">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <h5>Repository credentials</h5>
+            <div class="row mb-3">
+                <div class="col">
+                    <button (click)="isExistingAccount = true"
+                            [class.bg-dark]="!isExistingAccount"
+                            [class.bg-success]="isExistingAccount"
+                            block="true"
+                            class="text-white"
+                            mdbBtn size="sm">
+                        Stored Account
+                    </button>
+                </div>
+                <div class="col">
+                    <button (click)="isExistingAccount = false"
+                            [class.bg-dark]="isExistingAccount"
+                            [class.bg-success]="!isExistingAccount"
+                            block="true"
+                            class="text-white"
+                            mdbBtn size="sm">
+                        New Account
+                    </button>
+                </div>
+            </div>
+            <ng-container *ngIf="isExistingAccount">
+                <gitme-credential-list></gitme-credential-list>
+            </ng-container>
+
+            <ng-container *ngIf="!isExistingAccount">
+                <gitme-credential-input></gitme-credential-input>
+            </ng-container>
+
+        </div>
+    </form>
+    <div class="action-form">
+        <button (click)="cancelAdding(true)"
+                [size]="'sm'"
+                class="btn-warning bg-transparent mr-1" mdbBtn>
+            Cancel
+        </button>
+        <p (click)="test()">aasss</p>
+        <button [disabled]="!directoryVerified" [size]="'sm'" class="btn-info" mdbBtn>
+            Clone
+        </button>
+    </div>
+</div>

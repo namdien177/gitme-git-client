@@ -2,6 +2,7 @@
 @import "./styles/input";
 @import "./styles/button";
 @import "./styles/scrollbar";
+@import "./styles/others";
 
 /* You can add global styles to this file, and also import other style files */
 html, body {
@@ -18,4 +19,8 @@ html, body {
 body {
   font-family: 'Roboto', sans-serif;
   background-color: $background-primary-night !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

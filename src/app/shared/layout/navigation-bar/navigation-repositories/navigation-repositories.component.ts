@@ -1,47 +1,52 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery } from '../../../states/repositories-menu';
-import { RepositoriesQuery, RepositoriesState } from '../../../states/repositories';
-import { RepositoryQuery, RepositoryService, RepositoryState } from '../../../states/repository';
+import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { RepositoriesQuery, Repository } from '../../../states/DATA/repositories';
+import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'gitme-navigation-repositories',
-  templateUrl: './navigation-repositories.component.html',
-  styleUrls: ['./navigation-repositories.component.scss']
+    selector: 'gitme-navigation-repositories',
+    templateUrl: './navigation-repositories.component.html',
+    styleUrls: ['./navigation-repositories.component.scss']
 })
 export class NavigationRepositoriesComponent implements OnInit {
 
-  repositories: RepositoriesState = [];
-  isAddRepositoryDialogOn = false;
+    /**
+     * List of all repository within the system
+     */
+    repositories: Observable<Repository[]>;
+    isAddRepositoryActionOn = false;
+    isCloneRepositoryDialogOn: Observable<boolean>;
+    isAddRepositoryDialogOn: Observable<boolean>;
 
-  constructor(
-    private repositoriesQuery: RepositoriesQuery,
-    private repoMenu: RepositoriesMenuQuery,
-    private repositoryQuery: RepositoryQuery,
-    private repositoryService: RepositoryService,
-  ) {
-  }
-
-  ngOnInit() {
-    this.repoMenu.select().subscribe(e => {
-      console.log(e);
-    });
-
-    this.repositoriesQuery.selectAll().pipe().subscribe(listRepos => {
-      this.repositories = listRepos;
-      console.log(listRepos);
-    });
-  }
-
-  addRepositoryDialogOn() {
-    this.isAddRepositoryDialogOn = true;
-  }
-
-  addRepositoryDialogListener(closeStatus: { repository: RepositoryState; cancel: boolean }) {
-    console.log(closeStatus);
-    if (closeStatus.cancel) {
-      this.isAddRepositoryDialogOn = false;
-      return;
+    constructor(
+        private repositoriesQuery: RepositoriesQuery,
+        private repositoriesMenuQuery: RepositoriesMenuQuery,
+        private repositoriesMenuService: RepositoriesMenuService,
+    ) {
     }
-    console.log(closeStatus);
-  }
+
+    ngOnInit() {
+        // Retrieve all repositories on local
+        this.repositories = this.repositoriesQuery.selectAll();
+        // get state of cloning dialog
+        this.isCloneRepositoryDialogOn = this.repositoriesMenuQuery.select(
+            status => status.is_repository_clone_open
+        );
+        // get state of adding dialog
+        this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(
+            status => status.is_repository_addLocal_open
+        );
+
+
+    }
+
+    cloneRepositoryDialogOn() {
+        this.isAddRepositoryActionOn = false;
+        this.repositoriesMenuService.openRepositoryCloneDialog();
+    }
+
+    addRepositoryDialog() {
+        this.isAddRepositoryActionOn = false;
+        this.repositoriesMenuService.openRepositoryAddLocalDialog();
+    }
 }

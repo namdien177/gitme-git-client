@@ -1,19 +1,24 @@
 <div class="card">
-  <div class="card-body row">
-    <div class="name">
-      This is some text within a card body. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae excepturi
-      fuga incidunt non, pariatur perspiciatis saepe similique tenetur voluptatem? Nisi.
+    <div class="card-body row">
+        <div class="name">
+            {{repository?.name}}
+        </div>
+        <div class="status">
+            <div *ngIf="(repositoryObserve | async)?.behind > 0"
+                 [title]="(repositoryObserve | async)?.behind + pullTitle"
+                 class="pull">
+                <div class="circle-status bg-info"></div>
+            </div>
+            <div *ngIf="(repositoryObserve | async)?.ahead > 0"
+                 [title]="(repositoryObserve | async)?.ahead + pushTitle"
+                 class="push">
+                <div class="circle-status bg-success"></div>
+            </div>
+            <div *ngIf="(repositoryObserve | async)?.files.length > 0"
+                 [title]="(repositoryObserve | async)?.files.length + changesTitle"
+                 class="changes">
+                <div class="circle-status bg-warning"></div>
+            </div>
+        </div>
     </div>
-    <div class="status">
-      <div class="pull" [title]="pullTitle">
-        <div class="circle-status bg-info"></div>
-      </div>
-      <div class="push" [title]="pushTitle">
-        <div class="circle-status bg-success"></div>
-      </div>
-      <div class="changes" [title]="changesTitle">
-        <div class="circle-status bg-warning"></div>
-      </div>
-    </div>
-  </div>
 </div>
