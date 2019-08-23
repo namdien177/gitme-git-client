@@ -7,7 +7,12 @@
         Current Repository
       </div>
       <div class="title">
-        gitme-git-client
+        <ng-container *ngIf="repositoriesQuery.selectLoading() | async">
+          Loading
+        </ng-container>
+        <ng-container *ngIf="!(repositoriesQuery.selectLoading() | async)">
+          {{activeRepository?.name}}
+        </ng-container>
       </div>
     </div>
     <div class="right-feature">
@@ -30,7 +35,12 @@
     </div>
     <div class="title feature-right">
       <span class="text-nowrap">
-        branch Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, id!
+        <ng-container *ngIf="branchesQuery.selectLoading() | async">
+          Loading
+        </ng-container>
+        <ng-container *ngIf="!(branchesQuery.selectLoading() | async)">
+          {{activeBranch?.name}}
+        </ng-container>
       </span>
       <div class="status">
         <div class="badge badge-pill badge-secondary bg-info pull-request">

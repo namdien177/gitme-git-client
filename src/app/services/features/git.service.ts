@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/states/account-list';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/states/repository-branches';
+import { RepositoryBranchSummary } from '../../shared/states/repository-branches';
+import { Repository } from '../../shared/states/repositories';
 
 @Injectable()
 export class GitService {
 
   constructor(
     private utilities: UtilityService,
-    private repositoryBranchesService: RepositoryBranchesService
   ) {
   }
 
@@ -17,7 +17,7 @@ export class GitService {
     return git(dir);
   }
 
-  cloneTo(cloneURL: string, directory: string, credentials?: Account) {
+  async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
     let urlRemote = cloneURL;
     directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);
     if (credentials) {
@@ -26,7 +26,7 @@ export class GitService {
     return git().clone(urlRemote, directory);
   }
 
-  async allBranches(directory: string, credentials?: { username: string, password: string }) {
+  async allBranches(directory: string, credentials?: Account) {
     directory = this.utilities.directorySafePath(directory);
     const branchAll = await this.git(directory).branch(['-a']);
     const branchRemote = await this.git(directory).branch(['-r']);
@@ -40,7 +40,58 @@ export class GitService {
       }
       branchMerged.push(viewBranch);
     });
-    this.repositoryBranchesService.refreshList(branchMerged);
+    return branchMerged;
+  }
+
+  async fetchInfo(repository: Repository, credentials?: Account, customRemote: string = null) {
+    // retrieve the directory for git to execute
+    const directory = this.utilities.directorySafePath(repository.directory);
+
+    // checking remotes
+    let urlRemotes: string = null;
+    const fetchURlLocal = !!repository.remote ? repository.remote.fetch : null;
+    if (!!repository.remote && !!fetchURlLocal) {
+      if (credentials) {
+        urlRemotes = this.utilities.addCredentialsToRemote(fetchURlLocal, credentials);
+      } else {
+        urlRemotes = fetchURlLocal;
+      }
+    } else {
+      // retrieve from git
+      const listRemotes = await this.git(directory).getRemotes(true);
+
+      let fallbackURLRemotes = '';
+      listRemotes.forEach(remoteInfo => {
+        if (!!!customRemote && remoteInfo.name === 'origin') {
+          if (credentials) {
+            urlRemotes = this.utilities.addCredentialsToRemote(remoteInfo.refs.fetch, credentials);
+          } else {
+            urlRemotes = remoteInfo.refs.fetch;
+          }
+          fallbackURLRemotes = urlRemotes;
+        } else if (remoteInfo.name === customRemote) {
+          if (credentials) {
+            urlRemotes = this.utilities.addCredentialsToRemote(remoteInfo.refs.fetch, credentials);
+          } else {
+            urlRemotes = remoteInfo.refs.fetch;
+          }
+        }
+      });
+
+      if (!urlRemotes && !fallbackURLRemotes) {
+        return false;
+      }
+
+      if (!urlRemotes) {
+        urlRemotes = fallbackURLRemotes;
+      }
+    }
+    // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
+    const data = await this.git(directory).fetch(urlRemotes);
+    return {
+      fetchData: data,
+      repository
+    };
   }
 
   isGitProject(directory: string) {

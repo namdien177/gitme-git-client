@@ -5,6 +5,11 @@ export interface RepositoryBranchSummary {
   current: boolean | string;
 }
 
+export interface Branches {
+  branches: RepositoryBranchSummary[];
+  current: RepositoryBranchSummary;
+}
+
 export function createRepositoryBranch(params: Partial<RepositoryBranchSummary>) {
   return {} as RepositoryBranchSummary;
 }

@@ -7,4 +7,11 @@ export interface Repository {
     id_credential: string;
     name?: string
   };
+  selected: boolean;
+  remote?: {
+    fetch: string;
+    pull: string;
+  };
+
+  [key: string]: any;
 }

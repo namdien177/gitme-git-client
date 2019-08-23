@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account } from '../states/account-list';
+import { SecurityService } from '../../services/system/security.service';
 
 
 @Injectable()
@@ -26,7 +27,9 @@ export class UtilityService {
     { invalid: ']', replace: '%5D' },
   ];
 
-  constructor() {
+  constructor(
+    private securityService: SecurityService
+  ) {
   }
 
   static htmlUnitToFixed(strUnit: string): number {
@@ -103,7 +106,7 @@ export class UtilityService {
     if (isHTTPS) {
       const splitStr = remoteURL.split('//');
       const userSafe = this.gitStringSafe(credentials.username);
-      const pwdSafe = this.gitStringSafe(credentials.password);
+      const pwdSafe = this.gitStringSafe(this.securityService.decryptAES(credentials.password));
       let remoteCredentials = '';
       splitStr.forEach((stringRemote, index) => {
         remoteCredentials += stringRemote;

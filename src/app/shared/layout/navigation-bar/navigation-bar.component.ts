@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../states/repositories-menu';
+import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/repositories';
+import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/repository-branches';
 
 @Component({
   selector: 'gitme-navigation-bar',
@@ -10,17 +12,40 @@ export class NavigationBarComponent implements OnInit {
   isRepositoryBoxOpen = false;
   isBranchBoxOpen = false;
 
+  activeRepository: Repository = null;
+  activeBranch: RepositoryBranchSummary = null;
+
   constructor(
     private repositoriesMenuQuery: RepositoriesMenuQuery,
-    private repositoriesMenuService: RepositoriesMenuService
+    private repositoriesMenuService: RepositoriesMenuService,
+    protected repositoriesQuery: RepositoriesQuery,
+    protected branchesQuery: RepositoryBranchesQuery,
+    private repositoriesService: RepositoriesService,
+    private branchesService: RepositoryBranchesService
   ) {
     this.repositoriesMenuQuery.select().subscribe(state => {
       this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
       this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
     });
+
+    // Retrieve current selected
+    this.repositoriesService.getActive().subscribe(
+      selectedRepo => {
+        this.activeRepository = selectedRepo;
+        this.branchesService.load(selectedRepo.directory, null);
+      }
+    );
+
+    this.branchesQuery.selectAll().subscribe(listBranch => {
+      console.log(listBranch);
+      this.activeBranch = listBranch.find(branch => {
+        return branch.current || branch.current === 'true';
+      });
+    });
   }
 
   ngOnInit() {
+
   }
 
   toggleRepositoryBox() {
