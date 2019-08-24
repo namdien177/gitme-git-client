@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { EntityState, EntityStore, StoreConfig } from '@datorama/akita';
+import { ActiveState, EntityState, EntityStore, StoreConfig } from '@datorama/akita';
 import { RepositoryBranchSummary } from './repository-branch.model';
 
-export interface RepositoryBranchesState extends EntityState<RepositoryBranchSummary, string> {
+export interface RepositoryBranchesState extends EntityState<RepositoryBranchSummary, string>, ActiveState {
 }
 
 @Injectable({ providedIn: 'root' })

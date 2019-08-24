@@ -30,10 +30,10 @@ export class NavigationBarComponent implements OnInit {
         });
 
         // Retrieve current selected repository
-        this.repositoriesService.getActiveRepository().subscribe(
+        this.repositoriesService.getActive().subscribe(
             selectedRepo => {
                 this.activeRepository = selectedRepo;
-                this.branchesService.load(selectedRepo.directory, null);
+                this.branchesService.load(selectedRepo, null);
             }
         );
 

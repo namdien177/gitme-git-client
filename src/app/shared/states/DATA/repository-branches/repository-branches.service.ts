@@ -5,6 +5,8 @@ import { RepositoryBranchesQuery } from './repository-branches.query';
 import { GitService } from '../../../../services/features/git.service';
 import { Account } from '../account-list';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Repository } from '../repositories';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
@@ -16,8 +18,8 @@ export class RepositoryBranchesService {
     ) {
     }
 
-    async load(directoryGIT: string, credentials?: Account) {
-        const repoSum = await this.gitService.allBranches(directoryGIT, credentials);
+    async load(repository: Repository, credentials?: Account) {
+        const repoSum = await this.gitService.allBranches(repository.directory, credentials);
         this.set(repoSum);
     }
 
@@ -32,12 +34,31 @@ export class RepositoryBranchesService {
                 return 0;
             }
         );
-        console.log(listBranch);
+        listBranch.every(branch => {
+            if (branch.current) {
+                this.setActive(branch);
+                return false;
+            }
+            return true;
+        });
         this.store.set(listBranch);
     }
 
     get(): Observable<RepositoryBranchSummary[]> {
         return this.query.selectAll();
+    }
+
+    getActive() {
+        this.setLoading();
+        return this.query.selectActive().pipe(
+            tap(() => {
+                this.finishLoading();
+            })
+        );
+    }
+
+    setActive(branch: RepositoryBranchSummary) {
+        this.store.setActive(branch.id);
     }
 
     setLoading() {

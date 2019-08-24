@@ -15,7 +15,8 @@ export class GitService {
     ) {
     }
 
-    git(dir?) {
+    git(dir?: string) {
+        dir = this.utilities.directorySafePath(dir);
         return git(dir);
     }
 
@@ -117,6 +118,19 @@ export class GitService {
 
     async pull() {
 
+    }
+
+    async switchBranch(repository: Repository, branch: RepositoryBranchSummary, credentials?: Account) {
+        if (!this.isGitProject(repository.directory)) {
+            return false;
+        }
+
+        return await this.git(repository.directory).checkout(branch.name)
+        .then(resolve => true)
+        .catch(err => {
+            console.log(err);
+            return false;
+        });
     }
 
     private getURLRemoteFromListGitRemotes(remoteInfo: {

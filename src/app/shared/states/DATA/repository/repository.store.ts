@@ -8,7 +8,6 @@ export function createInitialState(): Repository {
         id_remote: null,
         name: null,
         directory: null,
-        selected: false
     };
 }
 
