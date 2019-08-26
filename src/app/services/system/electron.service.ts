@@ -119,7 +119,7 @@ export class ElectronService {
             }
 
             if (!!dataOutput.credentials && Array.isArray(dataOutput.credentials)) {
-                this.accountList.addNew(dataOutput.credentials);
+                this.accountList.set(dataOutput.credentials);
             }
         });
     }

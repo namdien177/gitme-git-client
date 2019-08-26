@@ -66,7 +66,8 @@ export class UtilityService {
     }
 
     directorySafePath(rawPath: string) {
-        const strSplit = rawPath.split('\\').map(nonTrim => nonTrim.trim());
+        const fixedRawPath = this.slashFixer(rawPath);
+        const strSplit = fixedRawPath.split('/').map(nonTrim => nonTrim.trim());
         let finalDir = '';
         strSplit.forEach(arrDir => {
             if (arrDir.includes(' ')) {
@@ -82,7 +83,7 @@ export class UtilityService {
             } else {
                 finalDir += arrDir;
             }
-            finalDir += '\\';
+            finalDir += '/';
         });
         return finalDir;
     }
@@ -119,5 +120,31 @@ export class UtilityService {
             });
             return remoteCredentials;
         }
+    }
+
+    filterFolderGroup(fileLocationString: string[]) {
+
+    }
+
+    /**
+     * Convert all `\` character to `/`
+     * @param directory
+     */
+    slashFixer(directory: string) {
+        return directory.replace(/\\/g, '/');
+    }
+
+    extractFrontPath(directory: string) {
+        const dir = directory.split('/');
+        let frontPath = '';
+        dir.forEach((path, index) => {
+            if (index !== dir.length - 1) {
+                frontPath += path + '/';
+            }
+        });
+        return {
+            front: frontPath,
+            end: dir[dir.length - 1]
+        };
     }
 }

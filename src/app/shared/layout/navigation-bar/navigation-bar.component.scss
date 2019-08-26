@@ -4,9 +4,9 @@
     height: 100%;
     width: 100%;
     display: grid;
-    grid-template-areas: 'selection' 'branches' 'actions' 'commit' 'files';
+    grid-template-areas: 'selection' 'branches' 'files' 'commit' 'actions';
     grid-template-columns: 300px;
-    grid-template-rows: repeat(3, 80px) max-content auto;
+    grid-template-rows: repeat(2, 80px) calc(100vh - 311px) 39px 80px;
     grid-gap: 0;
     box-shadow: $shadow-light;
 
@@ -125,10 +125,55 @@
 
 .repo-commit {
     grid-area: commit;
+
+    input {
+        border-radius: 0;
+        border: none;
+        border-top: 1px solid $background-primary-lighter-night;
+
+        &:focus {
+            background: $background-primary-night-selected;
+        }
+    }
 }
 
 .repo-files-commit {
     grid-area: files;
+    display: block;
+    height: 100%;
+    overflow: auto;
+
+    .files {
+        display: grid;
+        grid-template-columns: 3rem auto;
+        grid-template-rows: 1fr;
+        grid-gap: 0;
+        height: 2.5rem;
+        width: 100%;
+
+        &:hover {
+            background: $background-primary-night-selected;
+        }
+
+        .directory {
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: auto max-content;
+            grid-template-rows: 1fr;
+            grid-gap: 0.5rem;
+            width: 100%;
+            font-size: 0.95rem;
+            align-items: center;
+            padding-right: 0.5rem;
+            user-select: none;
+
+            .front-path {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+        }
+    }
 }
 
 .cursor-pointer {

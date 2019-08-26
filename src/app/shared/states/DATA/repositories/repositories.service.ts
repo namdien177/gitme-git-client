@@ -80,6 +80,22 @@ export class RepositoriesService {
         );
     }
 
+
+    getBranchStatus(repository: Repository, setLoading = true) {
+        if (setLoading) {
+            this.setLoading();
+        }
+        return fromPromise(this.gitService.getStatusOnBranch(repository))
+        .pipe(
+            map(status => {
+                if (setLoading) {
+                    this.finishLoading();
+                }
+                return status;
+            })
+        );
+    }
+
     setLoading() {
         this.store.setLoading(true);
     }

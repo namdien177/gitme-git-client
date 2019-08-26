@@ -93,6 +93,10 @@ export class GitService {
         };
     }
 
+    async getStatusOnBranch(repository: Repository) {
+        return this.git(repository.directory).status();
+    }
+
     async isGitProject(directory: string) {
         directory = this.utilities.directorySafePath(directory);
         return await git(directory).checkIsRepo();
@@ -116,8 +120,19 @@ export class GitService {
         // };
     }
 
-    async pull() {
+    async push(repository: Repository, credentials: Account) {
+        const urlRemote = this.utilities.addCredentialsToRemote(repository.remote.fetch, credentials);
+        return this.git(repository.directory).push(urlRemote);
+    }
 
+    async commit(repository: Repository, message: string, fileList?: string[], option?: {
+        [properties: string]: string
+    }) {
+        return this.git(repository.directory).commit(message, fileList, option);
+    }
+
+    async addWatch(repository: Repository, fileDir: string[]) {
+        await this.git(repository.directory).add(fileDir);
     }
 
     async switchBranch(repository: Repository, branch: RepositoryBranchSummary, credentials?: Account) {
