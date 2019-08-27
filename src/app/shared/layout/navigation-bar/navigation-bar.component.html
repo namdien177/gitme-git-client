@@ -11,7 +11,7 @@
                     Loading
                 </ng-container>
                 <ng-container *ngIf="!(repositoriesQuery.selectLoading() | async)">
-                    {{activeRepository?.name}}
+                    {{repository?.name}}
                 </ng-container>
             </div>
         </div>

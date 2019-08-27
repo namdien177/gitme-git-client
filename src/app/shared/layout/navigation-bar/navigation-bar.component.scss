@@ -158,9 +158,9 @@
         .directory {
             overflow: hidden;
             display: grid;
-            grid-template-columns: auto max-content;
+            grid-template-columns: auto minmax(max-content, 1fr);
             grid-template-rows: 1fr;
-            grid-gap: 0.5rem;
+            grid-gap: 0rem;
             width: 100%;
             font-size: 0.95rem;
             align-items: center;

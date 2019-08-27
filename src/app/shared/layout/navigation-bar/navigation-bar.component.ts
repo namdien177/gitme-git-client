@@ -2,12 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../states/UI/repositories-menu';
 import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/DATA/repositories';
 import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/DATA/repository-branches';
-import { GitService } from '../../../services/features/git.service';
 import { AccountListService } from '../../states/DATA/account-list';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { StatusSummary } from '../../model/StatusSummary';
-import { interval, of, Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
+import { FileChangesQuery, FileChangesService } from '../../states/system/FileChanges';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -17,7 +17,7 @@ import { UtilityService } from '../../utilities/utility.service';
 export class NavigationBarComponent implements OnInit, OnDestroy {
     isRepositoryBoxOpen = false;
     isBranchBoxOpen = false;
-    activeRepository: Repository = null;
+    repository: Repository = null;
     activeBranch: RepositoryBranchSummary = null;
     statusSummary: StatusSummary;
 
@@ -31,7 +31,8 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private repositoriesService: RepositoriesService,
         private branchesService: RepositoryBranchesService,
         private accountService: AccountListService,
-        private gitService: GitService,
+        private fileChangesService: FileChangesService,
+        private fileChangesQuery: FileChangesQuery,
         protected utilities: UtilityService
     ) {
         // State UI
@@ -42,10 +43,27 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
 
         // Retrieve current selected repository
         this.repositoriesService.getActive()
-        .subscribe(
-            selectedRepo => {
-                this.activeRepository = selectedRepo;
+        .pipe(
+            switchMap(selectedRepo => {
+                this.repository = selectedRepo;
                 this.branchesService.load(selectedRepo, null);
+                if (this.repository) {
+                    const dir = this.repository.directory;
+                    this.fileChangesService.switchTo(dir);
+                }
+
+                if (!!this.repository) {
+                    return this.repositoriesService.getBranchStatus(
+                        this.repository,
+                        false
+                    );
+                }
+                return of(null);
+            })
+        )
+        .subscribe(
+            (status: StatusSummary) => {
+                this.statusSummary = status;
             }
         );
 
@@ -59,25 +77,27 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             }
         );
 
-        // start listening to changes by GIT
-        interval(2000).pipe(
+        // start listening to changes by chokidar
+        this.fileChangesQuery.select().pipe(
             takeUntil(this.componentDestroyed),
+            debounceTime(200),
             switchMap(
-                () => {
-                    if (!!this.activeRepository) {
+                (changes) => {
+                    console.log(changes);
+                    if (!!this.repository) {
                         return this.repositoriesService.getBranchStatus(
-                            this.activeRepository,
+                            this.repository,
                             false
                         );
                     }
                     return of(null);
                 }
             )
-        ).subscribe((status) => {
-            this.statusSummary = status;
-            console.log(status);
-        });
-
+        ).subscribe(
+            (status: StatusSummary) => {
+                this.statusSummary = status;
+            }
+        );
     }
 
     ngOnDestroy(): void {
