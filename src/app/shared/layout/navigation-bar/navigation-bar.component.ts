@@ -8,6 +8,7 @@ import { StatusSummary } from '../../model/StatusSummary';
 import { of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
 import { FileChangesQuery, FileChangesService } from '../../states/system/FileChanges';
+import { GitService } from '../../../services/features/git.service';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -33,6 +34,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private accountService: AccountListService,
         private fileChangesService: FileChangesService,
         private fileChangesQuery: FileChangesQuery,
+        private gitService: GitService,
         protected utilities: UtilityService
     ) {
         // State UI

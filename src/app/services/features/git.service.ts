@@ -5,6 +5,7 @@ import { Account } from '../../shared/states/DATA/account-list';
 import { RepositoryBranchSummary } from '../../shared/states/DATA/repository-branches';
 import { Repository } from '../../shared/states/DATA/repositories';
 import { SecurityService } from '../system/security.service';
+import * as moment from 'moment';
 
 @Injectable()
 export class GitService {
@@ -132,7 +133,24 @@ export class GitService {
     }
 
     async addWatch(repository: Repository, fileDir: string[]) {
-        await this.git(repository.directory).add(fileDir);
+        return await this.git(repository.directory).add(fileDir);
+    }
+
+    async addStash(repository: Repository, message?: string) {
+        if (!message) {
+            message = `Stashed at ${ moment().format('YYYY/MM/DD - HH:mm:ss') }`;
+        }
+        return await this.git(repository.directory).stash();
+    }
+
+    async getListStash(repository: Repository) {
+        return await this.git(repository.directory).stashList();
+    }
+
+    async getStash(repository: Repository) {
+        return await this.git(repository.directory).stash([
+            'pop'
+        ]);
     }
 
     async switchBranch(repository: Repository, branch: RepositoryBranchSummary, credentials?: Account) {
