@@ -80,7 +80,6 @@ export class RepositoriesService {
         );
     }
 
-
     getBranchStatus(repository: Repository, setLoading = true) {
         if (setLoading) {
             this.setLoading();

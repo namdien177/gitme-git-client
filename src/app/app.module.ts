@@ -22,6 +22,7 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/system/localStorage.service';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
+import { CommitFilesComponent } from './shared/components/commit-files/commit-files.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -36,7 +37,8 @@ const declareComps = [
 
 @NgModule({
     declarations: [
-        ...declareComps
+        ...declareComps,
+        CommitFilesComponent
     ],
     imports: [
         BrowserModule,

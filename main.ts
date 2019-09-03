@@ -20,7 +20,7 @@ function createWindow() {
     height: size.height > 720 ? 720 : size.height,
     frame: false,
     minHeight: 620,
-    minWidth: 900,
+    minWidth: 1050,
     webPreferences: {
       nodeIntegration: true,
     },

@@ -122,8 +122,17 @@ export class UtilityService {
         }
     }
 
-    filterFolderGroup(fileLocationString: string[]) {
-
+    isStringExistIn(stringToCheck: string, inWhatArray: any[], propertiesInArray?: string) {
+        let isIn = false;
+        inWhatArray.every(toCompare => {
+            const checkingData = propertiesInArray ? toCompare[propertiesInArray] : toCompare;
+            if (checkingData === stringToCheck) {
+                isIn = true;
+                return false;
+            }
+            return true;
+        });
+        return isIn;
     }
 
     /**

@@ -1,39 +1,39 @@
-<div [class.open]="isRepositoryBoxOpen"
-     appIsClickOutside
-     class="function repo-selection">
-    <div class="inner-title feature-right">
-        <div (click)="toggleRepositoryBox()" class="main-function">
-            <div class="title-secondary text-muted">
-                Current Repository
+<div class="buttons-bar">
+    <div [class.open]="isRepositoryBoxOpen"
+         class="function repo-selection">
+        <div class="inner-title feature-right">
+            <div (click)="toggleRepositoryBox()" class="main-function">
+                <div class="title-secondary text-muted">
+                    Current Repository
+                </div>
+                <div class="title">
+                    <ng-container *ngIf="repositoriesQuery.selectLoading() | async">
+                        Loading
+                    </ng-container>
+                    <ng-container *ngIf="!(repositoriesQuery.selectLoading() | async)">
+                        {{repository?.name}}
+                    </ng-container>
+                </div>
             </div>
-            <div class="title">
-                <ng-container *ngIf="repositoriesQuery.selectLoading() | async">
-                    Loading
-                </ng-container>
-                <ng-container *ngIf="!(repositoriesQuery.selectLoading() | async)">
-                    {{repository?.name}}
-                </ng-container>
+            <div class="right-feature">
+                <i class="fas fa-cog"></i>
             </div>
         </div>
-        <div class="right-feature">
-            <i class="fas fa-cog"></i>
-        </div>
+
+        <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"
+                                       class="list-repositories">
+        </gitme-navigation-repositories>
     </div>
 
-    <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"
-                                   class="list-repositories">
-    </gitme-navigation-repositories>
-</div>
-
-<div (isOutside)="clickOutSide($event, 'branches')"
-     [class.open]="isBranchBoxOpen"
-     appIsClickOutside
-     class="function repo-branches">
-    <div (click)="toggleBranchBox()" class="inner-title raw">
-        <div class="title-secondary text-muted">
-            Current Branch
-        </div>
-        <div class="title feature-right">
+    <div (isOutside)="clickOutSide($event, 'branches')"
+         [class.open]="isBranchBoxOpen"
+         appIsClickOutside
+         class="function repo-branches">
+        <div (click)="toggleBranchBox()" class="inner-title raw">
+            <div class="title-secondary text-muted">
+                Current Branch
+            </div>
+            <div class="title feature-right">
             <span class="text-nowrap">
                 <ng-container *ngIf="branchesQuery.selectLoading() | async">
                     Loading
@@ -42,77 +42,83 @@
                     {{activeBranch?.name}}
                 </ng-container>
             </span>
-            <div class="status">
-                <div *ngIf="statusSummary?.behind > 0"
-                     class="badge badge-pill badge-secondary bg-info pull-request">
-                    <i class="fas fa-angle-down"></i>
-                    {{statusSummary?.behind}}
+                <div class="status">
+                    <div *ngIf="statusSummary?.behind > 0"
+                         class="badge badge-pill badge-secondary bg-info pull-request">
+                        <i class="fas fa-angle-down"></i>
+                        {{statusSummary?.behind}}
+                    </div>
+                    <div *ngIf="statusSummary?.ahead > 0"
+                         class="badge badge-pill badge-secondary bg-success push-request">
+                        <i class="fas fa-angle-up"></i>
+                        {{statusSummary?.ahead}}
+                    </div>
                 </div>
-                <div *ngIf="statusSummary?.ahead > 0"
-                     class="badge badge-pill badge-secondary bg-success push-request">
-                    <i class="fas fa-angle-up"></i>
-                    {{statusSummary?.ahead}}
+            </div>
+        </div>
+
+        <gitme-repo-branches *ngIf="isBranchBoxOpen"
+                             class="list-branches"></gitme-repo-branches>
+    </div>
+</div>
+
+<div class="files-commit">
+    <div class="function branch-actions">
+        <div (click)="actionButtonClick()" class="inner-title raw">
+            <div class="title-secondary text-muted">
+                git fetch origin
+            </div>
+            <div class="title feature-right">
+                <span class="text-nowrap">
+                  Fetch remote data
+                </span>
+                <div class="status">
+                    <div *ngIf="statusSummary?.files.length > 0"
+                         [title]="statusSummary?.files.length + ' file(s) changed'"
+                         class="badge badge-pill badge-secondary bg-warning changes">
+                        <i class="fas fa-file-invoice"></i>
+                        {{statusSummary?.files.length}}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <gitme-repo-branches *ngIf="isBranchBoxOpen"></gitme-repo-branches>
-</div>
+    <div class="branch-commit">
+        <button class="btn btn-block btn-success rounded-0">
+            Commit
+        </button>
+    </div>
 
-<div class="repo-files-commit">
-    <div *ngFor="let file of statusSummary?.files"
-         class="files">
-        <div class="added acomi-checkbox-control">
-            <input [value]="file"
-                   checked
+    <div class="files-checkAll">
+        <div class="added-checkbox acomi-checkbox-control">
+            <input checked
                    class="acomi-input-box"
+                   formControlName="files"
                    hidden
                    id="cbx"
-                   name="account"
+                   name="file"
                    type="checkbox"/>
             <label class="cbx" for="cbx">
                 <span>
-                  <svg height="10px" viewbox="0 0 12 10" width="12px">
-                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                  </svg>
+                    <svg height="10px" viewbox="0 0 12 10" width="12px">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </svg>
                 </span>
             </label>
         </div>
-        <div [title]="file.path" class="directory">
-            <div class="front-path text-muted">
-                {{utilities.extractFrontPath(file.path).front}}
-            </div>
-            <div class="file-name">
-                {{utilities.extractFrontPath(file.path).end}}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="repo-commit">
-    <input class="form-control form-control-dark"
-           placeholder="Commit title"
-           type="text">
-</div>
-
-<div class="function repo-actions">
-    <div class="inner-title raw">
-        <div class="title-secondary text-muted">
-            git fetch origin
-        </div>
-        <div class="title feature-right">
-        <span class="text-nowrap">
-          Fetch remote data
+        <span class="added-title">
+            Select All ({{statusSummary?.files?.length}} file{{statusSummary?.files?.length > 1 ? 's' : ''}})
         </span>
-            <div class="status">
-                <div *ngIf="statusSummary?.files.length > 0"
-                     [title]="statusSummary?.files.length + ' file(s) changed'"
-                     class="badge badge-pill badge-secondary bg-warning changes">
-                    <i class="fas fa-file-invoice"></i>
-                    {{statusSummary?.files.length}}
-                </div>
-            </div>
-        </div>
     </div>
+
+    <div class="commit-title">
+        <input class="form-control form-control-dark"
+               placeholder="Commit title (Required)"
+               type="text">
+    </div>
+</div>
+
+<div class="content-router">
+    <ng-content></ng-content>
 </div>

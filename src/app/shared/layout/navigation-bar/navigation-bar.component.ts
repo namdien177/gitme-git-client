@@ -9,6 +9,7 @@ import { of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
 import { FileChangesQuery, FileChangesService } from '../../states/system/FileChanges';
 import { GitService } from '../../../services/features/git.service';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -35,71 +36,13 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private fileChangesService: FileChangesService,
         private fileChangesQuery: FileChangesQuery,
         private gitService: GitService,
-        protected utilities: UtilityService
+        protected utilities: UtilityService,
+        private fb: FormBuilder
     ) {
-        // State UI
-        this.repositoriesMenuQuery.select().subscribe(state => {
-            this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
-            this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
-        });
-
-        // Retrieve current selected repository
-        this.repositoriesService.getActive()
-        .pipe(
-            switchMap(selectedRepo => {
-                this.repository = selectedRepo;
-                this.branchesService.load(selectedRepo, null);
-                if (this.repository) {
-                    const dir = this.repository.directory;
-                    this.fileChangesService.switchTo(dir);
-                }
-
-                if (!!this.repository) {
-                    return this.repositoriesService.getBranchStatus(
-                        this.repository,
-                        false
-                    );
-                }
-                return of(null);
-            })
-        )
-        .subscribe(
-            (status: StatusSummary) => {
-                this.statusSummary = status;
-            }
-        );
-
-        this.branchesQuery.selectAll()
-        .subscribe(
-            listBranch => {
-                this.activeBranch = listBranch.find(branch => {
-                    return branch.current || branch.current === 'true';
-                });
-                console.log(listBranch);
-            }
-        );
-
-        // start listening to changes by chokidar
-        this.fileChangesQuery.select().pipe(
-            takeUntil(this.componentDestroyed),
-            debounceTime(200),
-            switchMap(
-                (changes) => {
-                    console.log(changes);
-                    if (!!this.repository) {
-                        return this.repositoriesService.getBranchStatus(
-                            this.repository,
-                            false
-                        );
-                    }
-                    return of(null);
-                }
-            )
-        ).subscribe(
-            (status: StatusSummary) => {
-                this.statusSummary = status;
-            }
-        );
+        this.watchingUIState();
+        this.watchingRepository();
+        this.watchingBranch();
+        this.watchingFileChanges();
     }
 
     ngOnDestroy(): void {
@@ -126,6 +69,10 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         }
     }
 
+    actionButtonClick() {
+
+    }
+
     clickOutSide(isOutSide: boolean, button: 'repositories' | 'branches') {
         if (isOutSide) {
             switch (button) {
@@ -141,5 +88,81 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                     break;
             }
         }
+    }
+
+    /**
+     * Retrieve current selected repository
+     */
+    private watchingRepository() {
+        this.repositoriesService.getActive()
+        .pipe(
+            switchMap(selectedRepo => {
+                this.repository = selectedRepo;
+                this.branchesService.load(selectedRepo, null);
+                if (this.repository) {
+                    const dir = this.repository.directory;
+                    this.fileChangesService.switchTo(dir);
+                }
+
+                return this.observingBranchStatus();
+            })
+        )
+        .subscribe(
+            (status: StatusSummary) => {
+                console.log(status);
+                this.statusSummary = status;
+            }
+        );
+    }
+
+    private watchingUIState() {
+        this.repositoriesMenuQuery.select().subscribe(state => {
+            this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
+            this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
+        });
+    }
+
+    private watchingBranch() {
+        this.branchesQuery.selectAll()
+        .subscribe(
+            listBranch => {
+                this.activeBranch = listBranch.find(branch => {
+                    return branch.current || branch.current === 'true';
+                });
+                console.log(listBranch);
+            }
+        );
+    }
+
+    /**
+     * Start listening to changes by Chokidar for better performance and cross-platform support
+     */
+    private watchingFileChanges() {
+        this.fileChangesQuery.select().pipe(
+            takeUntil(this.componentDestroyed),
+            debounceTime(200),
+            switchMap(
+                () => {
+                    return this.observingBranchStatus();
+                }
+            )
+        ).subscribe(
+            (status: StatusSummary) => {
+                this.statusSummary = status;
+            }
+        );
+    }
+
+    /**
+     * Return the current status of branch
+     */
+    private observingBranchStatus() {
+        if (!!this.repository) {
+            return this.repositoriesService.getBranchStatus(
+                this.repository,
+                false
+            );
+        }
+        return of(null);
     }
 }
