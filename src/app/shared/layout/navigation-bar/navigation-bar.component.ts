@@ -5,11 +5,11 @@ import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSum
 import { AccountListService } from '../../states/DATA/account-list';
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 import { StatusSummary } from '../../model/StatusSummary';
-import { of, Subject } from 'rxjs';
+import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
-import { FileChangesQuery, FileChangesService } from '../../states/system/FileChanges';
-import { GitService } from '../../../services/features/git.service';
+import { FileWatchesQuery, FileWatchesService } from '../../states/system/File-Watches';
 import { FormBuilder } from '@angular/forms';
+import { FileChangesService } from '../../states/system/File-Changes';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -33,16 +33,17 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private repositoriesService: RepositoriesService,
         private branchesService: RepositoryBranchesService,
         private accountService: AccountListService,
+        private fileWatchesService: FileWatchesService,
+        private fileWatchesQuery: FileWatchesQuery,
         private fileChangesService: FileChangesService,
-        private fileChangesQuery: FileChangesQuery,
-        private gitService: GitService,
         protected utilities: UtilityService,
         private fb: FormBuilder
     ) {
         this.watchingUIState();
         this.watchingRepository();
         this.watchingBranch();
-        this.watchingFileChanges();
+        // this.watchingFileChanges(); // Chokidar is more efficient!
+        this.loopRefreshBranchStatus();
     }
 
     ngOnDestroy(): void {
@@ -90,6 +91,13 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         }
     }
 
+    private watchingUIState() {
+        this.repositoriesMenuQuery.select().subscribe(state => {
+            this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
+            this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
+        });
+    }
+
     /**
      * Retrieve current selected repository
      */
@@ -101,7 +109,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 this.branchesService.load(selectedRepo, null);
                 if (this.repository) {
                     const dir = this.repository.directory;
-                    this.fileChangesService.switchTo(dir);
+                    this.fileWatchesService.switchTo(dir);
                 }
 
                 return this.observingBranchStatus();
@@ -113,13 +121,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 this.statusSummary = status;
             }
         );
-    }
-
-    private watchingUIState() {
-        this.repositoriesMenuQuery.select().subscribe(state => {
-            this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
-            this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
-        });
     }
 
     private watchingBranch() {
@@ -138,7 +139,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
      * Start listening to changes by Chokidar for better performance and cross-platform support
      */
     private watchingFileChanges() {
-        this.fileChangesQuery.select().pipe(
+        this.fileWatchesQuery.select().pipe(
             takeUntil(this.componentDestroyed),
             debounceTime(200),
             switchMap(
@@ -164,5 +165,16 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             );
         }
         return of(null);
+    }
+
+    private loopRefreshBranchStatus(loopDuration = 2000) {
+        interval(loopDuration)
+        .pipe(
+            takeUntil(this.componentDestroyed),
+            switchMap(() => this.observingBranchStatus())
+        )
+        .subscribe((status) => {
+            this.statusSummary = status;
+        });
     }
 }

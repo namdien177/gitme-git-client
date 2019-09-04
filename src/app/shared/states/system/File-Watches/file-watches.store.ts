@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Store, StoreConfig } from '@datorama/akita';
 
-export interface FileChangesState {
+export interface FileWatchesState {
     isChange: boolean;
     path: string;
     type: string;
 }
 
-export function createInitialState(): FileChangesState {
+export function createInitialState(): FileWatchesState {
     return {
         isChange: false,
         path: null,
@@ -16,8 +16,8 @@ export function createInitialState(): FileChangesState {
 }
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'FileChanges' })
-export class FileChangesStore extends Store<FileChangesState> {
+@StoreConfig({ name: 'FileWatches' })
+export class FileWatchesStore extends Store<FileWatchesState> {
 
     constructor() {
         super(createInitialState());

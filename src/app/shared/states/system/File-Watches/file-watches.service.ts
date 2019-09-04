@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { FileChangesStore } from './file-changes.store';
+import { FileWatchesStore } from './file-watches.store';
 import { chokidarNode, fsNode } from '../../../types/types.electron';
 
 @Injectable({ providedIn: 'root' })
-export class FileChangesService implements OnDestroy {
+export class FileWatchesService implements OnDestroy {
 
     private chokidar: typeof chokidarNode;
     private watcher: typeof chokidarNode.FSWatcher.prototype = null;
@@ -28,7 +28,7 @@ export class FileChangesService implements OnDestroy {
     ];
 
     constructor(
-        private fileChangesStore: FileChangesStore,
+        private fileChangesStore: FileWatchesStore,
     ) {
         this.chokidar = chokidarNode;
     }

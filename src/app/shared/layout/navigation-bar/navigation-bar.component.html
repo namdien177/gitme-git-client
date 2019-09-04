@@ -90,11 +90,16 @@
         </button>
     </div>
 
+    <div class="commit-title">
+        <input class="form-control form-control-dark"
+               placeholder="Commit title (Required)"
+               type="text">
+    </div>
+
     <div class="files-checkAll">
         <div class="added-checkbox acomi-checkbox-control">
             <input checked
                    class="acomi-input-box"
-                   formControlName="files"
                    hidden
                    id="cbx"
                    name="file"
@@ -112,10 +117,8 @@
         </span>
     </div>
 
-    <div class="commit-title">
-        <input class="form-control form-control-dark"
-               placeholder="Commit title (Required)"
-               type="text">
+    <div class="commit-flies">
+        <gitme-commit-files></gitme-commit-files>
     </div>
 </div>
 
