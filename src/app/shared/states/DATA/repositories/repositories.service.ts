@@ -119,7 +119,7 @@ export class RepositoriesService {
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
         const { name } = repository.credential;
         const author = !!name ? name : null;
-        if (!!!option['--author'] && author) {
+        if (!!option && !!!option['--author'] && author) {
             Object.assign(option, {
                 '--author': author
             });

@@ -10,12 +10,11 @@ import { electronNG, fsNode } from '../../shared/types/types.electron';
 import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
-import * as moment from 'moment';
 import { RepositoriesService } from '../../shared/states/DATA/repositories';
 import { AccountListService } from '../../shared/states/DATA/account-list';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
-import { AppConfig } from '../../shared/model/App-Config';
+import { AppConfig, DefaultConfig } from '../../shared/model/App-Config';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService {
@@ -70,15 +69,7 @@ export class ElectronService {
                 )
             );
         } else {
-            const data: AppConfig = {
-                app_key: this.machine_id,
-                version: DefineCommon.APP_VERSION,
-                first_init: {
-                    created_at: moment().valueOf()
-                },
-                repository_config: [],
-                account_config: []
-            };
+            const data: AppConfig = DefaultConfig(configDefaultName);
             this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
                 resolve => {
                     console.log(resolve);

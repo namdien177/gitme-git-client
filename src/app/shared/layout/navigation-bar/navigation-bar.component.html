@@ -64,7 +64,7 @@
 
 <form [formGroup]="formCommitment" class="files-commit">
     <div class="function branch-actions">
-        <div class="inner-title raw" (click)="fetch()">
+        <div (click)="fetch()" class="inner-title raw">
             <div class="title-secondary text-muted">
                 git fetch origin
             </div>
@@ -85,10 +85,11 @@
     </div>
 
     <div class="branch-commit">
-        <button [disabled]="formCommitment.invalid"
-                (click)="commitFile()"
+        <button (click)="commitFile()"
+                [disabled]="formCommitment.invalid || loading.commit"
                 class="btn btn-block btn-success rounded-0">
-            Commit
+            <gitme-small-load *ngIf="loading.commit"></gitme-small-load>
+            <span>Commit</span>
         </button>
     </div>
 

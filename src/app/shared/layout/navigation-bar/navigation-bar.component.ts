@@ -28,6 +28,14 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     checkboxAllFileStatus = false;
     formCommitment: FormGroup;
 
+    loading = {
+        commit: false,
+        fetch: false,
+        push: false,
+        branch: false,
+        repository: false,
+    };
+
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -121,10 +129,12 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         if (this.formCommitment.invalid) {
             return;
         }
+        this.loading.commit = true;
         const listFilesCommit: FileStatusSummaryView[] = this.filesCommit.value;
         const paths: string[] = this.utilities.extractFilePathFromGitStatus(listFilesCommit);
         this.repositoriesService.commit(this.repository, this.titleCommit.value, paths).subscribe(
             result => {
+                this.loading.commit = false;
                 console.log(result);
             }
         );
@@ -134,17 +144,20 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         if (this.statusSummary.ahead < 1) {
             return;
         }
-
+        this.loading.push = true;
         this.repositoriesService.push(this.repository).subscribe(
             result => {
+                this.loading.commit = false;
                 console.log(result);
             }
         );
     }
 
     fetch() {
+        this.loading.fetch = true;
         this.repositoriesService.getRemotes(this.repository).subscribe(
             result => {
+                this.loading.fetch = false;
                 console.log(result);
             }
         );
