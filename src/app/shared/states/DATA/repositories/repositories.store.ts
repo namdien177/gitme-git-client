@@ -10,7 +10,7 @@ const initialState = {
 };
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'repositories' })
+@StoreConfig({ name: 'repositories', resettable: true })
 export class RepositoriesStore extends EntityStore<RepositoriesState> {
 
     constructor() {

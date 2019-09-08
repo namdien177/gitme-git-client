@@ -1,6 +1,3 @@
-import { Repository } from '../states/DATA/repositories';
-import { Account } from '../states/DATA/account-list';
-
 export class AppConfig {
     app_key: string;
     version: string;
@@ -8,6 +5,6 @@ export class AppConfig {
         created_at: number
         [key: string]: any;
     };
-    repositories: Repository[];
-    credentials: Account[];
+    repository_config: string[];
+    account_config: string[];
 }

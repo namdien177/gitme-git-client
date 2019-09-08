@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Account, AccountListQuery } from '../../states/DATA/account-list';
+import { Account, AccountListQuery } from '../../../states/DATA/account-list';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SecurityService } from '../../../services/system/security.service';
+import { SecurityService } from '../../../../services/system/security.service';
 
 
 @Component({

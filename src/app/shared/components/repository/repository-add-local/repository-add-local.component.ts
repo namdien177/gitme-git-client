@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UtilityService } from '../../utilities/utility.service';
-import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
-import { GitService } from '../../../services/features/git.service';
-import { FileSystemService } from '../../../services/system/fileSystem.service';
-import { electronNG, osNode } from '../../types/types.electron';
+import { UtilityService } from '../../../utilities/utility.service';
+import { RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { GitService } from '../../../../services/features/git.service';
+import { FileSystemService } from '../../../../services/system/fileSystem.service';
+import { electronNG, osNode } from '../../../types/types.electron';
 
 @Component({
     selector: 'gitme-repository-add-local',

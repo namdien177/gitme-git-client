@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RepositoryBranchSummary } from '../../states/DATA/repository-branches';
+import { RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
 
 @Component({
     selector: 'gitme-branch-item',

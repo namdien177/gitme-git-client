@@ -25,6 +25,14 @@ export class RepositoriesMenuService {
         });
     }
 
+    toggleRepositoryMenu(status: boolean) {
+        if (status) {
+            this.closeRepoMenu();
+        } else {
+            this.openRepoMenu();
+        }
+    }
+
     openBranchMenu() {
         this.repositoriesMenuStore.update({
             is_branch_open: true,
@@ -37,6 +45,14 @@ export class RepositoriesMenuService {
             is_branch_open: false,
             is_repository_open: false,
         });
+    }
+
+    toggleBranchMenu(status: boolean) {
+        if (status) {
+            this.closeBranchMenu();
+        } else {
+            this.openBranchMenu();
+        }
     }
 
     openRepositoryCloneDialog() {
@@ -77,7 +93,7 @@ export class RepositoriesMenuService {
         }
     }
 
-    selectRepo(repo_id, repo_provider) {
-
+    select() {
+        return this.repositoryMenuQuery.select();
     }
 }

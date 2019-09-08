@@ -15,4 +15,18 @@ export class DefineCommon {
         }
         return '/app-config/';
     }
+
+    static DIR_ACCOUNTS(app_id?) {
+        if (app_id !== undefined) {
+            return '/app-accounts/' + app_id + '.json';
+        }
+        return '/app-accounts/';
+    }
+
+    static DIR_REPOSITORIES(app_id?) {
+        if (app_id !== undefined) {
+            return '/app-repositories/' + app_id + '.json';
+        }
+        return '/app-repositories/';
+    }
 }

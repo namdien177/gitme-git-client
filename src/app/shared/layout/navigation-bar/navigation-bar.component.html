@@ -62,9 +62,9 @@
     </div>
 </div>
 
-<div class="files-commit">
+<form [formGroup]="formCommitment" class="files-commit">
     <div class="function branch-actions">
-        <div (click)="actionButtonClick()" class="inner-title raw">
+        <div class="inner-title raw" (click)="fetch()">
             <div class="title-secondary text-muted">
                 git fetch origin
             </div>
@@ -85,26 +85,28 @@
     </div>
 
     <div class="branch-commit">
-        <button class="btn btn-block btn-success rounded-0">
+        <button [disabled]="formCommitment.invalid"
+                (click)="commitFile()"
+                class="btn btn-block btn-success rounded-0">
             Commit
         </button>
     </div>
 
     <div class="commit-title">
         <input class="form-control form-control-dark"
+               formControlName="title"
                placeholder="Commit title (Required)"
                type="text">
     </div>
 
-    <div class="files-checkAll">
+    <div (click)="toggleCheckboxAllFile()" class="files-checkAll">
         <div class="added-checkbox acomi-checkbox-control">
-            <input checked
+            <input [checked]="checkboxAllFileStatus"
                    class="acomi-input-box"
                    hidden
-                   id="cbx"
-                   name="file"
+                   id="checkboxAllFile"
                    type="checkbox"/>
-            <label class="cbx" for="cbx">
+            <label class="cbx">
                 <span>
                     <svg height="10px" viewbox="0 0 12 10" width="12px">
                         <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
@@ -113,14 +115,17 @@
             </label>
         </div>
         <span class="added-title">
-            Select All ({{statusSummary?.files?.length}} file{{statusSummary?.files?.length > 1 ? 's' : ''}})
+            Select All ({{statusSummary?.files?.length}}
+            file{{statusSummary?.files?.length > 1 ? 's' : ''}})
         </span>
     </div>
 
     <div class="commit-flies">
-        <gitme-commit-files></gitme-commit-files>
+        <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
+                            (isAllFileChecked)="eventEmitCheckBoxFile($event)">
+        </gitme-commit-files>
     </div>
-</div>
+</form>
 
 <div class="content-router">
     <ng-content></ng-content>

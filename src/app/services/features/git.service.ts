@@ -50,10 +50,13 @@ export class GitService {
         return branchMerged;
     }
 
+    async getRemotes(repository: Repository) {
+        return await this.git(repository.directory).getRemotes(true);
+    }
+
     async fetchInfo(repository: Repository, credentials?: Account, customRemote: string = null) {
         // retrieve the directory for git to execute
-        const { directory: repoDirectory, remote } = repository;
-        const directory = this.utilities.directorySafePath(repoDirectory);
+        const { directory, remote } = repository;
 
         // checking remotes
         let urlRemotes: string = null;
@@ -121,9 +124,9 @@ export class GitService {
         // };
     }
 
-    async push(repository: Repository, credentials: Account) {
+    async push(repository: Repository, credentials: Account, options?: { [option: string]: string }) {
         const urlRemote = this.utilities.addCredentialsToRemote(repository.remote.fetch, credentials);
-        return this.git(repository.directory).push(urlRemote);
+        return this.git(repository.directory).push(urlRemote, undefined, options);
     }
 
     async commit(repository: Repository, message: string, fileList?: string[], option?: {

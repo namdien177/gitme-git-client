@@ -11,6 +11,8 @@ import { LocalStorageService } from '../../../../services/system/localStorage.se
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RepositoryBranchSummary } from '../repository-branches';
 import { Observable } from 'rxjs';
+import { Account, AccountListService } from '../account-list';
+import { AppRepositories } from '../../../model/App-Repositories';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -20,7 +22,8 @@ export class RepositoriesService {
         protected query: RepositoriesQuery,
         private gitService: GitService,
         private fileService: FileSystemService,
-        private localStorageService: LocalStorageService
+        private localStorageService: LocalStorageService,
+        private accountListService: AccountListService
     ) {
     }
 
@@ -31,7 +34,21 @@ export class RepositoriesService {
             machineID, DefineCommon.DIR_CONFIG()
         ).then(fulfilled => fulfilled.value);
 
-        const repositories = configFile.repositories;
+        if (!!!configFile) {
+            return;
+        }
+
+        const repositoryFile = configFile.repository_config;
+        const repositories: Repository[] = [];
+        for (const configName of repositoryFile) {
+            const repos = await this.fileService.getFileContext<AppRepositories>(
+                configName, DefineCommon.DIR_REPOSITORIES()
+            );
+            if (!!repos.value && !!repos.value.repositories && repos.value.repositories.length > 0) {
+                repos.value.repositories.forEach(repo => repositories.push(repo));
+            }
+        }
+
         const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
             this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
                 repositories[0].id : null;
@@ -45,6 +62,10 @@ export class RepositoriesService {
             this.setActive(findCached);
         }
         this.set(repositories);
+    }
+
+    add(arrData: Repository[]) {
+        this.store.add(arrData, { prepend: true });
     }
 
     set(arr: Repository[]) {
@@ -95,11 +116,55 @@ export class RepositoriesService {
         );
     }
 
+    commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
+        const { name } = repository.credential;
+        const author = !!name ? name : null;
+        if (!!!option['--author'] && author) {
+            Object.assign(option, {
+                '--author': author
+            });
+        }
+        return fromPromise(
+            this.gitService.commit(repository, title, files, option)
+        );
+    }
+
+    push(repository: Repository, option?: { [git: string]: string }) {
+        // get account
+        const credential: Account = this.accountListService.getOneSync(
+            repository.credential.id_credential
+        );
+
+        return fromPromise(
+            this.gitService.push(repository, credential, option)
+        );
+    }
+
+    fetch(repository: Repository, option?: { [git: string]: string }) {
+        // get account
+        const credential: Account = this.accountListService.getOneSync(
+            repository.credential.id_credential
+        );
+        return fromPromise(
+            this.gitService.fetchInfo(repository, credential)
+        );
+    }
+
+    getRemotes(repository: Repository) {
+        return fromPromise(
+            this.gitService.getRemotes(repository)
+        );
+    }
+
     setLoading() {
         this.store.setLoading(true);
     }
 
     finishLoading() {
         this.store.setLoading(false);
+    }
+
+    reset() {
+        this.store.reset();
     }
 }

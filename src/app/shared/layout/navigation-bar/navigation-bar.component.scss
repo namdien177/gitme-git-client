@@ -22,7 +22,7 @@
         display: grid;
         grid-template-areas: 'fetch' 'commit' 'title' 'checkbox' 'files-list';
         grid-template-columns: 1fr;
-        grid-template-rows: 80px 40px 40px 32px calc(100vh - 224px);
+        grid-template-rows: 80px 80px 40px 32px calc(100vh - 264px);
         grid-gap: 0;
     }
 

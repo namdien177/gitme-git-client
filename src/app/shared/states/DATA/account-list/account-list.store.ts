@@ -6,7 +6,7 @@ export interface AccountListState extends EntityState<Account> {
 }
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'account-list' })
+@StoreConfig({ name: 'account-list', resettable: true })
 export class AccountListStore extends EntityStore<AccountListState, Account> {
 
     constructor() {

@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Repository } from '../../states/DATA/repositories';
-import { GitService } from '../../../services/features/git.service';
-import { SecurityService } from '../../../services/system/security.service';
-import { FileSystemService } from '../../../services/system/fileSystem.service';
-import { StatusSummary } from '../../model/StatusSummary';
+import { Repository } from '../../../states/DATA/repositories';
+import { GitService } from '../../../../services/features/git.service';
+import { SecurityService } from '../../../../services/system/security.service';
+import { FileSystemService } from '../../../../services/system/fileSystem.service';
+import { StatusSummary } from '../../../model/StatusSummary';
 import { Observable, of } from 'rxjs';
-import { Account } from '../../states/DATA/account-list';
+import { Account } from '../../../states/DATA/account-list';
 
 @Component({
     selector: 'gitme-repository-item',

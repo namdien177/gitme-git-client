@@ -1,10 +1,10 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { electronNG, osNode } from '../../types/types.electron';
+import { electronNG, osNode } from '../../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { UtilityService } from '../../utilities/utility.service';
-import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
-import { GitService } from '../../../services/features/git.service';
-import { FileSystemService } from '../../../services/system/fileSystem.service';
+import { UtilityService } from '../../../utilities/utility.service';
+import { RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { GitService } from '../../../../services/features/git.service';
+import { FileSystemService } from '../../../../services/system/fileSystem.service';
 
 @Component({
     selector: 'gitme-repository-clone',

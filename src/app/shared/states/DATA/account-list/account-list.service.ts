@@ -24,7 +24,11 @@ export class AccountListService {
         return this.query.selectAll();
     }
 
-    getOneAsync(idAccount: string) {
+    getOneSync(idAccount: string) {
         return this.query.getEntity(idAccount);
+    }
+
+    reset() {
+        this.store.reset();
     }
 }

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../states/UI/repositories-menu';
+import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
 import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/DATA/repositories';
 import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/DATA/repository-branches';
 import { AccountListService } from '../../states/DATA/account-list';
@@ -8,8 +8,9 @@ import { StatusSummary } from '../../model/StatusSummary';
 import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
 import { FileWatchesQuery, FileWatchesService } from '../../states/system/File-Watches';
-import { FormBuilder } from '@angular/forms';
-import { FileChangesService } from '../../states/system/File-Changes';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../states/DATA/repository-status';
+import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -19,14 +20,17 @@ import { FileChangesService } from '../../states/system/File-Changes';
 export class NavigationBarComponent implements OnInit, OnDestroy {
     isRepositoryBoxOpen = false;
     isBranchBoxOpen = false;
+
     repository: Repository = null;
     activeBranch: RepositoryBranchSummary = null;
     statusSummary: StatusSummary;
 
+    checkboxAllFileStatus = false;
+    formCommitment: FormGroup;
+
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
     constructor(
-        private repositoriesMenuQuery: RepositoriesMenuQuery,
         private repositoriesMenuService: RepositoriesMenuService,
         protected repositoriesQuery: RepositoriesQuery,
         protected branchesQuery: RepositoryBranchesQuery,
@@ -35,7 +39,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private accountService: AccountListService,
         private fileWatchesService: FileWatchesService,
         private fileWatchesQuery: FileWatchesQuery,
-        private fileChangesService: FileChangesService,
+        private repositoryStatusService: RepositoryStatusService,
         protected utilities: UtilityService,
         private fb: FormBuilder
     ) {
@@ -46,32 +50,40 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.loopRefreshBranchStatus();
     }
 
+    get titleCommit() {
+        return this.formCommitment.get('title');
+    }
+
+    get filesCommit() {
+        return this.formCommitment.get('files');
+    }
+
     ngOnDestroy(): void {
         this.componentDestroyed.next(true);
     }
 
     ngOnInit() {
-
+        this.setupFormCommitment();
     }
 
     toggleRepositoryBox() {
-        if (this.isRepositoryBoxOpen) {
-            this.repositoriesMenuService.closeRepoMenu();
-        } else {
-            this.repositoriesMenuService.openRepoMenu();
-        }
+        this.repositoriesMenuService.toggleRepositoryMenu(this.isRepositoryBoxOpen);
     }
 
     toggleBranchBox() {
-        if (this.isBranchBoxOpen) {
-            this.repositoriesMenuService.closeBranchMenu();
-        } else {
-            this.repositoriesMenuService.openBranchMenu();
-        }
+        this.repositoriesMenuService.toggleBranchMenu(this.isBranchBoxOpen);
     }
 
-    actionButtonClick() {
+    eventEmitCheckBoxFile(event: boolean) {
+        this.checkboxAllFileStatus = event;
+    }
 
+    toggleCheckboxAllFile() {
+        if (this.checkboxAllFileStatus) {
+            this.repositoryStatusService.uncheckAllCheckboxState();
+        } else {
+            this.repositoryStatusService.checkAllCheckboxState();
+        }
     }
 
     clickOutSide(isOutSide: boolean, button: 'repositories' | 'branches') {
@@ -91,8 +103,55 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         }
     }
 
+    setNewFilesCommit(files: FileStatusSummaryView[]) {
+        const newFileList: FileStatusSummaryView[] = [];
+        files.forEach(
+            file => {
+                if (file.checked) {
+                    newFileList.push(file);
+                }
+            }
+        );
+
+        // Update the formData
+        this.filesCommit.setValue(newFileList);
+    }
+
+    commitFile() {
+        if (this.formCommitment.invalid) {
+            return;
+        }
+        const listFilesCommit: FileStatusSummaryView[] = this.filesCommit.value;
+        const paths: string[] = this.utilities.extractFilePathFromGitStatus(listFilesCommit);
+        this.repositoriesService.commit(this.repository, this.titleCommit.value, paths).subscribe(
+            result => {
+                console.log(result);
+            }
+        );
+    }
+
+    pushCommit() {
+        if (this.statusSummary.ahead < 1) {
+            return;
+        }
+
+        this.repositoriesService.push(this.repository).subscribe(
+            result => {
+                console.log(result);
+            }
+        );
+    }
+
+    fetch() {
+        this.repositoriesService.getRemotes(this.repository).subscribe(
+            result => {
+                console.log(result);
+            }
+        );
+    }
+
     private watchingUIState() {
-        this.repositoriesMenuQuery.select().subscribe(state => {
+        this.repositoriesMenuService.select().subscribe(state => {
             this.isRepositoryBoxOpen = state.is_repository_open && !!state.is_available;
             this.isBranchBoxOpen = state.is_branch_open && !!state.is_available;
         });
@@ -175,6 +234,16 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         )
         .subscribe((status) => {
             this.statusSummary = status;
+            if (status) {
+                this.repositoryStatusService.set(status);
+            }
+        });
+    }
+
+    private setupFormCommitment() {
+        this.formCommitment = this.fb.group({
+            title: ['', [Validators.required]],
+            files: [[], [ArrayLengthShouldLargerThan(0)]]
         });
     }
 }

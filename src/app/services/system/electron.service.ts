@@ -13,6 +13,9 @@ import { DefineCommon } from '../../common/define.common';
 import * as moment from 'moment';
 import { RepositoriesService } from '../../shared/states/DATA/repositories';
 import { AccountListService } from '../../shared/states/DATA/account-list';
+import { AppRepositories } from '../../shared/model/App-Repositories';
+import { AppAccounts } from '../../shared/model/App-Accounts';
+import { AppConfig } from '../../shared/model/App-Config';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService {
@@ -45,8 +48,7 @@ export class ElectronService {
             this.fs = fsNode;
             this.machine_id = machineIdSync();
             this.setupUUID();
-            this.initializeDatabase();
-            console.log(this.securityService.randomID);
+            this.initializeConfigFromLocalDatabase();
         }
     }
 
@@ -54,7 +56,7 @@ export class ElectronService {
         return window && window.process && window.process.type;
     }
 
-    initializeDatabase() {
+    initializeConfigFromLocalDatabase() {
         /**
          * Loading the configuration file
          */
@@ -68,16 +70,100 @@ export class ElectronService {
                 )
             );
         } else {
-            const data = {
+            const data: AppConfig = {
                 app_key: this.machine_id,
                 version: DefineCommon.APP_VERSION,
                 first_init: {
                     created_at: moment().valueOf()
                 },
-                repositories: [],
-                credentials: []
+                repository_config: [],
+                account_config: []
             };
             this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
+                resolve => {
+                    console.log(resolve);
+                }, reject => {
+                    console.log(reject);
+                }
+            );
+        }
+    }
+
+    initializeRepositoriesFromLocalDatabase(repository_config: string[]) {
+        this.repositoriesList.reset();
+        if (!!repository_config && repository_config.length > 0) {
+            /**
+             * Loading repository config files
+             */
+            const repositoryConfigFileName = [];
+            repository_config.forEach(fileName => {
+                if (
+                    // ensure no duplicated repo config file in the app config
+                    repositoryConfigFileName.indexOf(fileName) === -1 &&
+                    // ensure the config file is existed
+                    this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))
+                ) {
+                    // load to memory repos and other settings
+                    this.setupApplicationRepositories(
+                        this.fileService.getFileContext(
+                            fileName,
+                            DefineCommon.DIR_CONFIG()
+                        )
+                    );
+                    repositoryConfigFileName.push(fileName);
+                }
+            });
+        } else {
+            /**
+             * create default config for application
+             */
+            const configDefaultName = this.machine_id;
+            const data: AppRepositories = {
+                repositories: [],
+            };
+            this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_REPOSITORIES()).then(
+                resolve => {
+                    console.log(resolve);
+                }, reject => {
+                    console.log(reject);
+                }
+            );
+        }
+    }
+
+    initializeAccountsFromLocalDatabase(account_config: string[]) {
+        this.accountList.reset();
+        if (!!account_config && account_config.length > 0) {
+            /**
+             * Loading account config files
+             */
+            const accountConfigFileName = [];
+            account_config.forEach(fileName => {
+                if (
+                    // ensure no duplicated account config file in the app config
+                    accountConfigFileName.indexOf(fileName) === -1 &&
+                    // ensure the config file is existed
+                    this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))
+                ) {
+                    // load to memory repos and other settings
+                    this.setupApplicationAccounts(
+                        this.fileService.getFileContext(
+                            fileName,
+                            DefineCommon.DIR_CONFIG()
+                        )
+                    );
+                    accountConfigFileName.push(fileName);
+                }
+            });
+        } else {
+            /**
+             * create default config for application
+             */
+            const configDefaultName = this.machine_id;
+            const data: AppAccounts = {
+                accounts: [],
+            };
+            this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_ACCOUNTS()).then(
                 resolve => {
                     console.log(resolve);
                 }, reject => {
@@ -113,13 +199,27 @@ export class ElectronService {
 
     private setupApplicationConfiguration(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
         fileContext.then(contextStatus => {
-            const dataOutput = contextStatus.value;
-            if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
-                this.repositoriesList.set(dataOutput.repositories);
-            }
+            const dataOutput: AppConfig = contextStatus.value;
+            // Load repository configs
+            this.initializeRepositoriesFromLocalDatabase(dataOutput.repository_config);
+            this.initializeAccountsFromLocalDatabase(dataOutput.account_config);
+        });
+    }
 
-            if (!!dataOutput.credentials && Array.isArray(dataOutput.credentials)) {
-                this.accountList.set(dataOutput.credentials);
+    private setupApplicationRepositories(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
+        fileContext.then((contextStatus) => {
+            const dataOutput: AppRepositories = contextStatus.value;
+            if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
+                this.repositoriesList.add(dataOutput.repositories);
+            }
+        });
+    }
+
+    private setupApplicationAccounts(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
+        fileContext.then((contextStatus) => {
+            const dataOutput: AppAccounts = contextStatus.value;
+            if (!!dataOutput.accounts && Array.isArray(dataOutput.accounts)) {
+                this.accountList.add(dataOutput.accounts);
             }
         });
     }
