@@ -100,7 +100,9 @@
                type="text">
     </div>
 
-    <div (click)="toggleCheckboxAllFile()" class="files-checkAll">
+    <div (click)="toggleCheckboxAllFile()"
+         *ngIf="statusSummary?.files?.length > 0"
+         class="files-checkAll">
         <div class="added-checkbox acomi-checkbox-control">
             <input [checked]="checkboxAllFileStatus"
                    class="acomi-input-box"
@@ -123,8 +125,13 @@
 
     <div class="commit-flies">
         <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
-                            (isAllFileChecked)="eventEmitCheckBoxFile($event)">
+                            (isAllFileChecked)="eventEmitCheckBoxFile($event)"
+                            *ngIf="statusSummary?.files?.length > 0">
         </gitme-commit-files>
+        <p *ngIf="statusSummary?.files?.length == 0"
+           class="text-muted">
+            No change file to be committed
+        </p>
     </div>
 </form>
 
