@@ -135,6 +135,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.repositoriesService.commit(this.repository, this.titleCommit.value, paths).subscribe(
             result => {
                 this.loading.commit = false;
+                this.formCommitment.reset();
                 console.log(result);
             }
         );
