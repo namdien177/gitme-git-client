@@ -1,6 +1,3 @@
-s;
-s
-s
-s
-s
-s
+export class Newtest {
+
+}
