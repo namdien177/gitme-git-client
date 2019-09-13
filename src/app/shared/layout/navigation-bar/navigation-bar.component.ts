@@ -55,7 +55,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.watchingRepository();
         this.watchingBranch();
         // this.watchingFileChanges(); // Chokidar is more efficient!
-        this.loopRefreshBranchStatus();
+        // this.loopRefreshBranchStatus();
     }
 
     get titleCommit() {

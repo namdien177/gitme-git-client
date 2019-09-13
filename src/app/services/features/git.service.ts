@@ -7,6 +7,7 @@ import { Repository, RepositoryRemotes } from '../../shared/states/DATA/reposito
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
+import { child_processNode } from '../../shared/types/types.electron';
 
 @Injectable()
 export class GitService {
@@ -17,7 +18,7 @@ export class GitService {
     ) {
     }
 
-    git(dir?: string) {
+    gitInstance(dir?: string) {
         dir = this.utilities.directorySafePath(dir);
         return git(dir);
     }
@@ -33,8 +34,8 @@ export class GitService {
 
     async allBranches(directory: string, credentials?: Account) {
         directory = this.utilities.directorySafePath(directory);
-        const branchAll = await this.git(directory).branch(['-a']);
-        const branchRemote = await this.git(directory).branch(['-r']);
+        const branchAll = await this.gitInstance(directory).branch(['-a']);
+        const branchRemote = await this.gitInstance(directory).branch(['-r']);
         const branchMerged: RepositoryBranchSummary[] = [];
 
         Object.keys(branchRemote.branches).forEach(branchName => {
@@ -52,7 +53,7 @@ export class GitService {
     }
 
     async getRemotes(repository: Repository) {
-        return await this.git(repository.directory).getRemotes(true);
+        return await this.gitInstance(repository.directory).getRemotes(true);
     }
 
     async updateRemotesRepository(repository: Repository, branches: RepositoryBranchSummary[]) {
@@ -97,7 +98,7 @@ export class GitService {
     }
 
     async fetchInfo(repository: Repository, credentials?: Account, customRemote: string = null) {
-        // retrieve the directory for git to execute
+        // retrieve the directory for gitInstance to execute
         const { directory, remote } = repository;
 
         // checking remotes
@@ -116,8 +117,8 @@ export class GitService {
                 urlRemotes = fetchURlLocal;
             }
         } else {
-            // retrieve from git
-            const listRemotes = await this.git(directory).getRemotes(true);
+            // retrieve from gitInstance
+            const listRemotes = await this.gitInstance(directory).getRemotes(true);
 
             let fallbackURLRemotes = '';
             listRemotes.forEach(remoteInfo => {
@@ -138,7 +139,7 @@ export class GitService {
             }
         }
         // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
-        const data = await this.git(directory).fetch(urlRemotes);
+        const data = await this.gitInstance(directory).fetch(urlRemotes);
         return {
             fetchData: data,
             repository
@@ -146,7 +147,7 @@ export class GitService {
     }
 
     async getStatusOnBranch(repository: Repository) {
-        return this.git(repository.directory).status();
+        return this.gitInstance(repository.directory).status();
     }
 
     async isGitProject(directory: string) {
@@ -173,18 +174,20 @@ export class GitService {
     }
 
     push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
-        // const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
-        this.git('D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client')
-        .push();
-        // await this.git(repository.directory).raw(
+        const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
+        const sync = child_processNode.exec('git push', {
+            cwd: 'D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client'
+        });
+
+        // this.gitInstance(repository.directory).raw(
         //     [
         //         // `${urlRemote}`
         //         'push',
         //         `--repo=${ urlRemote }`,
         //         '--all'
         //     ]
-        // );
-        // await this.git(repository.directory).push(
+        // ).then(r => console.log(r));
+        // await this.gitInstance(repository.directory).push(
         //     urlRemote,
         //     // undefined,
         //     // options
@@ -199,26 +202,26 @@ export class GitService {
     async commit(repository: Repository, message: string, fileList?: string[], option?: {
         [properties: string]: string
     }) {
-        return this.git(repository.directory).commit(message, fileList, option);
+        return this.gitInstance(repository.directory).commit(message, fileList, option);
     }
 
     async addWatch(repository: Repository, fileDir: string[]) {
-        return await this.git(repository.directory).add(fileDir);
+        return await this.gitInstance(repository.directory).add(fileDir);
     }
 
     async addStash(repository: Repository, message?: string) {
         if (!message) {
             message = `Stashed at ${ moment().format('YYYY/MM/DD - HH:mm:ss') }`;
         }
-        return await this.git(repository.directory).stash();
+        return await this.gitInstance(repository.directory).stash();
     }
 
     async getListStash(repository: Repository) {
-        return await this.git(repository.directory).stashList();
+        return await this.gitInstance(repository.directory).stashList();
     }
 
     async getStash(repository: Repository) {
-        return await this.git(repository.directory).stash([
+        return await this.gitInstance(repository.directory).stash([
             'pop'
         ]);
     }
@@ -228,7 +231,7 @@ export class GitService {
             return false;
         }
 
-        return await this.git(repository.directory).checkout(branch.name)
+        return await this.gitInstance(repository.directory).checkout(branch.name)
         .then(resolve => true)
         .catch(err => {
             console.log(err);

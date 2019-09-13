@@ -103,8 +103,8 @@ export class RepositoryAddLocalComponent implements OnInit {
         this.repo_dir.valueChanges.subscribe(newVal => {
             console.log(newVal);
             if (!!newVal && this.fileSystemService.isDirectoryExist(newVal)) {
-                // TODO valid directory? Need check git
-                // Check git
+                // TODO valid directory? Need check gitInstance
+                // Check gitInstance
                 this.gitPackService.isGitProject(newVal).then(result => console.log(result));
             } else {
                 // TODO invalid directory? can create afterward and init

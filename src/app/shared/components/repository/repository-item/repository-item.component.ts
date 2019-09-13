@@ -32,7 +32,7 @@ export class RepositoryItemComponent implements OnInit {
         this.gitService.isGitProject(this.repository.directory).then(
             status => {
                 if (status) {
-                    return this.gitService.git(this.repository.directory).status();
+                    return this.gitService.gitInstance(this.repository.directory).status();
                 } else {
                     return Promise.reject('Not Git Repo');
                 }

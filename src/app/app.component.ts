@@ -25,6 +25,6 @@ export class AppComponent {
         //   console.log('Mode web');
         // }
 
-        // this.gitService.git('D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client').push('origin', 'side-bar-work');
+        // this.gitService.gitInstance('D:\\Projects\\School\\_topup\\GitMe\\gitme-gitInstance-client').push('origin', 'side-bar-work');
     }
 }
