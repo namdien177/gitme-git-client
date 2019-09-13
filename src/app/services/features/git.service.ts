@@ -174,7 +174,7 @@ export class GitService {
     }
 
     push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
-        const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
+        // const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
         const sync = child_processNode.exec('git push', {
             cwd: 'D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client'
         });
