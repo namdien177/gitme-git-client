@@ -48,6 +48,10 @@ export class RepositoryBranchesService {
         return this.query.selectAll();
     }
 
+    getSync(): RepositoryBranchSummary[] {
+        return this.query.getAll();
+    }
+
     getActive() {
         this.setLoading();
         return this.query.selectActive().pipe(
@@ -57,8 +61,16 @@ export class RepositoryBranchesService {
         );
     }
 
+    getActiveSync() {
+        return this.query.getActive();
+    }
+
     setActive(branch: RepositoryBranchSummary) {
         this.store.setActive(branch.id);
+    }
+
+    setActiveID(branchID: string) {
+        this.store.setActive(branchID);
     }
 
     setLoading() {

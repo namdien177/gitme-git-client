@@ -3,9 +3,10 @@ import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/states/DATA/account-list';
 import { RepositoryBranchSummary } from '../../shared/states/DATA/repository-branches';
-import { Repository } from '../../shared/states/DATA/repositories';
+import { Repository, RepositoryRemotes } from '../../shared/states/DATA/repositories';
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
+import { RemoteWithRefs } from 'simple-git/typings/response';
 
 @Injectable()
 export class GitService {
@@ -54,13 +55,60 @@ export class GitService {
         return await this.git(repository.directory).getRemotes(true);
     }
 
+    async updateRemotesRepository(repository: Repository, branches: RepositoryBranchSummary[]) {
+        const remoteList: RemoteWithRefs[] = await this.getRemotes(repository);
+        const updateRepository = { ...repository };
+        const remoteRepositoryReturn: RepositoryRemotes[] = [];
+        const remoteBranchesReturn: RepositoryBranchSummary[] = [];
+        if (!this.isRemoteAvailable(repository)) {
+            updateRepository.remote = [];
+        }
+
+        let activeBranchRetrieve = null;
+
+        remoteList.forEach(remote => {
+            const branchExisted = branches.find(branch => branch.name === remote.name);
+            const id: string = !!branchExisted ? branchExisted.id : this.securityService.randomID;
+            const newRemote = {
+                id,
+                fetch: remote.refs.fetch,
+                push: remote.refs.push,
+            };
+            remoteRepositoryReturn.push(newRemote);
+            remoteBranchesReturn.push({
+                id,
+                commit: branchExisted ? branchExisted.commit : null,
+                label: branchExisted ? branchExisted.label : null,
+                name: branchExisted ? branchExisted.name : remote.name,
+                current: branchExisted ? branchExisted.current : false
+            });
+
+            if (!!branchExisted && branchExisted.current) {
+                activeBranchRetrieve = branchExisted.id;
+            }
+        });
+
+        updateRepository.remote = remoteRepositoryReturn;
+        return {
+            repository: updateRepository,
+            branches: remoteBranchesReturn,
+            activeBranch: !!activeBranchRetrieve ? activeBranchRetrieve : remoteBranchesReturn[0].id,
+        };
+    }
+
     async fetchInfo(repository: Repository, credentials?: Account, customRemote: string = null) {
         // retrieve the directory for git to execute
         const { directory, remote } = repository;
 
         // checking remotes
         let urlRemotes: string = null;
-        const fetchURlLocal = !!remote ? remote.fetch : null;
+        let fetchURlLocal = null;
+        if (!!remote) {
+            const findBranchDefault = remote.find(remoteFetch => remoteFetch.fetch.indexOf('origin/') === 0);
+            if (!!findBranchDefault) {
+                fetchURlLocal = findBranchDefault;
+            }
+        }
         if (!!remote && !!fetchURlLocal) {
             if (credentials) {
                 urlRemotes = this.utilities.addCredentialsToRemote(fetchURlLocal, credentials);
@@ -124,9 +172,28 @@ export class GitService {
         // };
     }
 
-    async push(repository: Repository, credentials: Account, options?: { [option: string]: string }) {
-        const urlRemote = this.utilities.addCredentialsToRemote(repository.remote.fetch, credentials);
-        return this.git(repository.directory).push(urlRemote, undefined, options);
+    push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
+        // const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
+        this.git('D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client')
+        .push();
+        // await this.git(repository.directory).raw(
+        //     [
+        //         // `${urlRemote}`
+        //         'push',
+        //         `--repo=${ urlRemote }`,
+        //         '--all'
+        //     ]
+        // );
+        // await this.git(repository.directory).push(
+        //     urlRemote,
+        //     // undefined,
+        //     // options
+        //     // 'origin',
+        //     // 'side-bar-work',
+        //     // {
+        //     //     '--repo': urlRemote
+        //     // }
+        // );
     }
 
     async commit(repository: Repository, message: string, fileList?: string[], option?: {
@@ -169,6 +236,24 @@ export class GitService {
         });
     }
 
+    isRemoteAvailable(repository: Repository) {
+        return !!repository.remote;
+    }
+
+    isFetchRemoteAvailable(repository: Repository) {
+        if (!this.isRemoteAvailable(repository)) {
+            return false;
+        }
+        return !!repository.remote.find(any => any.fetch != null);
+    }
+
+    isPullRemoteAvailable(repository: Repository) {
+        if (!this.isRemoteAvailable(repository)) {
+            return false;
+        }
+        return !!repository.remote.find(any => any.push != null);
+    }
+
     private getURLRemoteFromListGitRemotes(remoteInfo: {
         refs: {
             fetch: string;
@@ -182,4 +267,5 @@ export class GitService {
             return remoteInfo.refs.fetch;
         }
     }
+
 }

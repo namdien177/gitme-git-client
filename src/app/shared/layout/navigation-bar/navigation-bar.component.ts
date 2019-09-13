@@ -43,7 +43,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         protected repositoriesQuery: RepositoriesQuery,
         protected branchesQuery: RepositoryBranchesQuery,
         private repositoriesService: RepositoriesService,
-        private branchesService: RepositoryBranchesService,
+        private repositoryBranchesService: RepositoryBranchesService,
         private accountService: AccountListService,
         private fileWatchesService: FileWatchesService,
         private fileWatchesQuery: FileWatchesQuery,
@@ -146,7 +146,8 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             return;
         }
         this.loading.push = true;
-        this.repositoriesService.push(this.repository).subscribe(
+        const branches = this.repositoryBranchesService.getSync();
+        this.repositoriesService.push(this.repository, branches).subscribe(
             result => {
                 this.loading.commit = false;
                 console.log(result);
@@ -179,7 +180,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         .pipe(
             switchMap(selectedRepo => {
                 this.repository = selectedRepo;
-                this.branchesService.load(selectedRepo, null);
+                this.repositoryBranchesService.load(selectedRepo, null);
                 if (this.repository) {
                     const dir = this.repository.directory;
                     this.fileWatchesService.switchTo(dir);

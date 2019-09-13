@@ -64,7 +64,7 @@
 
 <form [formGroup]="formCommitment" class="files-commit">
     <div class="function branch-actions">
-        <div (click)="fetch()" class="inner-title raw">
+        <div (click)="pushCommit()" class="inner-title raw">
             <div class="title-secondary text-muted">
                 git fetch origin
             </div>
@@ -73,6 +73,16 @@
                   Fetch remote data
                 </span>
                 <div class="status">
+                    <div *ngIf="statusSummary?.behind > 0"
+                         class="badge badge-pill badge-secondary bg-info pull-request">
+                        <i class="fas fa-angle-down"></i>
+                        {{statusSummary?.behind}}
+                    </div>
+                    <div *ngIf="statusSummary?.ahead > 0"
+                         class="badge badge-pill badge-secondary bg-success push-request">
+                        <i class="fas fa-angle-up"></i>
+                        {{statusSummary?.ahead}}
+                    </div>
                     <div *ngIf="statusSummary?.files.length > 0"
                          [title]="statusSummary?.files.length + ' file(s) changed'"
                          class="badge badge-pill badge-secondary bg-warning changes">
@@ -129,7 +139,7 @@
                             *ngIf="statusSummary?.files?.length > 0">
         </gitme-commit-files>
         <p *ngIf="statusSummary?.files?.length == 0"
-           class="text-muted text-center">
+           class="text-muted text-center nonSelectable">
             No change file to be committed
         </p>
     </div>

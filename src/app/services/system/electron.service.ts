@@ -98,7 +98,7 @@ export class ElectronService {
                     this.setupApplicationRepositories(
                         this.fileService.getFileContext(
                             fileName,
-                            DefineCommon.DIR_CONFIG()
+                            DefineCommon.DIR_REPOSITORIES()
                         )
                     );
                     repositoryConfigFileName.push(fileName);
@@ -140,7 +140,7 @@ export class ElectronService {
                     this.setupApplicationAccounts(
                         this.fileService.getFileContext(
                             fileName,
-                            DefineCommon.DIR_CONFIG()
+                            DefineCommon.DIR_ACCOUNTS()
                         )
                     );
                     accountConfigFileName.push(fileName);

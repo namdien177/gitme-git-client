@@ -172,7 +172,7 @@ export class FileSystemService {
      * @param directoryPath extra path to append. Must include slash to front and end
      * @param extension currently only accepting .txt or .json file. Much prefer `.json`.
      */
-    updateFileContext(
+    updateFileContext<dataType>(
         fileName: string,
         data: object | string,
         directoryPath: string = '/',
@@ -189,7 +189,11 @@ export class FileSystemService {
         if (!writeDataStatus.valid) {
             return this.promiseReturn(null, writeDataStatus.data, false);
         }
-        return writePromises(finalDir, writeDataStatus.data);
+        return writePromises(finalDir, writeDataStatus.data).then(() => {
+            return this.promiseReturn(null, 'Read success - Dir: ' + finalDir, true);
+        }, err => {
+            return this.promiseReturn(err, 'Read failed - Dir: ' + finalDir, false);
+        });
     }
 
     saveFileData(

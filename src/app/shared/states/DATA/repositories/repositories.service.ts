@@ -9,8 +9,8 @@ import { AppConfig } from '../../../model/App-Config';
 import { DefineCommon } from '../../../../common/define.common';
 import { LocalStorageService } from '../../../../services/system/localStorage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RepositoryBranchSummary } from '../repository-branches';
-import { Observable } from 'rxjs';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../repository-branches';
+import { Observable, of } from 'rxjs';
 import { Account, AccountListService } from '../account-list';
 import { AppRepositories } from '../../../model/App-Repositories';
 
@@ -23,7 +23,8 @@ export class RepositoriesService {
         private gitService: GitService,
         private fileService: FileSystemService,
         private localStorageService: LocalStorageService,
-        private accountListService: AccountListService
+        private accountListService: AccountListService,
+        private repositoryBranchesService: RepositoryBranchesService,
     ) {
     }
 
@@ -129,14 +130,35 @@ export class RepositoriesService {
         );
     }
 
-    push(repository: Repository, option?: { [git: string]: string }) {
+    push(repository: Repository, branches: RepositoryBranchSummary[], option?: { [git: string]: string }) {
         // get account
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
 
-        return fromPromise(
-            this.gitService.push(repository, credential, option)
+        // If the repository does not contain any remote => retrieve a full update
+        return fromPromise(this.gitService.updateRemotesRepository(repository, branches)).pipe(
+            switchMap(updateData => {
+                repository = updateData.repository;
+                branches = updateData.branches;
+                const activeBranch = updateData.branches.find(branch => branch.id === updateData.activeBranch);
+
+                this.repositoryBranchesService.set(branches);
+                this.repositoryBranchesService.setActiveID(updateData.activeBranch);
+                const retrieveBranchRemotePush = repository.remote.find(remote => remote.id === updateData.activeBranch);
+
+                return of({
+                    pushURL: retrieveBranchRemotePush.push,
+                    branchName: activeBranch.name
+                });
+            }),
+            switchMap(status => {
+                if (status.pushURL) {
+                    this.gitService.push(repository, status.pushURL, credential, option);
+                }
+                return of(true);
+            }),
+            tap(() => this.updateLocal(repository)),
         );
     }
 
@@ -166,5 +188,63 @@ export class RepositoriesService {
 
     reset() {
         this.store.reset();
+    }
+
+    async updateLocal(repositoryUpdate: Repository) {
+        const machineID = this.localStorageService.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME);
+        const configFile: AppConfig = await this.fileService.getFileContext<AppConfig>(
+            machineID, DefineCommon.DIR_CONFIG()
+        ).then(fulfilled => fulfilled.value);
+
+        const repositoryFileDirectory = configFile.repository_config;
+        const repositories: {
+            repositories: Repository[],
+            fileName: string
+        }[] = [];
+
+        const statusUpdate = [];
+
+        for (const dir of repositoryFileDirectory) {
+            const repos = await this.fileService.getFileContext<AppRepositories>(
+                dir, DefineCommon.DIR_REPOSITORIES()
+            );
+            if (!!repos.value && !!repos.value.repositories && repos.value.repositories.length > 0) {
+                repositories.push({
+                    repositories: repos.value.repositories,
+                    fileName: dir
+                });
+            }
+        }
+
+        for (const repository of repositories) {
+            let isChanged = false;
+            repository.repositories.forEach((repoData, index, originalArray) => {
+                if (repoData.id === repositoryUpdate.id) {
+                    originalArray[index] = repositoryUpdate;
+                    isChanged = true;
+                }
+            });
+
+            if (isChanged) {
+                const saveData: AppRepositories = {
+                    repositories: repository.repositories
+                };
+                const status = await this.fileService.updateFileContext(
+                    repository.fileName, saveData, DefineCommon.DIR_REPOSITORIES()
+                );
+                console.log(status);
+                statusUpdate.push(
+                    {
+                        status: status.status,
+                        repository: repositoryUpdate,
+                        directory: DefineCommon.DIR_REPOSITORIES() + repository.fileName + '.json'
+                    }
+                );
+            }
+        }
+
+        await this.load();
+
+        return statusUpdate;
     }
 }
