@@ -1,3 +1,3 @@
 export class Newtest {
-    a = '112345';
+    a = '1';
 }
