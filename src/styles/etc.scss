@@ -21,3 +21,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.nonSelectable {
+    user-select: none;
+}
