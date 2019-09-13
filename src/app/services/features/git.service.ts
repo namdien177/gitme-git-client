@@ -187,16 +187,6 @@ export class GitService {
         //         '--all'
         //     ]
         // ).then(r => console.log(r));
-        // await this.gitInstance(repository.directory).push(
-        //     urlRemote,
-        //     // undefined,
-        //     // options
-        //     // 'origin',
-        //     // 'side-bar-work',
-        //     // {
-        //     //     '--repo': urlRemote
-        //     // }
-        // );
     }
 
     async commit(repository: Repository, message: string, fileList?: string[], option?: {
