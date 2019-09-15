@@ -94,7 +94,6 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
     formListener() {
         this.formRegisterRepository.valueChanges.subscribe(
             (formFields: any) => {
-                console.log(formFields);
                 this.checkingStepOneRepo(formFields);
             }
         );

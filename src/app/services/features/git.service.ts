@@ -7,7 +7,7 @@ import { Repository, RepositoryRemotes } from '../../shared/states/DATA/reposito
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
-import { child_processNode } from '../../shared/types/types.electron';
+import { FileStatusSummaryView } from '../../shared/states/DATA/repository-status';
 
 @Injectable()
 export class GitService {
@@ -174,11 +174,7 @@ export class GitService {
     }
 
     push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
-        // const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
-        const sync = child_processNode.exec('git push', {
-            cwd: 'D:\\Projects\\School\\_topup\\GitMe\\gitme-git-client'
-        });
-
+        const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
         // this.gitInstance(repository.directory).raw(
         //     [
         //         // `${urlRemote}`
@@ -187,12 +183,27 @@ export class GitService {
         //         '--all'
         //     ]
         // ).then(r => console.log(r));
+        return this.gitInstance(repository.directory).push().then(() => {
+            console.log('push complete');
+            return true;
+        });
     }
 
     async commit(repository: Repository, message: string, fileList?: string[], option?: {
         [properties: string]: string
     }) {
         return this.gitInstance(repository.directory).commit(message, fileList, option);
+    }
+
+    async undoChange(repository: Repository, files: FileStatusSummaryView[]) {
+        if (files.length === 0) {
+            // reset hard
+            return this.gitInstance(repository.directory).reset('hard');
+        } else {
+            const dirList = files.map(file => file.working_dir);
+            return this.gitInstance(repository.directory)
+            .checkout(dirList).then(() => null);
+        }
     }
 
     async addWatch(repository: Repository, fileDir: string[]) {

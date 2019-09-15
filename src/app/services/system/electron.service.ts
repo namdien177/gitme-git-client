@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
 import { BrowserWindow, ipcRenderer, remote, webFrame } from 'electron';
@@ -15,17 +15,16 @@ import { AccountListService } from '../../shared/states/DATA/account-list';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, DefaultConfig } from '../../shared/model/App-Config';
+import { ApplicationStateService } from '../../shared/states/UI/Application-State';
 
 @Injectable({ providedIn: 'root' })
-export class ElectronService {
-
+export class ElectronService implements OnDestroy {
     ipcRenderer: typeof ipcRenderer;
     webFrame: typeof webFrame;
     remote: typeof remote;
     childProcess: typeof childProcess;
     fs: typeof fsNode;
     os: typeof os;
-
     private window: BrowserWindow;
     private readonly machine_id: string;
 
@@ -34,7 +33,8 @@ export class ElectronService {
         private securityService: SecurityService,
         private fileService: FileSystemService,
         private repositoriesList: RepositoriesService,
-        private accountList: AccountListService
+        private accountList: AccountListService,
+        private applicationStateService: ApplicationStateService
     ) {
         // Conditional imports
         if (ElectronService.isElectron()) {
@@ -42,6 +42,12 @@ export class ElectronService {
             this.webFrame = electronNG.webFrame;
             this.remote = electronNG.remote;
             this.window = electronNG.remote.getCurrentWindow();
+            // this.window.on('blur', () => {
+            //     this.applicationStateService.setBlur();
+            // });
+            // this.window.on('focus', () => {
+            //     this.applicationStateService.setFocus();
+            // });
 
             this.childProcess = window.require('child_process');
             this.fs = fsNode;
@@ -53,6 +59,9 @@ export class ElectronService {
 
     static isElectron() {
         return window && window.process && window.process.type;
+    }
+
+    ngOnDestroy(): void {
     }
 
     initializeConfigFromLocalDatabase() {

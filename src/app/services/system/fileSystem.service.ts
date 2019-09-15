@@ -174,7 +174,7 @@ export class FileSystemService {
      */
     updateFileContext<dataType>(
         fileName: string,
-        data: object | string,
+        data: dataType | string | object,
         directoryPath: string = '/',
         extension: '.json' | '.txt' = '.json'
     ) {
@@ -244,7 +244,7 @@ export class FileSystemService {
         }, []);
     }
 
-    private parsingData(data: object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
+    private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
         let writeData = '';
         if (extension === '.txt') {
             if (typeof data !== 'string') {

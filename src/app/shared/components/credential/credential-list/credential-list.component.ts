@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Account, AccountListQuery, AccountListState } from '../../../states/DATA/account-list';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SecurityService } from '../../../../services/system/security.service';
 
 @Component({
     selector: 'gitme-credential-list',
@@ -10,8 +9,8 @@ import { SecurityService } from '../../../../services/system/security.service';
 })
 export class CredentialListComponent implements OnInit, AfterViewInit {
 
-    @Input() accountSelected: AccountListState;
-    @Output() accountSelectedChange = new EventEmitter();
+    @Output() accountSelectedChange: EventEmitter<Account> = new EventEmitter();
+    @Output() isExistingCredentialValid: EventEmitter<boolean> = new EventEmitter();
 
     listExistedAccount: AccountListState[] = [];
     accountForm: FormGroup;
@@ -19,11 +18,9 @@ export class CredentialListComponent implements OnInit, AfterViewInit {
     constructor(
         private fb: FormBuilder,
         private accountListQuery: AccountListQuery,
-        private securityService: SecurityService
     ) {
         this.accountListQuery.selectAll().subscribe(
             listExisted => {
-                console.log(listExisted);
                 this.listExistedAccount = listExisted;
             }
         );
@@ -37,6 +34,8 @@ export class CredentialListComponent implements OnInit, AfterViewInit {
         this.accountForm = this.fb.group({
             account: [null, [Validators.required]]
         });
+
+        this.emitAccount();
     }
 
     ngAfterViewInit(): void {
@@ -51,13 +50,7 @@ export class CredentialListComponent implements OnInit, AfterViewInit {
 
     emitAccount() {
         const valueSelected: Account = this.account.value;
-        const obEmit: Account = {
-            username: valueSelected.username,
-            password: this.securityService.encryptAES(valueSelected.password),
-            password_raw: valueSelected.password_raw,
-            id: valueSelected.id_local
-        };
-        console.log(this.accountForm.controls);
-        this.accountSelectedChange.emit(obEmit);
+        this.accountSelectedChange.emit(valueSelected);
+        this.isExistingCredentialValid.emit(this.accountForm.valid);
     }
 }

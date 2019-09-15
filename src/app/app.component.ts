@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { AppConfig } from '../environments/environment';
 import { FileSystemService } from './services/system/fileSystem.service';
 import { GitService } from './services/features/git.service';
 
@@ -17,7 +16,6 @@ export class AppComponent {
     ) {
 
         translate.setDefaultLang('en');
-        console.log('AppConfig', AppConfig);
 
         // if (ElectronService.isElectron()) {
         //   console.log('Mode electron');

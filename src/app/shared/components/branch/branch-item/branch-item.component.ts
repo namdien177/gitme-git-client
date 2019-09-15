@@ -18,7 +18,6 @@ export class BranchItemComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log(this.branchSummary);
     }
 
 }

@@ -26,6 +26,10 @@ export class SecurityService {
         return genUUID;
     }
 
+    get appUUID() {
+        return this.secretUUID;
+    }
+
     encryptAES(password) {
         const secret = this.secretUUID.slice(0, 32);
         if (password.length > 50 || password.length < 2) {

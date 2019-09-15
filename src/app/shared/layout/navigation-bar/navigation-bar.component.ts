@@ -3,7 +3,7 @@ import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
 import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/DATA/repositories';
 import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/DATA/repository-branches';
 import { AccountListService } from '../../states/DATA/account-list';
-import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { StatusSummary } from '../../model/StatusSummary';
 import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
@@ -11,6 +11,7 @@ import { FileWatchesQuery, FileWatchesService } from '../../states/system/File-W
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileStatusSummaryView, RepositoryStatusService } from '../../states/DATA/repository-status';
 import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
+import { ApplicationStateService } from '../../states/UI/Application-State';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -40,22 +41,23 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
 
     constructor(
         private repositoriesMenuService: RepositoriesMenuService,
-        protected repositoriesQuery: RepositoriesQuery,
-        protected branchesQuery: RepositoryBranchesQuery,
+        public repositoriesQuery: RepositoriesQuery,
+        public branchesQuery: RepositoryBranchesQuery,
         private repositoriesService: RepositoriesService,
         private repositoryBranchesService: RepositoryBranchesService,
         private accountService: AccountListService,
         private fileWatchesService: FileWatchesService,
         private fileWatchesQuery: FileWatchesQuery,
         private repositoryStatusService: RepositoryStatusService,
-        protected utilities: UtilityService,
-        private fb: FormBuilder
+        public utilities: UtilityService,
+        private fb: FormBuilder,
+        private applicationStateService: ApplicationStateService
     ) {
         this.watchingUIState();
         this.watchingRepository();
         this.watchingBranch();
-        // this.watchingFileChanges(); // Chokidar is more efficient!
-        // this.loopRefreshBranchStatus();
+        this.watchingFileChanges(); // Chokidar is more efficient!
+        this.loopRefreshBranchStatus();
     }
 
     get titleCommit() {
@@ -216,14 +218,16 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.fileWatchesQuery.select().pipe(
             takeUntil(this.componentDestroyed),
             debounceTime(200),
-            switchMap(
-                () => {
-                    return this.observingBranchStatus();
-                }
-            )
+            takeWhile(
+                () => !this.applicationStateService.getApplicationState().isLosingFocus
+            ),
+            switchMap(() => this.observingBranchStatus())
         ).subscribe(
             (status: StatusSummary) => {
                 this.statusSummary = status;
+                if (status) {
+                    this.repositoryStatusService.set(status);
+                }
             }
         );
     }
@@ -241,13 +245,16 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         return of(null);
     }
 
-    private loopRefreshBranchStatus(loopDuration = 2000) {
+    /**
+     * Default looping 15s
+     * @param loopDuration
+     */
+    private loopRefreshBranchStatus(loopDuration = 15000) {
         interval(loopDuration)
         .pipe(
             takeUntil(this.componentDestroyed),
             switchMap(() => this.observingBranchStatus())
-        )
-        .subscribe((status) => {
+        ).subscribe((status) => {
             this.statusSummary = status;
             if (status) {
                 this.repositoryStatusService.set(status);

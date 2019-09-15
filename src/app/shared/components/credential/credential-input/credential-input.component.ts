@@ -12,9 +12,9 @@ import { SecurityService } from '../../../../services/system/security.service';
 export class CredentialInputComponent implements OnInit, AfterViewInit {
 
     @Input() account: Account;
-    @Output() accountChange = new EventEmitter();
+    @Output() accountNewChange = new EventEmitter();
 
-    @Output() isCredentialsValid = new EventEmitter();
+    @Output() isNewCredentialsValid = new EventEmitter();
 
     listMightMatchAccount: Account[] = [];
 
@@ -27,7 +27,6 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
     ) {
         this.accountListQuery.selectAll().subscribe(
             listExisted => {
-                console.log(listExisted);
                 this.listMightMatchAccount = listExisted;
             }
         );
@@ -45,11 +44,16 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
         return this.accountForm.get('password');
     }
 
+    get author() {
+        return this.accountForm.get('author');
+    }
+
     ngOnInit() {
         this.accountForm = this.fb.group({
-            username: ['', [Validators.required]],
-            password: ['', [Validators.required]],
-            uuid: ['', [Validators.required]]
+            username: ['', [Validators.required, Validators.minLength(3)]],
+            password: ['', [Validators.required, Validators.minLength(3)]],
+            uuid: ['', [Validators.required]],
+            author: ['', [Validators.required]]
         });
     }
 
@@ -60,19 +64,32 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
     }
 
     onInputChanges() {
-        this.isCredentialsValid.emit(this.accountForm.valid);
+        this.isNewCredentialsValid.emit(this.accountForm.valid);
         this.emitAccount();
     }
 
     emitAccount() {
         this.uuid.setValue(this.secureService.randomID, { emitEvent: false });
+        if (this.author.pristine) {
+            // Manually generate author name if it's empty
+            if (this.username.valid) {
+                this.author.setValue(
+                    this.extractName(this.username.value),
+                    { emitEvent: false }
+                );
+                this.author.markAsPristine();
+            }
+        }
         const obEmit: Account = {
+            id: this.uuid.value,
+            name_local: this.author.value,
             username: this.username.value,
-            password: this.secureService.encryptAES(this.password.value),
-            password_raw: this.password.value,
-            id: this.uuid.value
+            password: this.secureService.encryptAES(this.password.value)
         };
-        console.log(this.accountForm.controls);
-        this.accountChange.emit(obEmit);
+        this.accountNewChange.emit(obEmit);
+    }
+
+    private extractName(name: string) {
+        return name.split('@')[0];
     }
 }

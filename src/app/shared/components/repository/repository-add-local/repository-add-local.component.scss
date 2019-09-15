@@ -14,19 +14,42 @@
 
 .main-form {
     z-index: 100;
-    width: 430px;
-    height: max-content;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    width: 100vw;
+    height: calc(100vh - 32px);
     background-color: $background-primary-night;
     box-shadow: $shadow-light;
 
-    display: flex;
-    flex-direction: column;
-}
+    display: grid;
+    grid-template-areas: '. title title .' '. info info .' '. repository account .' '. confirm confirm .' '. . . .';
+    grid-template-columns: 1fr 360px 360px 1fr;
+    grid-template-rows: repeat(4, max-content) auto;
+    grid-gap: 2rem;
 
-.flex-end--ng {
-    justify-content: flex-end;
+    padding: 3rem;
+
+    .title-section {
+        grid-area: title;
+        display: flex;
+
+        align-items: center;
+    }
+
+    .info-dialog {
+        grid-area: info;
+    }
+
+    .repository-information {
+        grid-area: repository;
+    }
+
+    .repository-credentials {
+        grid-area: account;
+    }
+
+    .confirmation-action {
+        grid-area: confirm;
+        justify-content: flex-end;
+    }
 }
 
 .wrap--ng {

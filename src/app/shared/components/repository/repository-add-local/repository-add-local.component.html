@@ -1,5 +1,24 @@
 <form [formGroup]="formRegisterRepository" class="main-form">
-    <div class="form-group mb-3">
+    <div class="title-section">
+        <h2 class="text-white">
+            Adding existing local repository
+        </h2>
+    </div>
+
+    <div *ngIf="infoDialogs.type !== null"
+         [class.bg-danger]="infoDialogs.type == 'ERROR'"
+         [class.bg-info]="infoDialogs.type == 'INFO'"
+         [class.bg-warning]="infoDialogs.type == 'WARNING'"
+         class="info-dialog card">
+        <div [class.text-black]="infoDialogs.type == 'WARNING'"
+             [class.text-white]="infoDialogs.type == 'ERROR' || infoDialogs.type == 'INFO'"
+             class="card-body">
+            {{infoDialogs.message}}
+        </div>
+    </div>
+
+    <div class="repository-information form-group">
+        <h5>Local Repository</h5>
         <label for="directory">Repository directory</label>
         <div class="wrap--ng">
             <input class="form-control form-control-dark"
@@ -14,7 +33,9 @@
         <small class="text-muted">
             Repository will be added to manage list as "abc"
         </small>
-        <hr>
+    </div>
+
+    <div class="repository-credentials form-group">
         <h5>Repository credentials</h5>
         <div class="row mb-3">
             <div class="col">
@@ -24,7 +45,7 @@
                         block="true"
                         class="text-white"
                         mdbBtn size="sm">
-                    Stored Account
+                    Saved Account
                 </button>
             </div>
             <div class="col">
@@ -39,19 +60,20 @@
             </div>
         </div>
         <ng-container *ngIf="isExistingAccount">
-            <gitme-credential-list></gitme-credential-list>
+            <gitme-credential-list (accountSelectedChange)="listenAccount($event)">
+            </gitme-credential-list>
         </ng-container>
 
         <ng-container *ngIf="!isExistingAccount">
-            <gitme-credential-input (isCredentialsValid)="credentialsFormValid = $event">
+            <gitme-credential-input (accountNewChange)="listenAccount($event)">
             </gitme-credential-input>
         </ng-container>
     </div>
-    <div class="d-flex flex-end--ng">
+    <div class="confirmation-action d-flex flex-end--ng">
         <button (click)="cancelAdding()" class="mr-3" color="dark" mdbBtn size="sm">
             Cancel
         </button>
-        <button color="success" mdbBtn size="sm">
+        <button (click)="submitNewRepository()" color="success" mdbBtn size="sm">
             Confirm
         </button>
     </div>

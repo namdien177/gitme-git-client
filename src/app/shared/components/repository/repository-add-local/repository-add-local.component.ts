@@ -5,6 +5,13 @@ import { RepositoriesMenuService } from '../../../states/UI/repositories-menu';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
 import { electronNG, osNode } from '../../../types/types.electron';
+import { switchMap } from 'rxjs/operators';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { of } from 'rxjs';
+import { DialogsInformation } from '../../../model/DialogsInformation';
+import { RepositoriesService, Repository } from '../../../states/DATA/repositories';
+import { SecurityService } from '../../../../services/system/security.service';
+import { Account, AccountListService } from '../../../states/DATA/account-list';
 
 @Component({
     selector: 'gitme-repository-add-local',
@@ -14,10 +21,20 @@ import { electronNG, osNode } from '../../../types/types.electron';
 export class RepositoryAddLocalComponent implements OnInit {
 
     formRegisterRepository: FormGroup;
-    directoryVerified = false;
-    illuminateValue_dir: string = osNode.homedir();
     isExistingAccount = true;
-    credentialsFormValid = false;
+
+    infoDialogs: DialogsInformation = {
+        type: null,
+        message: null
+    };
+
+    needCreateNewGitDirectory = false;
+
+    /**
+     * Identify credentials
+     */
+    isCredentialsValid = false;
+    credentials: Account = null;
 
     private readonly electron: typeof electronNG.remote;
     private formFieldBuilder = {
@@ -25,19 +42,19 @@ export class RepositoryAddLocalComponent implements OnInit {
         repo_dir: [osNode.homedir(), Validators.required],
         repo_dir_display: [osNode.homedir(), Validators.required],
         repo_name: [''],
-        repo_account: [{
-            username: '',
-            password: ''
-        }]
+        repo_account: [null, [Validators.required]]
     };
 
     constructor(
         private formBuilder: FormBuilder,
+        private accountListService: AccountListService,
+        private repositoryService: RepositoriesService,
         private utilityService: UtilityService,
         private repositoriesMenuService: RepositoriesMenuService,
         private gitPackService: GitService,
         private fileSystemService: FileSystemService,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private securityService: SecurityService
     ) {
         this.electron = electronNG.remote;
     }
@@ -64,10 +81,6 @@ export class RepositoryAddLocalComponent implements OnInit {
 
     ngOnInit() {
         this.formRegisterRepository = this.formBuilder.group(this.formFieldBuilder);
-        this.gitPackService.isGitProject('').then(val => {
-            console.log(val);
-        });
-
         this.listenerDirectory();
     }
 
@@ -90,26 +103,122 @@ export class RepositoryAddLocalComponent implements OnInit {
     }
 
     listenerDirectory() {
-        this.repo_dir_display.valueChanges.subscribe(newVal => {
-            if (!!newVal) {
-                const safeDir = this.utilityService.directorySafePath(newVal);
-                if (safeDir) {
-                    this.repo_dir.setValue(safeDir);
-                }
+        this.repo_dir_display.valueChanges
+        .subscribe(
+            viewingDirectory => {
+                this.convertDisplayDirectoryToSafeDirectory(viewingDirectory);
             }
-            console.log(newVal);
-        });
+        );
 
-        this.repo_dir.valueChanges.subscribe(newVal => {
-            console.log(newVal);
-            if (!!newVal && this.fileSystemService.isDirectoryExist(newVal)) {
-                // TODO valid directory? Need check gitInstance
-                // Check gitInstance
-                this.gitPackService.isGitProject(newVal).then(result => console.log(result));
-            } else {
-                // TODO invalid directory? can create afterward and init
+        this.repo_dir.valueChanges
+        .pipe(
+            switchMap(directorySafe => {
+                return this.checkIfGitDirectory(directorySafe);
+            }),
+        )
+        .subscribe(
+            repositoryStatus => {
+                this.infoDialogs = {
+                    type: null,
+                    message: null
+                };
+                if (repositoryStatus === null) {
+                    // Not valid repository
+                    // TODO: Display error message?
+                    this.infoDialogs = {
+                        type: 'ERROR',
+                        message: 'The directory is invalid!'
+                    };
+                } else if (repositoryStatus === false) {
+                    // Not a git repository
+                    // TODO: Display option to create repository
+                    this.infoDialogs = {
+                        type: 'WARNING',
+                        message: 'The directory is not initialized with git'
+                    };
+                } else {
+                    // Is a valid repository
+
+                }
+
+                this.cd.detectChanges();
             }
-// const displayPath = this.utilityService.directorySafePath()
-        });
+        );
+    }
+
+    listenAccount(account: Account) {
+        this.repo_account.setValue(account);
+    }
+
+    submitNewRepository() {
+        if (this.formRegisterRepository.invalid) {
+            return;
+        }
+
+        const credentialsInstance: Account = <Account>this.repo_account.value;
+
+        const repositoryInstance: Repository = {
+            id: this.securityService.randomID,
+            name: this.repo_name.value,
+            directory: this.repo_dir.value,
+            credential: {
+                id_credential: credentialsInstance.id,
+                name: credentialsInstance.name_local,
+            },
+            selected: true,
+        };
+
+        /**
+         * Confirm this will:
+         * * Saving credentials and repository into local file database
+         * * Update working repository
+         * * Fetching new repository => reassign main branch
+         */
+        this.repositoryService.addExistingLocalRepository(
+            repositoryInstance, credentialsInstance, !this.isExistingAccount
+        ).subscribe(
+            addStatus => {
+                console.log(addStatus);
+                this.cancelAdding();
+            }
+        );
+    }
+
+    private checkIfGitDirectory(directory: string) {
+        /**
+         * Check if directory exist
+         */
+        if (!!directory && this.fileSystemService.isDirectoryExist(directory)) {
+            /**
+             * Then check if it's a git repo already
+             */
+            return fromPromise(this.gitPackService.isGitProject(directory));
+        } else {
+            return of(null);
+        }
+    }
+
+    private convertDisplayDirectoryToSafeDirectory(rawDirectory: string) {
+        if (!!rawDirectory) {
+            const safeDir = this.utilityService.directorySafePath(rawDirectory);
+            if (safeDir) {
+                this.repo_dir.setValue(safeDir);
+                this.setupNameRepository(rawDirectory);
+            } else {
+                this.repo_dir.setValue(null);
+                this.repo_name.setValue(null);
+            }
+        } else {
+            this.repo_dir.setValue(null);
+            this.repo_name.setValue(null);
+        }
+    }
+
+    private setupNameRepository(viewingDirectory: string) {
+        const safeString = this.utilityService.slashFixer(viewingDirectory);
+        const arrPaths = safeString.split('/');
+        const nameExpected = arrPaths[arrPaths.length - 1];
+        this.repo_name.setValue(nameExpected);
+        return nameExpected;
     }
 }

@@ -100,8 +100,6 @@ export class UtilityService {
             return false;
         }
         const removeDotGit = nameWithDotGit.slice(0, nameWithDotGit.length - 4);
-        console.log(strSplit);
-        console.log(removeDotGit);
         return removeDotGit;
     }
 
