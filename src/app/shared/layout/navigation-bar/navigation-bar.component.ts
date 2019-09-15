@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FileStatusSummaryView, RepositoryStatusService } from '../../states/DATA/repository-status';
 import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
 import { ApplicationStateService } from '../../states/UI/Application-State';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -178,23 +179,32 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
      * Retrieve current selected repository
      */
     private watchingRepository() {
-        this.repositoriesService.getActive()
+        this.repositoriesService.selectActive()
         .pipe(
             switchMap(selectedRepo => {
+                this.loading.branch = true;
+                this.loading.repository = true;
                 this.repository = selectedRepo;
-                this.repositoryBranchesService.load(selectedRepo, null);
+                let account = null;
                 if (this.repository) {
                     const dir = this.repository.directory;
                     this.fileWatchesService.switchTo(dir);
+                    account = this.accountService.getOneSync(this.repository.credential.id_credential);
                 }
-
-                return this.observingBranchStatus();
-            })
+                return fromPromise(this.repositoryBranchesService.load(selectedRepo, account));
+            }),
+            switchMap(() => this.observingBranchStatus())
         )
         .subscribe(
             (status: StatusSummary) => {
                 console.log(status);
                 this.statusSummary = status;
+                if (status) {
+                    this.repositoryStatusService.set(status);
+                    this.repositoriesService.getDiffOfFile(this.repository, status.files[0]);
+                }
+                this.loading.branch = false;
+                this.loading.repository = false;
             }
         );
     }

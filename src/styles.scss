@@ -8,21 +8,21 @@
 
 /* You can add global styles to this file, and also import other style files */
 html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
 *, *:before, *:after {
-  box-sizing: border-box;
-  color: white;
+    box-sizing: border-box;
+    color: white;
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: $background-primary-night !important;
+    font-family: 'Roboto', sans-serif;
+    background-color: $background-primary-night !important;
 }
 
 .cursor-pointer {
-  cursor: pointer;
+    cursor: pointer;
 }

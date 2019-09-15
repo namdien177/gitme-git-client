@@ -1,92 +1,92 @@
 @import "src/styles/theme";
 
 .form-control-dark {
-  outline: none !important;
-  background-color: $background-primary-night !important;
-  border-color: $background-primary-lighter-night !important;
-  color: white !important;
-  box-shadow: none !important;
+    outline: none !important;
+    background-color: $background-primary-night !important;
+    border-color: $background-primary-lighter-night !important;
+    color: white !important;
+    box-shadow: none !important;
 
-  &.hover:hover {
-    border-color: whitesmoke !important;
-  }
+    &.hover:hover {
+        border-color: whitesmoke !important;
+    }
 
-  &.focus:focus {
-    border-color: white !important;
-  }
+    &.focus:focus {
+        border-color: white !important;
+    }
 }
 
 .acomi-checkbox-control {
-  display: grid;
-  place-content: center;
+    display: grid;
+    place-content: center;
 
-  .acomi-input-box {
-    &:checked + .cbx span:first-child {
-      background: #506EEC;
-      border-color: #506EEC;
+    .acomi-input-box {
+        &:checked + .cbx span:first-child {
+            background: #506EEC;
+            border-color: #506EEC;
 
-      svg {
-        stroke-dashoffset: 0;
-      }
+            svg {
+                stroke-dashoffset: 0;
+            }
+        }
     }
-  }
 
-  .cbx {
-    margin: auto;
-    -webkit-user-select: none;
-    user-select: none;
-    cursor: pointer;
+    .cbx {
+        margin: auto;
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: pointer;
 
-    span {
-      display: inline-block;
-      vertical-align: middle;
-      transform: translate3d(0, 0, 0);
+        span {
+            display: inline-block;
+            vertical-align: middle;
+            transform: translate3d(0, 0, 0);
 
-      &:first-child {
-        position: relative;
-        width: 18px;
-        height: 18px;
-        border-radius: 3px;
-        transform: scale(1);
-        vertical-align: middle;
-        border: 1px solid #9098A9;
-        transition: all 0.2s ease;
+            &:first-child {
+                position: relative;
+                width: 18px;
+                height: 18px;
+                border-radius: 3px;
+                transform: scale(1);
+                vertical-align: middle;
+                border: 1px solid #9098A9;
+                transition: all 0.2s ease;
 
-        svg {
-          position: absolute;
-          top: 3px;
-          left: 2px;
-          fill: none;
-          stroke: #FFFFFF;
-          stroke-width: 2;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          stroke-dasharray: 16px;
-          stroke-dashoffset: 16px;
-          transition: all 0.3s ease;
-          transition-delay: 0.1s;
-          transform: translate3d(0, 0, 0);
+                svg {
+                    position: absolute;
+                    top: 3px;
+                    left: 2px;
+                    fill: none;
+                    stroke: #FFFFFF;
+                    stroke-width: 2;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    stroke-dasharray: 16px;
+                    stroke-dashoffset: 16px;
+                    transition: all 0.3s ease;
+                    transition-delay: 0.1s;
+                    transform: translate3d(0, 0, 0);
+                }
+
+                &:before {
+                    content: "";
+                    width: 100%;
+                    height: 100%;
+                    background: #506EEC;
+                    display: block;
+                    transform: scale(0);
+                    opacity: 1;
+                    border-radius: 50%;
+                }
+            }
+
+            &:last-child {
+                padding-left: 8px;
+            }
         }
 
-        &:before {
-          content: "";
-          width: 100%;
-          height: 100%;
-          background: #506EEC;
-          display: block;
-          transform: scale(0);
-          opacity: 1;
-          border-radius: 50%;
+        &:hover span:first-child {
+            border-color: #506EEC;
         }
-      }
-
-      &:last-child {
-        padding-left: 8px;
-      }
     }
-
-    &:hover span:first-child {
-      border-color: #506EEC;
-    }
-  }
 }

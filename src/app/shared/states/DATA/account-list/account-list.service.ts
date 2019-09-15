@@ -32,6 +32,10 @@ export class AccountListService {
         return this.query.getEntity(idAccount);
     }
 
+    getOneAsync(idAccount: string) {
+        return this.query.selectEntity(idAccount);
+    }
+
     reset() {
         this.store.reset();
     }

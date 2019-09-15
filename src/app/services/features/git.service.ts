@@ -155,24 +155,13 @@ export class GitService {
         return await git(directory).checkIsRepo();
     }
 
-    async createRepositoryData(
-        directory: string,
-        rawCredentials: { username: string, password: string },
-        remote: string,
-        localName?: string
-    ) {
-        directory = this.utilities.directorySafePath(directory);
-        const isRepo = await this.isGitProject(directory);
-        if (!isRepo) {
-            return null;
-        }
-
-        // const newRepo: Repository = {
-        //     id: this.securityService.randomID,
-        //
-        // };
-    }
-
+    /**
+     * TODO: checking git issue for more info.
+     * @param repository
+     * @param branchURL
+     * @param credentials
+     * @param options
+     */
     push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
         const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
         // this.gitInstance(repository.directory).raw(
@@ -204,6 +193,12 @@ export class GitService {
             return this.gitInstance(repository.directory)
             .checkout(dirList).then(() => null);
         }
+    }
+
+    async getDiffOfFile(repository: Repository, filePath: string) {
+        return await this.gitInstance(repository.directory).diff(
+            ['--', filePath]
+        );
     }
 
     async addWatch(repository: Repository, fileDir: string[]) {

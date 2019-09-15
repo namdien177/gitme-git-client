@@ -96,7 +96,7 @@
 
     <div class="branch-commit">
         <button (click)="commitFile()"
-                [disabled]="formCommitment.invalid || loading.commit"
+                [disabled]="formCommitment.invalid || loading.commit || loading.repository || loading.branch"
                 class="btn btn-block btn-success rounded-0">
             <gitme-small-load *ngIf="loading.commit"></gitme-small-load>
             <span>Commit</span>

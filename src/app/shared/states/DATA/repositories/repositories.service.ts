@@ -15,6 +15,7 @@ import { Account, AccountListService } from '../account-list';
 import { AppRepositories } from '../../../model/App-Repositories';
 import { SecurityService } from '../../../../services/system/security.service';
 import { AppAccounts } from '../../../model/App-Accounts';
+import { FileStatusSummary } from '../../../model/FileStatusSummary';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -78,9 +79,10 @@ export class RepositoriesService {
 
     setActive(activeRepository: Repository) {
         this.store.setActive(activeRepository.id);
+        this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
     }
 
-    getActive(): Observable<Repository> {
+    selectActive(): Observable<Repository> {
         this.setLoading();
         return fromPromise(this.load()).pipe(
             switchMap(() => this.query.selectActive()),
@@ -321,5 +323,11 @@ export class RepositoriesService {
         return await this.fileService.getFileContext<AppConfig>(
             this.securityService.appUUID, DefineCommon.DIR_CONFIG()
         ).then(fulfilled => fulfilled.value);
+    }
+
+    getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
+        return this.gitService.getDiffOfFile(repository, fileStatusSummary.path).then(res => {
+            return res;
+        });
     }
 }

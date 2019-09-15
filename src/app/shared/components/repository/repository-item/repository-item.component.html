@@ -1,21 +1,21 @@
-<div class="card">
+<div (click)="switchToRepository()" class="card">
     <div class="card-body row">
         <div class="name">
             {{repository?.name}}
         </div>
         <div class="status">
-            <div *ngIf="(repositoryObserve | async)?.behind > 0"
-                 [title]="(repositoryObserve | async)?.behind + pullTitle"
+            <div *ngIf="repositorySummary?.behind > 0"
+                 [title]="repositorySummary?.behind + pullTitle"
                  class="pull">
                 <div class="circle-status bg-info"></div>
             </div>
-            <div *ngIf="(repositoryObserve | async)?.ahead > 0"
-                 [title]="(repositoryObserve | async)?.ahead + pushTitle"
+            <div *ngIf="repositorySummary?.ahead > 0"
+                 [title]="repositorySummary?.ahead + pushTitle"
                  class="push">
                 <div class="circle-status bg-success"></div>
             </div>
-            <div *ngIf="(repositoryObserve | async)?.files.length > 0"
-                 [title]="(repositoryObserve | async)?.files.length + changesTitle"
+            <div *ngIf="repositorySummary?.files.length > 0"
+                 [title]="repositorySummary?.files.length + changesTitle"
                  class="changes">
                 <div class="circle-status bg-warning"></div>
             </div>
