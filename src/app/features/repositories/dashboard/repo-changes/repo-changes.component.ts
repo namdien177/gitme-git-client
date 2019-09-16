@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Diff2Html } from 'diff2html';
 import { GitDiffService } from '../../../../shared/states/DATA/git-diff';
 import { GitDiff } from '../../../../shared/model/GitDiff';
+import { HighlightResult } from 'ngx-highlightjs';
 
 @Component({
     selector: 'gitme-repo-changes',
@@ -34,4 +35,7 @@ export class RepoChangesComponent implements OnInit {
         );
     }
 
+    highlighted($event: HighlightResult) {
+        console.log($event);
+    }
 }

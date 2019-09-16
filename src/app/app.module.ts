@@ -22,6 +22,21 @@ import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/system/localStorage.service';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
+import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
+
+import xml from 'highlight.js/lib/languages/xml';
+import scss from 'highlight.js/lib/languages/scss';
+import typescript from 'highlight.js/lib/languages/typescript';
+import javascript from 'highlight.js/lib/languages/javascript';
+
+export function hljsLanguages() {
+    return [
+        { name: 'typescript', func: typescript },
+        { name: 'javascript', func: javascript },
+        { name: 'scss', func: scss },
+        { name: 'xml', func: xml }
+    ];
+}
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -52,9 +67,17 @@ const declareComps = [
         }),
         AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
         AkitaNgRouterStoreModule.forRoot(),
-        MDBBootstrapModule.forRoot()
+        MDBBootstrapModule.forRoot(),
     ],
-    providers: [ElectronService, LocalStorageService],
+    providers: [
+        ElectronService,
+        LocalStorageService,
+        {
+            provide: HIGHLIGHT_OPTIONS,
+            useValue: {
+                languages: hljsLanguages,
+            }
+        }],
     bootstrap: [AppComponent]
 })
 export class AppModule {
