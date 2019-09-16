@@ -201,7 +201,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 this.statusSummary = status;
                 if (status) {
                     this.repositoryStatusService.set(status);
-                    this.repositoriesService.getDiffOfFile(this.repository, status.files[0]);
                 }
                 this.loading.branch = false;
                 this.loading.repository = false;

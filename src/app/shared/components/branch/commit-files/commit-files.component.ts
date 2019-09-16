@@ -1,12 +1,15 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { UtilityService } from '../../../utilities/utility.service';
-import { RepositoriesQuery, RepositoriesService } from '../../../states/DATA/repositories';
+import { RepositoriesQuery, RepositoriesService, Repository } from '../../../states/DATA/repositories';
 import {
     createInitialState,
     FileStatusSummaryView,
     RepositoryStatusService,
     RepositoryStatusState
 } from '../../../states/DATA/repository-status';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { tap } from 'rxjs/operators';
+import { GitDiffService } from '../../../states/DATA/git-diff';
 
 @Component({
     selector: 'gitme-commit-files',
@@ -16,6 +19,8 @@ import {
 export class CommitFilesComponent implements OnInit {
 
     statusSummary: RepositoryStatusState = createInitialState();
+
+    @Input() repository: Repository;
 
     @Output()
     isAllFileChecked = new EventEmitter<boolean>();
@@ -31,6 +36,7 @@ export class CommitFilesComponent implements OnInit {
         private repositoriesService: RepositoriesService,
         private repositoriesQuery: RepositoriesQuery,
         private repositoryStatusService: RepositoryStatusService,
+        private gitDiffService: GitDiffService
     ) {
         this.repositoryStatusService.select()
         .subscribe(
@@ -78,6 +84,22 @@ export class CommitFilesComponent implements OnInit {
     }
 
     trackByPath(item: FileStatusSummaryView) {
-        return item;
+        return item.path;
+    }
+
+    viewDiffFile(fileSummary: FileStatusSummaryView, index: number) {
+        fromPromise(this.repositoriesService.getDiffOfFile(this.repository, fileSummary))
+        .pipe(
+            tap(diff => {
+                this.gitDiffService.setDiff(
+                    diff,
+                    fileSummary.path
+                );
+                console.log(diff);
+            })
+        )
+        .subscribe(() => {
+            this.repositoryStatusService.toggleActive(index);
+        });
     }
 }

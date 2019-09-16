@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createInitialState, FileStatusSummaryView, RepositoryStatusStore } from './repository-status.store';
-import { HttpClient } from '@angular/common/http';
 import { StatusSummary } from '../../../model/StatusSummary';
 import { RepositoryStatusQuery } from './repository-status.query';
-import { UtilityService } from '../../../utilities/utility.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusService {
@@ -11,8 +9,6 @@ export class RepositoryStatusService {
     constructor(
         private repositoryStatusStore: RepositoryStatusStore,
         private repositoryStatusQuery: RepositoryStatusQuery,
-        private utilityService: UtilityService,
-        private http: HttpClient
     ) {
     }
 
@@ -24,7 +20,7 @@ export class RepositoryStatusService {
                 return {
                     ...file,
                     checked: isCached ? this.retrieveCheckStatusFromCacheFile(isCached) : true,
-                    active: false
+                    active: isCached ? isCached.active : false
                 };
             }
         );
@@ -128,9 +124,11 @@ export class RepositoryStatusService {
 
     private retrieveToggledActivatedArray(index: number) {
         const mutableState = [...this.repositoryStatusQuery.getValue().files];
-        mutableState[index] = Object.assign({
-            ...mutableState[index],
-            active: !mutableState[index].active
+        mutableState.forEach((file, i, allFiles) => {
+            allFiles[i] = Object.assign({
+                ...file,
+                active: i === index ? !file.active : false
+            });
         });
         return mutableState;
     }

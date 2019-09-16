@@ -1,3 +1,5 @@
+@import "src/styles/theme";
+
 .repo-files-commit {
     grid-area: files;
     display: block;
@@ -14,7 +16,11 @@
         margin-bottom: 0.25rem;
 
         &:hover {
-            background: #292929;
+            background: $background-primary-night-hover;
+        }
+
+        &.active {
+            background: $background-primary-night-selected !important;
         }
 
         .added {

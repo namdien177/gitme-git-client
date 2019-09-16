@@ -1,3 +1,41 @@
-<p>
-    repo-changes works!
-</p>
+<div class="tb-container">
+    <div class="row-diff">
+        <ng-container *ngFor="let block of outputHTML?.blocks[0].lines">
+            <div class="col-index-old">{{block.oldNumber}}</div>
+            <div class="col-index-new">{{block.newNumber}}</div>
+            <!--                <div class="diff-type">-->
+            <!--                    <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>-->
+            <!--                    <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>-->
+            <!--                    <ng-container *ngIf="block.type == 'd2h-cntx'"></ng-container>-->
+            <!--                </div>-->
+        </ng-container>
+    </div>
+    <div class="row-diff-context">
+        <ng-container *ngFor="let block of outputHTML?.blocks[0].lines">
+            <div class="diff-text">{{block.content | gitDiff}}</div>
+        </ng-container>
+    </div>
+</div>
+
+<!--<table class="tb">-->
+<!--    <tr>-->
+<!--        <th class="tb-index" colspan="2">Row</th>-->
+<!--        <th class="tb-type" rowspan="2">Type</th>-->
+<!--        <th class="tb-context" rowspan="2">Context</th>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <th class="tb-index-item">Old</th>-->
+<!--        <th class="tb-index-item">New</th>-->
+<!--    </tr>-->
+<!--    <tr *ngFor="let block of outputHTML?.blocks[0].lines">-->
+<!--        <td class="tb-index-item">{{block.oldNumber}}</td>-->
+<!--        <td class="tb-index-item">{{block.newNumber}}</td>-->
+<!--        <td class="tb-type">-->
+<!--            <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>-->
+<!--            <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>-->
+<!--            <ng-container *ngIf="block.type == 'd2h-cntx'"></ng-container>-->
+<!--        </td>-->
+<!--        <td class="tb-context">{{block.content}}</td>-->
+<!--    </tr>-->
+<!--</table>-->
+

@@ -11,7 +11,7 @@ export class GitDiffService {
     ) {
     }
 
-    setDiff(diff: string, fileName: string, fileDirectory: string) {
+    setDiff(diff: string, fileDirectory: string) {
         this.gitDiffStore.update({
             diff
         });

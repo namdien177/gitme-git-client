@@ -3,7 +3,6 @@ import { Store, StoreConfig } from '@datorama/akita';
 
 export interface GitDiffState {
     diff: string;
-    name: string;
     directory: string;
     commit?: {
         original: string;
@@ -14,7 +13,6 @@ export interface GitDiffState {
 export function createInitialState(): GitDiffState {
     return {
         diff: null,
-        name: null,
         directory: null
     };
 }

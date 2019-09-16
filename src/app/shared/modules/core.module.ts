@@ -11,6 +11,8 @@ import { GitService } from '../../services/features/git.service';
 import { CredentialInputComponent } from '../components/credential/credential-input/credential-input.component';
 import { CredentialListComponent } from '../components/credential/credential-list/credential-list.component';
 import { SmallLoadComponent } from '../components/UI/small-load/small-load.component';
+import { SafeHtmlPipe } from '../pipe/safe-html.pipe';
+import { GitDiffPipe } from '../pipe/git-diff.pipe';
 
 const importModules = [];
 const exportModules = [];
@@ -36,12 +38,14 @@ const declareComps = [
     ReactiveEllipsisDirective,
     CredentialInputComponent,
     CredentialListComponent,
-    SmallLoadComponent
+    SmallLoadComponent,
+    SafeHtmlPipe,
+    GitDiffPipe,
 ];
 
 @NgModule({
     declarations: [
-        ...declareComps
+        ...declareComps,
     ],
     imports: [
         CommonModule,

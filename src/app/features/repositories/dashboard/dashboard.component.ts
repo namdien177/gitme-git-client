@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { RepositoriesService } from '../../../shared/states/DATA/repositories';
+import { GitDiffService, GitDiffState } from '../../../shared/states/DATA/git-diff';
 
 @Component({
     selector: 'gitme-dashboard',
@@ -7,10 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-    constructor() {
+    diffStatus: GitDiffState = null;
+
+    constructor(
+        private repositoriesService: RepositoriesService,
+        private gitDiffService: GitDiffService
+    ) {
     }
 
     ngOnInit() {
+        this.gitDiffService.getDiff().subscribe(
+            diffStatus => {
+                this.diffStatus = diffStatus;
+            }
+        );
     }
 
 }

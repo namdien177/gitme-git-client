@@ -1,5 +1,7 @@
 <div class="repo-files-commit">
-    <div *ngFor="let file of statusSummary?.files; let i = index; trackBy: trackByPath"
+    <div (click)="viewDiffFile(file, i)"
+         *ngFor="let file of statusSummary?.files; let i = index; trackBy: trackByPath"
+         [class.active]="file.active"
          class="files">
         <div class="added acomi-checkbox-control">
             <input (click)="toggleCheckFile(i)"
