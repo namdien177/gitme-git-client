@@ -100,7 +100,7 @@
 }
 
 .function {
-    background-color: $background-secondary-night;
+    background-color: $primary-black-lighter;
     user-select: none;
     display: grid;
     align-items: center;
@@ -198,6 +198,6 @@
     }
 
     &.open {
-        background-color: $background-primary-night-selected;
+        background-color: $primary-black;
     }
 }

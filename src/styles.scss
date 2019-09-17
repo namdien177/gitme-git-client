@@ -5,6 +5,7 @@
 @import "styles/etc";
 @import "./styles/icon";
 @import "./styles/text";
+@import "./styles/layout";
 
 /* You can add global styles to this file, and also import other style files */
 html, body {
@@ -19,8 +20,8 @@ html, body {
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: $background-primary-night !important;
+    font-family: 'Roboto', sans-serif !important;
+    background-color: $primary-black !important;
 }
 
 .cursor-pointer {

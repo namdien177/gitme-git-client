@@ -18,7 +18,6 @@ import { AppComponent } from './app.component';
 import { WindowsFrameComponent } from './shared/layout/windows-frame/windows-frame.component';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { AppConfig } from '../environments/environment';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/system/localStorage.service';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
@@ -28,6 +27,7 @@ import xml from 'highlight.js/lib/languages/xml';
 import scss from 'highlight.js/lib/languages/scss';
 import typescript from 'highlight.js/lib/languages/typescript';
 import javascript from 'highlight.js/lib/languages/javascript';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export function hljsLanguages() {
     return [
@@ -67,7 +67,7 @@ const declareComps = [
         }),
         AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
         AkitaNgRouterStoreModule.forRoot(),
-        MDBBootstrapModule.forRoot(),
+        BrowserAnimationsModule,
     ],
     providers: [
         ElectronService,

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from '../../services/system/localStorage.service';
 import { ClickOutSideDirective, OverCountedDirective, ReactiveEllipsisDirective, SimpleEllipsisDirective } from '../directives';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,14 +12,15 @@ import { CredentialListComponent } from '../components/credential/credential-lis
 import { SmallLoadComponent } from '../components/UI/small-load/small-load.component';
 import { SafeHtmlPipe } from '../pipe/safe-html.pipe';
 import { GitDiffPipe } from '../pipe/git-diff.pipe';
+import { MaterialModule } from './material.module';
 
 const importModules = [];
 const exportModules = [];
 
 const reExportModules = [
-    MDBBootstrapModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MaterialModule
 ];
 
 const providers = [

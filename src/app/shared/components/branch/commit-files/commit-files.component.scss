@@ -16,11 +16,11 @@
         margin-bottom: 0.25rem;
 
         &:hover {
-            background: $background-primary-night-hover;
+            background: $primary-black-lighter;
         }
 
         &.active {
-            background: $background-primary-night-selected !important;
+            background: $primary-black !important;
         }
 
         .added {

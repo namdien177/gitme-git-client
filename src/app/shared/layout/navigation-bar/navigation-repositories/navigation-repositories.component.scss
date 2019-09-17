@@ -6,7 +6,7 @@
     left: 0;
     bottom: 0;
     width: 300px;
-    background-color: $background-primary-night-selected;
+    background-color: $primary-black;
     z-index: 10050;
     padding: 0;
 }
@@ -43,7 +43,7 @@
                 padding: 1.25rem;
                 border-radius: 0.5rem;
                 box-shadow: $shadow-light;
-                background: $background-primary-night;
+                background: $primary-black;
                 z-index: 100;
                 width: 100%;
                 height: 100%;
@@ -55,7 +55,7 @@
                     border: none;
                     cursor: pointer;
                     user-select: none;
-                    background: $background-primary-night-selected;
+                    background: $primary-black;
                     transition: background-color 0.2s;
 
                     &:hover {
