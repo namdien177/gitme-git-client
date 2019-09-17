@@ -181,14 +181,14 @@ export class RepositoriesService {
         );
         repository.timestamp = moment().valueOf();
         return fromPromise(
-            this.gitService.fetchInfo(repository, credential)
-        ).pipe(
-            tap(newRepo => {
-                console.log(newRepo);
-                if (typeof newRepo !== 'boolean') {
-                    this.updateExistingRepositoryOnLocalDatabase(newRepo.repository);
+            this.gitService.fetchInfo(repository, credential).then(
+                res => {
+                    if (typeof res !== 'boolean') {
+                        this.updateExistingRepositoryOnLocalDatabase(res.repository);
+                    }
+                    return res;
                 }
-            })
+            )
         );
     }
 

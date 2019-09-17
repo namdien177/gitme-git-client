@@ -151,7 +151,6 @@ export class GitService {
         }
         // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
         const data = await this.gitInstance(directory).fetch(urlRemotes);
-        console.log(data);
         return {
             fetchData: data,
             repository
