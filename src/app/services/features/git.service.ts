@@ -104,11 +104,11 @@ export class GitService {
 
         // checking remotes
         let urlRemotes: string = null;
-        let fetchURlLocal = null;
+        let fetchURlLocal: string = null;
         if (!!remote) {
             const findBranchDefault = remote.find(remoteFetch => remoteFetch.name === 'origin');
             if (!!findBranchDefault) {
-                fetchURlLocal = findBranchDefault;
+                fetchURlLocal = findBranchDefault.fetch;
             }
         }
         if (!!remote && !!fetchURlLocal) {
