@@ -179,14 +179,17 @@ export class RepositoriesService {
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
+        debugger
         repository.timestamp = moment().valueOf();
 
         return fromPromise(
             this.gitService.fetchInfo(repository, credential)
         ).pipe(
-            tap(() => this.updateExistingRepositoryOnLocalDatabase(repository)),
             tap(() => {
-                this.load();
+                debugger
+                this.updateExistingRepositoryOnLocalDatabase(repository).then(
+                    update => console.log(update)
+                );
             })
         );
     }
