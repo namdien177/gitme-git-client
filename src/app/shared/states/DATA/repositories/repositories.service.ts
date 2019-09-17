@@ -179,7 +179,6 @@ export class RepositoriesService {
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
-        debugger
         repository.timestamp = moment().valueOf();
 
         return fromPromise(

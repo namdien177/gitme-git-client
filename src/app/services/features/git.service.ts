@@ -104,6 +104,7 @@ export class GitService {
         // checking remotes
         let urlRemotes: string = null;
         let fetchURlLocal = null;
+        debugger;
         if (!!remote) {
             const findBranchDefault = remote.find(remoteFetch => remoteFetch.fetch.indexOf('origin/') === 0);
             if (!!findBranchDefault) {
