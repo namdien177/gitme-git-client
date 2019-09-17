@@ -13,6 +13,7 @@ export interface Repository {
 
 export interface RepositoryRemotes {
     id: string;
+    name: string;
     fetch: string;
     push?: string;
 }

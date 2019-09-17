@@ -105,7 +105,7 @@ export class GitService {
         let urlRemotes: string = null;
         let fetchURlLocal = null;
         if (!!remote) {
-            const findBranchDefault = remote.find(remoteFetch => remoteFetch.fetch.indexOf('origin/') === 0);
+            const findBranchDefault = remote.find(remoteFetch => remoteFetch.name.indexOf('origin') === 0);
             if (!!findBranchDefault) {
                 fetchURlLocal = findBranchDefault;
             }
@@ -119,8 +119,9 @@ export class GitService {
         } else {
             // retrieve from gitInstance
             const listRemotes = await this.gitInstance(directory).getRemotes(true);
-debugger
             let fallbackURLRemotes = '';
+            const arrNewRemotes: RepositoryRemotes[] = [];
+
             listRemotes.forEach(remoteInfo => {
                 if (!!!customRemote && remoteInfo.name === 'origin') {
                     urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
@@ -128,6 +129,13 @@ debugger
                 } else if (remoteInfo.name === customRemote) {
                     urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
                 }
+
+                arrNewRemotes.push({
+                    id: this.securityService.randomID,
+                    name: remoteInfo.name,
+                    fetch: remoteInfo.refs.fetch,
+                    push: remoteInfo.refs.push
+                });
             });
 
             if (!urlRemotes && !fallbackURLRemotes) {
@@ -137,6 +145,8 @@ debugger
             if (!urlRemotes) {
                 urlRemotes = fallbackURLRemotes;
             }
+
+            repository.remote = arrNewRemotes;
         }
         // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
         const data = await this.gitInstance(directory).fetch(urlRemotes);
