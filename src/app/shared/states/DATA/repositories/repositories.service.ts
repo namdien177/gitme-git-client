@@ -180,16 +180,9 @@ export class RepositoriesService {
             repository.credential.id_credential
         );
         repository.timestamp = moment().valueOf();
-
+        this.updateExistingRepositoryOnLocalDatabase(repository);
         return fromPromise(
             this.gitService.fetchInfo(repository, credential)
-        ).pipe(
-            tap(() => {
-                debugger
-                this.updateExistingRepositoryOnLocalDatabase(repository).then(
-                    update => console.log(update)
-                );
-            })
         );
     }
 
