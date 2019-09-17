@@ -184,7 +184,10 @@ export class RepositoriesService {
         return fromPromise(
             this.gitService.fetchInfo(repository, credential)
         ).pipe(
-            tap(() => this.updateExistingRepositoryOnLocalDatabase(repository))
+            tap(() => this.updateExistingRepositoryOnLocalDatabase(repository)),
+            tap(() => {
+                this.load();
+            })
         );
     }
 
