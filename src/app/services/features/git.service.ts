@@ -72,6 +72,7 @@ export class GitService {
             const id: string = !!branchExisted ? branchExisted.id : this.securityService.randomID;
             const newRemote = {
                 id,
+                name: remote.name,
                 fetch: remote.refs.fetch,
                 push: remote.refs.push,
             };
@@ -105,7 +106,7 @@ export class GitService {
         let urlRemotes: string = null;
         let fetchURlLocal = null;
         if (!!remote) {
-            const findBranchDefault = remote.find(remoteFetch => remoteFetch.name.indexOf('origin') === 0);
+            const findBranchDefault = remote.find(remoteFetch => remoteFetch.name === 'origin');
             if (!!findBranchDefault) {
                 fetchURlLocal = findBranchDefault;
             }
