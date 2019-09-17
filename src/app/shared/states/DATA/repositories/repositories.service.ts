@@ -179,6 +179,7 @@ export class RepositoriesService {
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
+        // update timestamp
         repository.timestamp = moment().valueOf();
         return fromPromise(
             this.gitService.fetchInfo(repository, credential).then(
