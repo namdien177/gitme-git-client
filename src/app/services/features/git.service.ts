@@ -120,7 +120,7 @@ export class GitService {
         } else {
             // retrieve from gitInstance
             const listRemotes = await this.gitInstance(directory).getRemotes(true);
-
+debugger
             let fallbackURLRemotes = '';
             listRemotes.forEach(remoteInfo => {
                 if (!!!customRemote && remoteInfo.name === 'origin') {
