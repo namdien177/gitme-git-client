@@ -184,6 +184,7 @@ export class RepositoriesService {
             this.gitService.fetchInfo(repository, credential)
         ).pipe(
             tap(newRepo => {
+                console.log(newRepo);
                 if (typeof newRepo !== 'boolean') {
                     this.updateExistingRepositoryOnLocalDatabase(newRepo.repository);
                 }
