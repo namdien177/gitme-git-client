@@ -99,8 +99,7 @@ export class UtilityService {
         if (nameWithDotGit.slice(nameWithDotGit.length - 4) !== '.git') {
             return false;
         }
-        const removeDotGit = nameWithDotGit.slice(0, nameWithDotGit.length - 4);
-        return removeDotGit;
+        return nameWithDotGit.slice(0, nameWithDotGit.length - 4);
     }
 
     addCredentialsToRemote(remoteURL: string, credentials: Account, isHTTPS: boolean = true) {
