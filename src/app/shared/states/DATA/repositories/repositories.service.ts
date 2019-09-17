@@ -138,7 +138,7 @@ export class RepositoriesService {
         return fromPromise(
             this.gitService.commit(repository, title, files, option)
         ).pipe(
-            tap(() => this.fetch(repository))
+            tap(() => this.fetch({ ...repository }))
         );
     }
 
