@@ -13,7 +13,7 @@
              class="row-diff-content"
              dir="ltr">
             <code (highlighted)="highlighted($event)"
-                  [highlight]="block.content | gitDiff"
+                  [highlight]="block.content"
                   [languages]="[outputHTML?.language, 'css']"
                   class="row-diff-content-sp"></code>
         </div>

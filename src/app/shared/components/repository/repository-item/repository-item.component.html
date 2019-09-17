@@ -1,24 +1,41 @@
-<div (click)="switchToRepository()" class="card">
+<div (click)="switchToRepository()"
+     [class.active]="isActive"
+     class="card">
     <div class="card-body row">
+        <div class="icon">
+            <i class="fas fa-project-diagram"></i>
+        </div>
         <div class="name">
             {{repository?.name}}
         </div>
-        <div class="status">
-            <div *ngIf="repositorySummary?.behind > 0"
-                 [title]="repositorySummary?.behind + pullTitle"
-                 class="pull">
-                <div class="circle-status bg-info"></div>
+        <div *ngIf="repositorySummary?.ahead > 0"
+             [title]="repositorySummary?.ahead + pushTitle"
+             class="status push">
+            <div class="circle-status bg-success"></div>
+            <div [overCountWhenExceed]="2"
+                 [value]="repositorySummary?.ahead"
+                 class="indicator"
+                 overCountDetection>
+                {{repositorySummary?.ahead}}
             </div>
-            <div *ngIf="repositorySummary?.ahead > 0"
-                 [title]="repositorySummary?.ahead + pushTitle"
-                 class="push">
-                <div class="circle-status bg-success"></div>
+        </div>
+        <div *ngIf="repositorySummary?.behind > 0"
+             [title]="repositorySummary?.behind + pullTitle"
+             class="status pull">
+            <div class="circle-status bg-info"></div>
+            <div [overCountWhenExceed]="2"
+                 [value]="repositorySummary?.behind"
+                 class="indicator"
+                 overCountDetection>
             </div>
-            <div *ngIf="repositorySummary?.files.length > 0"
-                 [title]="repositorySummary?.files.length + changesTitle"
-                 class="changes">
-                <div class="circle-status bg-warning"></div>
-            </div>
+        </div>
+
+        <div [title]="repository.timestamp != null ? (repository.timestamp | date) : 'Never fetched'"
+             class="timestamp text-muted">
+            <i class="far fa-clock"></i>
+            <span>
+                {{repository.timestamp != null ? (repository.timestamp | recentTime) : 'Never fetched'}}
+            </span>
         </div>
     </div>
 </div>

@@ -4,6 +4,7 @@
     height: calc(100vh - 152px);
     width: calc(100vw - 350px);
     overflow: auto;
+    margin: 0;
 
     .ng-row-diff {
         display: block;
@@ -14,7 +15,6 @@
         font-size: 0.85rem;
         position: relative;
         padding-left: calc(180px + 1.3rem);
-        direction: ltr;
 
         .row-index {
             //grid-area: index;
@@ -22,7 +22,7 @@
             grid-template-rows: 1fr;
             grid-template-columns: 1fr 1fr;
             grid-gap: 0;
-            background: $background-primary-lighter-night;
+            background: $primary-light;
             height: 100%;
             width: 180px;
             position: absolute;
@@ -51,19 +51,24 @@
             white-space: pre;
             word-break: normal;
             padding: 2px 5px 2px 0;
-            margin: 0;
             font-variant-ligatures: contextual;
             font-family: "Courier New", monospace;
             //border: none;
             //height: 100%;
             width: calc(100vw - 530px - 1.3rem);
-            //overflow: visible;
+            //overflow: auto;
             //cursor: text;
+            font-size: 1rem;
+            line-height: 1.3rem;
 
             .row-diff-content-sp {
                 word-break: break-all;
                 white-space: pre;
                 word-wrap: normal;
+                font-size: 1rem;
+                line-height: 1.3rem;
+                margin: 0;
+                padding: 0;
             }
         }
     }

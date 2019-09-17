@@ -13,6 +13,7 @@ import { SmallLoadComponent } from '../components/UI/small-load/small-load.compo
 import { SafeHtmlPipe } from '../pipe/safe-html.pipe';
 import { GitDiffPipe } from '../pipe/git-diff.pipe';
 import { MaterialModule } from './material.module';
+import { RecentTimeDirective } from '../pipe/recentTime.pipe';
 
 const importModules = [];
 const exportModules = [];
@@ -41,6 +42,7 @@ const declareComps = [
     SmallLoadComponent,
     SafeHtmlPipe,
     GitDiffPipe,
+    RecentTimeDirective
 ];
 
 @NgModule({

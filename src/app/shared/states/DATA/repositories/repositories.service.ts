@@ -16,6 +16,7 @@ import { AppRepositories } from '../../../model/App-Repositories';
 import { SecurityService } from '../../../../services/system/security.service';
 import { AppAccounts } from '../../../model/App-Accounts';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
+import * as moment from 'moment';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -92,6 +93,10 @@ export class RepositoriesService {
         );
     }
 
+    getActive() {
+        return this.query.getActive();
+    }
+
     clearActive() {
         this.store.setActive(null);
     }
@@ -132,6 +137,8 @@ export class RepositoriesService {
         }
         return fromPromise(
             this.gitService.commit(repository, title, files, option)
+        ).pipe(
+            tap(() => this.fetch(repository))
         );
     }
 
@@ -172,8 +179,12 @@ export class RepositoriesService {
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
+        repository.timestamp = moment().unix();
+
         return fromPromise(
             this.gitService.fetchInfo(repository, credential)
+        ).pipe(
+            tap(() => this.updateExistingRepositoryOnLocalDatabase(repository))
         );
     }
 

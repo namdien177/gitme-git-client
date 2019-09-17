@@ -6,6 +6,7 @@ export interface Repository {
     directory?: string;
     credential?: RepositoryCredential;
     remote?: RepositoryRemotes[];
+    timestamp?: number;
 
     [key: string]: any;
 }

@@ -48,6 +48,7 @@
 
     .commit-title {
         grid-area: title;
+        position: relative;
 
         input {
             height: 100%;
@@ -64,7 +65,7 @@
         grid-template-columns: 32px auto;
         grid-template-rows: 1fr;
         grid-gap: 0;
-        border-bottom: 1px solid $background-primary-lighter-night;
+        border-bottom: 1px solid $primary-black-lighter;
 
         .added-checkbox {
             width: 100%;
@@ -182,6 +183,7 @@
 
     &.repo-selection {
         grid-area: repository;
+        position: relative;
     }
 
     &.repo-branches {

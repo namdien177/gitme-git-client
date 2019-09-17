@@ -1,66 +1,79 @@
 @import "src/styles/theme";
 
 .card {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    user-select: none;
+    border-left: 4px solid transparent;
 
-    &:hover {
-        background-color: $background-primary-lighter-night;
+    &.active {
+        border-left: 4px solid lawngreen;
     }
 
     .card-body {
-        padding: 0.75rem;
-        margin: 0;
-        font-size: 0.8rem;
-        line-height: 1rem;
-        color: white;
-
         display: grid;
-        grid-template-columns: auto 2rem;
-        grid-template-rows: 1fr;
-        grid-gap: 0.75rem;
+        grid-template-areas: 'icon name name name' 'icon push pull time';
+        grid-template-columns: 2.5rem 2rem 2rem auto;
+        grid-template-rows: 1.5rem 0.9rem;
+        grid-gap: 0.25rem;
+
+        width: 100%;
 
         .icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8rem;
-            width: 1rem;
-            height: 1rem;
+            grid-area: icon;
+            display: grid;
+            place-content: center;
+            font-size: 1rem;
+            color: $primary-light-lighter;
         }
 
         .name {
+            grid-area: name;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
             align-self: center;
+            font-size: 1.2rem;
+            line-height: 1.5rem;
         }
 
         .status {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-gap: 0.1rem;
-            font-size: 0.5rem;
-            align-content: center;
-            justify-content: center;
-            align-self: center;
+            display: flex;
+            font-size: 0.75rem;
+            line-height: 0.9rem;
+            align-items: center;
+            justify-content: space-around;
 
-            > * {
-                display: grid;
-                place-content: center;
-                width: 0.6rem;
-                height: 0.6rem;
+            > .indicator {
+            }
 
-                .circle-status {
-                    display: block;
-                    width: 0.5rem;
-                    height: 0.5rem;
-                    border-radius: 50%;
-                    justify-self: center;
-                    align-self: center;
-                }
+            > .circle-status {
+                display: block;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+                justify-self: center;
+                align-self: center;
+            }
+
+            &.push {
+                grid-area: push;
+            }
+
+            &.pull {
+                grid-area: pull;
+            }
+        }
+
+        .timestamp {
+            grid-area: time;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            > *, *:before {
+                color: #8d9ba2;
+            }
+
+            i {
+                margin-right: 0.2rem;
             }
         }
     }

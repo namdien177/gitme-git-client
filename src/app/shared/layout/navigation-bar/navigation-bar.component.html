@@ -7,10 +7,10 @@
                     Current Repository
                 </div>
                 <div class="title">
-                    <ng-container *ngIf="repositoriesQuery.selectLoading() | async">
+                    <ng-container *ngIf="loading.repository">
                         Loading
                     </ng-container>
-                    <ng-container *ngIf="!(repositoriesQuery.selectLoading() | async)">
+                    <ng-container *ngIf="!loading.repository">
                         {{repository?.name}}
                     </ng-container>
                 </div>
@@ -35,10 +35,10 @@
             </div>
             <div class="title feature-right">
             <span class="text-nowrap">
-                <ng-container *ngIf="branchesQuery.selectLoading() | async">
+                <ng-container *ngIf="loading.branch">
                     Loading
                 </ng-container>
-                <ng-container *ngIf="!(branchesQuery.selectLoading() | async)">
+                <ng-container *ngIf="!loading.branch">
                     {{activeBranch?.name}}
                 </ng-container>
             </span>
@@ -96,10 +96,10 @@
 
     <div class="branch-commit">
         <button (click)="commitFile()"
-                mat-flat-button
-                color="primary"
                 [disabled]="formCommitment.invalid || loading.commit || loading.repository || loading.branch"
-                class="w-100 rounded-0">
+                class="w-100 rounded-0"
+                color="primary"
+                mat-flat-button>
             <gitme-small-load *ngIf="loading.commit"></gitme-small-load>
             <span>Commit</span>
         </button>
@@ -110,6 +110,7 @@
                formControlName="title"
                placeholder="Commit title (Required)"
                type="text">
+        <span class="focus-bg"></span>
     </div>
 
     <div (click)="toggleCheckboxAllFile()"

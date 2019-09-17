@@ -3,7 +3,7 @@ import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
 import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/DATA/repositories';
 import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/DATA/repository-branches';
 import { AccountListService } from '../../states/DATA/account-list';
-import { debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
+import { auditTime, debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { StatusSummary } from '../../model/StatusSummary';
 import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
@@ -59,6 +59,8 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.watchingBranch();
         this.watchingFileChanges(); // Chokidar is more efficient!
         this.loopRefreshBranchStatus();
+
+        this.watchLoading();
     }
 
     get titleCommit() {
@@ -276,5 +278,19 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             title: ['', [Validators.required]],
             files: [[], [ArrayLengthShouldLargerThan(0)]]
         });
+    }
+
+    private watchLoading() {
+        this.branchesQuery.selectLoading()
+        .pipe(
+            auditTime(200)
+        )
+        .subscribe(status => this.loading.branch = status);
+
+        this.repositoriesQuery.selectLoading()
+        .pipe(
+            auditTime(200)
+        )
+        .subscribe(status => this.loading.repository = status);
     }
 }
