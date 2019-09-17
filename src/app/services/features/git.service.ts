@@ -104,7 +104,6 @@ export class GitService {
         // checking remotes
         let urlRemotes: string = null;
         let fetchURlLocal = null;
-        debugger;
         if (!!remote) {
             const findBranchDefault = remote.find(remoteFetch => remoteFetch.fetch.indexOf('origin/') === 0);
             if (!!findBranchDefault) {
@@ -141,6 +140,7 @@ debugger
         }
         // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
         const data = await this.gitInstance(directory).fetch(urlRemotes);
+        console.log(data);
         return {
             fetchData: data,
             repository
