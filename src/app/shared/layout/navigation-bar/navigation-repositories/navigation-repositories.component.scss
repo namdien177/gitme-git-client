@@ -6,6 +6,7 @@
     left: 0;
     bottom: 0;
     width: calc(100vw - 700px);
+    max-width: 350px;
     background-color: $primary-black;
     z-index: 10050;
     padding: 0;
