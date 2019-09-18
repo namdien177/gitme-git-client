@@ -3,7 +3,7 @@ export interface RepositoryBranchSummary {
     commit: string;
     label: string;
     name: string;
-    current: boolean | string;
+    current: boolean;
 }
 
 export function createRepositoryBranch(params: Partial<RepositoryBranchSummary>) {

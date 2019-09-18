@@ -3,7 +3,6 @@ import { XTerminalStore } from './x-terminal.store';
 import { XTerminalQuery } from './x-terminal.query';
 import { IDisposable as xtermIDisposable, Terminal } from 'xterm';
 import * as os from 'os';
-import * as fit from 'xterm/lib/addons/fit/fit';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { nodePty, nodePtyTypeOf } from '../../types/types.electron';
@@ -47,7 +46,6 @@ export class XTerminalService {
     openTerminal(terminalDOM: HTMLElement) {
         const terminal = new Terminal({
             fontSize: 12,
-            experimentalCharAtlas: 'dynamic'
         });
         terminal.open(terminalDOM);
 
@@ -132,7 +130,6 @@ export class XTerminalService {
     private fitTerminal() {
         const terminal = this.xTerminalStore;
         if (terminal instanceof Terminal) {
-            fit.fit(terminal);
         }
     }
 }
