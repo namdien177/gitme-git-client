@@ -17,11 +17,11 @@
         </div>
     </div>
 
-    <div class="repository-information form-group">
+    <div class="repository-information">
         <h5>Local Repository</h5>
         <label for="directory">Repository directory</label>
         <div class="wrap--ng">
-            <input class="form-control form-control-dark"
+            <input class="form-control form-control-dark form-control-float"
                    formControlName="repo_dir_display"
                    id="directory">
 
@@ -35,29 +35,23 @@
         </small>
     </div>
 
-    <div class="repository-credentials form-group">
+    <div class="repository-credentials">
         <h5>Repository credentials</h5>
-        <div class="row mb-3">
-            <div class="col">
-                <button (click)="isExistingAccount = true"
-                        [class.bg-dark]="!isExistingAccount"
-                        [class.bg-success]="isExistingAccount"
-                        block="true"
-                        class="text-white"
-                        mdbBtn size="sm">
-                    Saved Account
-                </button>
-            </div>
-            <div class="col">
-                <button (click)="isExistingAccount = false"
-                        [class.bg-dark]="isExistingAccount"
-                        [class.bg-success]="!isExistingAccount"
-                        block="true"
-                        class="text-white"
-                        mdbBtn size="sm">
-                    New Account
-                </button>
-            </div>
+        <div class="btn--section">
+            <button (click)="isExistingAccount = true"
+                    [class.bg-success]="isExistingAccount"
+                    [class.bg-transparent]="!isExistingAccount"
+                    class="text-white"
+                    mat-flat-button>
+                Saved Account
+            </button>
+            <button (click)="isExistingAccount = false"
+                    [class.bg-success]="!isExistingAccount"
+                    [class.bg-transparent]="isExistingAccount"
+                    class="text-white"
+                    mat-flat-button>
+                New Account
+            </button>
         </div>
         <ng-container *ngIf="isExistingAccount">
             <gitme-credential-list (accountSelectedChange)="listenAccount($event)">
@@ -69,11 +63,11 @@
             </gitme-credential-input>
         </ng-container>
     </div>
-    <div class="confirmation-action d-flex flex-end--ng">
-        <button (click)="cancelAdding()" class="mr-3" color="dark" mdbBtn size="sm">
+    <div class="confirmation-action">
+        <button (click)="cancelAdding()" class="bg-transparent" mat-flat-button>
             Cancel
         </button>
-        <button (click)="submitNewRepository()" color="success" mdbBtn size="sm">
+        <button (click)="submitNewRepository()" color="primary" mat-raised-button>
             Confirm
         </button>
     </div>
