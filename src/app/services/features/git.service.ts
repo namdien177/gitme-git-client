@@ -41,7 +41,8 @@ export class GitService {
         Object.keys(branchRemote.branches).forEach(branchName => {
             const viewBranch: RepositoryBranchSummary = {
                 id: this.securityService.randomID,
-                ...branchRemote.branches[branchName]
+                ...branchRemote.branches[branchName],
+                current: branchRemote.branches[branchName].current === 'true'
             };
             const arrSplitName = viewBranch.name.split('origin/');
             if (arrSplitName.length > 1 && arrSplitName[1] === branchAll.current) {
