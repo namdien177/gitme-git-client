@@ -1,3 +1,21 @@
-<p>
-    repo-changes works!
-</p>
+<div class="tb-container">
+    <div *ngFor="let block of outputHTML?.blocks[0].lines"
+         class="ng-row-diff">
+        <div class="row-index">
+            <div class="row-index-item old">{{block.oldNumber}}</div>
+            <div class="row-index-item new">{{block.newNumber}}</div>
+        </div>
+        <div class="row-diff-type">
+            <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>
+            <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>
+        </div>
+        <div [lang]="outputHTML?.language"
+             class="row-diff-content"
+             dir="ltr">
+            <code (highlighted)="highlighted($event)"
+                  [highlight]="block.content"
+                  [languages]="[outputHTML?.language, 'css']"
+                  class="row-diff-content-sp"></code>
+        </div>
+    </div>
+</div>

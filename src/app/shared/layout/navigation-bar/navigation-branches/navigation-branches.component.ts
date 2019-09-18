@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -13,9 +13,8 @@ export class NavigationBranchesComponent implements OnInit {
 
     constructor(
         private repositoryBranchesService: RepositoryBranchesService,
-        private repositoriesBranchesQuery: RepositoryBranchesQuery
     ) {
-        this.branches = this.repositoriesBranchesQuery.selectAll();
+        this.branches = this.repositoryBranchesService.get();
     }
 
     ngOnInit() {

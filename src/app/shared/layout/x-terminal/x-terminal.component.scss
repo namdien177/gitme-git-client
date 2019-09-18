@@ -2,7 +2,7 @@
 
 :host {
     min-height: 32px;
-    background-color: $background-primary-night;
+    background-color: $primary-black;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -34,7 +34,7 @@
             background-color: transparent;
 
             &.active {
-                background-color: $background-primary-lighter-night;
+                background-color: $primary-light;
             }
         }
     }

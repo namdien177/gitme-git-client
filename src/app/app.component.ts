@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { ElectronService } from './services/system/electron.service';
 import { TranslateService } from '@ngx-translate/core';
-import { AppConfig } from '../environments/environment';
 import { FileSystemService } from './services/system/fileSystem.service';
+import { GitService } from './services/features/git.service';
 
 @Component({
     selector: 'gitme-root',
@@ -11,18 +10,19 @@ import { FileSystemService } from './services/system/fileSystem.service';
 })
 export class AppComponent {
     constructor(
-        public electronService: ElectronService,
+        public gitService: GitService,
         private fileServices: FileSystemService,
         private translate: TranslateService
     ) {
 
         translate.setDefaultLang('en');
-        console.log('AppConfig', AppConfig);
 
         // if (ElectronService.isElectron()) {
         //   console.log('Mode electron');
         // } else {
         //   console.log('Mode web');
         // }
+
+        // this.gitService.gitInstance('D:\\Projects\\School\\_topup\\GitMe\\gitme-gitInstance-client').push('origin', 'side-bar-work');
     }
 }

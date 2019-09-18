@@ -7,7 +7,6 @@ export interface Account {
     avatar_remote?: string;
     username: string;
     password: string;
-    password_raw?: string;
 
     [key: string]: any;
 }

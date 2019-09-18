@@ -1,0 +1,81 @@
+@import "src/styles/theme";
+
+.card {
+    border-left: 4px solid transparent;
+
+    &.active {
+        border-left: 4px solid lawngreen;
+    }
+
+    .card-body {
+        display: grid;
+        grid-template-areas: 'icon name name name' 'icon push pull time';
+        grid-template-columns: 2.5rem 2rem 2rem auto;
+        grid-template-rows: 1.5rem 0.9rem;
+        grid-gap: 0.25rem;
+
+        width: 100%;
+
+        .icon {
+            grid-area: icon;
+            display: grid;
+            place-content: center;
+            font-size: 1rem;
+            color: $primary-light-lighter;
+        }
+
+        .name {
+            grid-area: name;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            align-self: center;
+            font-size: 1.2rem;
+            line-height: 1.5rem;
+        }
+
+        .status {
+            display: flex;
+            font-size: 0.75rem;
+            line-height: 0.9rem;
+            align-items: center;
+            justify-content: space-around;
+
+            > .indicator {
+            }
+
+            > .circle-status {
+                display: block;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 50%;
+                justify-self: center;
+                align-self: center;
+            }
+
+            &.push {
+                grid-area: push;
+            }
+
+            &.pull {
+                grid-area: pull;
+            }
+        }
+
+        .timestamp {
+            grid-area: time;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            > *, *:before {
+                color: #8d9ba2;
+            }
+
+            i {
+                margin-right: 0.2rem;
+            }
+        }
+    }
+
+}

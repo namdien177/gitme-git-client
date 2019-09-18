@@ -1,0 +1,22 @@
+@import "./theme";
+
+.card {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.25rem;
+    border-radius: 4px;
+
+    &:hover {
+        background-color: $primary-light;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1rem;
+        color: white;
+    }
+}

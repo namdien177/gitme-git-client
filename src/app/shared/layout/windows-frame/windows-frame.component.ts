@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../services/system/electron.service';
 
 @Component({
-    selector: 'app-windows-frame',
+    selector: 'gitme-windows-frame',
     templateUrl: './windows-frame.component.html',
     styleUrls: ['./windows-frame.component.scss']
 })

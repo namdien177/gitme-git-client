@@ -1,54 +1,50 @@
-<div class="container-fluid">
+<div class="container-fluid w-100">
+    <div (click)="isAddRepositoryActionOn = false" *ngIf="isAddRepositoryActionOn"
+         class="backdrop background-opacity-black"></div>
     <div class="search-repositories">
-        <input class="form-control search"
-               mdbInput
+        <input class="form-control form-control-dark form-control-float search w-100"
                placeholder="Find local repo"
                type="text">
-        <hr class="m-0 p-0">
     </div>
 
-    <div class="add-new-repository">
+    <div [class.repo-action-on]="isAddRepositoryActionOn"
+         class="add-new-repository">
         <button (click)="isAddRepositoryActionOn = true"
-                [color]="'success'"
-                [size]="'sm'"
-                class="btn-block"
-                mdbBtn
-                rounded="true"
+                class="button-init"
+                color="primary"
+                mat-flat-button
                 type="button">
             <i class="fas fa-plus"></i>
             New Repository
         </button>
 
-        <div *ngIf="isAddRepositoryActionOn" class="add-new-repository-type">
-            <div (click)="isAddRepositoryActionOn = false" class="backdrop background-opacity-black"></div>
-            <div class="choose-type-action">
-                <div (click)="cloneRepositoryDialogOn()" class="type">
-                    Clone from internet
-                    <br>
-                    <small class="text-muted">
-                        Currently supporting GitHub and GitLab
-                    </small>
-                </div>
-                <div (click)="addRepositoryDialog()" class="type">
-                    Add from local machine
-                    <br>
-                    <small class="text-muted">
-                        Add existing repository to manage
-                    </small>
-                </div>
-                <div class="type">
-                    Make a new repository
-                    <br>
-                    <small class="text-muted">
-                        Add existing folder as a repository
-                    </small>
-                </div>
+        <div class="button-slide">
+            <div (click)="cloneRepositoryDialogOn()" class="btn-action clone-action">
+                Clone from internet
+                <br>
+                <small class="text-muted">
+                    Currently supporting GitHub and GitLab
+                </small>
+            </div>
+            <div (click)="addRepositoryDialog()" class="btn-action exist-action">
+                Add from local machine
+                <br>
+                <small class="text-muted">
+                    Add existing repository to manage
+                </small>
+            </div>
+            <div class="btn-action new-action">
+                Make a new repository
+                <br>
+                <small class="text-muted">
+                    Add existing folder as a repository
+                </small>
             </div>
         </div>
     </div>
 
     <div class="list-repositories">
-        <gitme-repository-item *ngFor="let repo of (repositories | async)"
+        <gitme-repository-item *ngFor="let repo of (repositories | async); trackBy: trackBy"
                                [repository]="repo"
                                class="repo"></gitme-repository-item>
     </div>

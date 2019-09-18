@@ -4,15 +4,21 @@ export interface Repository {
     name?: string;
     name_local?: string;
     directory?: string;
-    credential?: {
-        id_credential: string;
-        name?: string
-    };
-    selected: boolean;
-    remote?: {
-        fetch: string;
-        pull: string;
-    };
+    credential?: RepositoryCredential;
+    remote?: RepositoryRemotes[];
+    timestamp?: number;
 
     [key: string]: any;
+}
+
+export interface RepositoryRemotes {
+    id: string;
+    name: string;
+    fetch: string;
+    push?: string;
+}
+
+export interface RepositoryCredential {
+    id_credential: string;
+    name?: string;
 }

@@ -1,2 +1,17 @@
 @import "src/styles/theme";
 
+:host {
+    display: grid;
+    grid-template-areas: 'information' 'diffs';
+    grid-gap: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content auto;
+
+    .file-information {
+        grid-area: information;
+    }
+
+    .file-diffs {
+        grid-area: diffs;
+    }
+}

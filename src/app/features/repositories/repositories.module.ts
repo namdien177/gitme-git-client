@@ -10,6 +10,8 @@ import { RepoChangesComponent } from './dashboard/repo-changes/repo-changes.comp
 import { RepoHistoryComponent } from './repo-history/repo-history.component';
 import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
 import { NavigationBarModule } from '../../shared/layout/navigation-bar/navigation-bar.module';
+import { HighlightModule } from 'ngx-highlightjs';
+
 
 const declareComps = [
     RepositoriesComponent,
@@ -29,7 +31,8 @@ const declareComps = [
         XTerminalModule,
         CoreModule,
         RepositoriesRoutingModule,
-        NavigationBarModule
+        NavigationBarModule,
+        HighlightModule
     ]
 })
 export class RepositoriesModule {

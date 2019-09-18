@@ -1,10 +1,10 @@
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationRepositoriesComponent } from './navigation-repositories.component';
-import { RepositoryItemComponent } from '../../../components/repository-item/repository-item.component';
+import { RepositoryItemComponent } from '../../../components/repository/repository-item/repository-item.component';
 import { CoreModule } from '../../../modules/core.module';
-import { RepositoryCloneComponent } from '../../../components/repository-add-clone/repository-clone.component';
-import { RepositoryAddLocalComponent } from '../../../components/repository-add-local/repository-add-local.component';
+import { RepositoryCloneComponent } from '../../../components/repository/repository-add-clone/repository-clone.component';
+import { RepositoryAddLocalComponent } from '../../../components/repository/repository-add-local/repository-add-local.component';
 
 const declareComps = [
     NavigationRepositoriesComponent,

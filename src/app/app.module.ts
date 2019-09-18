@@ -18,10 +18,25 @@ import { AppComponent } from './app.component';
 import { WindowsFrameComponent } from './shared/layout/windows-frame/windows-frame.component';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { AppConfig } from '../environments/environment';
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { LocalStorageService } from './services/system/localStorage.service';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
+import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
+
+import xml from 'highlight.js/lib/languages/xml';
+import scss from 'highlight.js/lib/languages/scss';
+import typescript from 'highlight.js/lib/languages/typescript';
+import javascript from 'highlight.js/lib/languages/javascript';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+export function hljsLanguages() {
+    return [
+        { name: 'typescript', func: typescript },
+        { name: 'javascript', func: javascript },
+        { name: 'scss', func: scss },
+        { name: 'xml', func: xml }
+    ];
+}
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -36,7 +51,7 @@ const declareComps = [
 
 @NgModule({
     declarations: [
-        ...declareComps
+        ...declareComps,
     ],
     imports: [
         BrowserModule,
@@ -52,9 +67,17 @@ const declareComps = [
         }),
         AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
         AkitaNgRouterStoreModule.forRoot(),
-        MDBBootstrapModule.forRoot()
+        BrowserAnimationsModule,
     ],
-    providers: [ElectronService, LocalStorageService],
+    providers: [
+        ElectronService,
+        LocalStorageService,
+        {
+            provide: HIGHLIGHT_OPTIONS,
+            useValue: {
+                languages: hljsLanguages,
+            }
+        }],
     bootstrap: [AppComponent]
 })
 export class AppModule {

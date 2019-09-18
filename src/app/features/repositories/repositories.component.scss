@@ -1,20 +1,26 @@
 @import "src/styles/theme";
 
 :host {
+    //position: relative;
+    //
+    //display: grid;
+    //grid-template-areas: 'navigation-bar router-ng';
+    //grid-template-rows: 1fr;
+    //grid-template-columns: 300px auto;
+    //grid-gap: 0;
+    //height: 100%;
+    //
+    //.router-ng {
+    //    grid-area: router-ng;
+    //}
+    //
+    //.navigation-bar {
+    //    grid-area: navigation-bar;
+    //}
+}
+
+.navigation-bar {
     position: relative;
-
-    display: grid;
-    grid-template-areas: 'navigation-bar router-ng';
-    grid-template-rows: 1fr;
-    grid-template-columns: 300px auto;
-    grid-gap: 0;
+    width: 100%;
     height: 100%;
-
-    .router-ng {
-        grid-area: router-ng;
-    }
-
-    .navigation-bar {
-        grid-area: navigation-bar;
-    }
 }

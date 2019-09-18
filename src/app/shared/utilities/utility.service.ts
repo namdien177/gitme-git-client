@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Account } from '../states/DATA/account-list';
 import { SecurityService } from '../../services/system/security.service';
+import { FileStatusSummaryView } from '../states/DATA/repository-status';
+import { FileStatusSummary } from '../model/FileStatusSummary';
 
 
 @Injectable()
@@ -66,7 +68,8 @@ export class UtilityService {
     }
 
     directorySafePath(rawPath: string) {
-        const strSplit = rawPath.split('\\').map(nonTrim => nonTrim.trim());
+        const fixedRawPath = this.slashFixer(rawPath);
+        const strSplit = fixedRawPath.split('/').map(nonTrim => nonTrim.trim());
         let finalDir = '';
         strSplit.forEach(arrDir => {
             if (arrDir.includes(' ')) {
@@ -82,7 +85,7 @@ export class UtilityService {
             } else {
                 finalDir += arrDir;
             }
-            finalDir += '\\';
+            finalDir += '/';
         });
         return finalDir;
     }
@@ -96,10 +99,7 @@ export class UtilityService {
         if (nameWithDotGit.slice(nameWithDotGit.length - 4) !== '.git') {
             return false;
         }
-        const removeDotGit = nameWithDotGit.slice(0, nameWithDotGit.length - 4);
-        console.log(strSplit);
-        console.log(removeDotGit);
-        return removeDotGit;
+        return nameWithDotGit.slice(0, nameWithDotGit.length - 4);
     }
 
     addCredentialsToRemote(remoteURL: string, credentials: Account, isHTTPS: boolean = true) {
@@ -119,5 +119,64 @@ export class UtilityService {
             });
             return remoteCredentials;
         }
+    }
+
+    isStringExistIn(stringToCheck: string, inWhatArray: any[], propertiesInArray?: string) {
+        let isIn = false;
+        inWhatArray.every(toCompare => {
+            const checkingData = propertiesInArray ? toCompare[propertiesInArray] : toCompare;
+            if (checkingData === stringToCheck) {
+                isIn = true;
+                return false;
+            }
+            return true;
+        });
+        return isIn;
+    }
+
+    /**
+     * Convert all `\` character to `/`
+     * @param directory
+     */
+    slashFixer(directory: string) {
+        return directory.replace(/\\/g, '/');
+    }
+
+    extractFrontPath(directory: string) {
+        const dir = directory.split('/');
+        let frontPath = '';
+        dir.forEach((path, index) => {
+            if (index !== dir.length - 1) {
+                frontPath += path + '/';
+            }
+        });
+        return {
+            front: frontPath,
+            end: dir[dir.length - 1]
+        };
+    }
+
+    extractFilePathFromGitStatus(files: FileStatusSummaryView[] | FileStatusSummary[]) {
+        const arrCompleted: string[] = [];
+        files.forEach(file => {
+            if (file.path.includes('->')) {
+                const extracted = this.extractPathsFromRenamedCase(file);
+                arrCompleted.push(extracted.deleted, extracted.added);
+            } else {
+                const safePath = this.directorySafePath(file.path);
+                arrCompleted.push(safePath.slice(0, safePath.length - 1));
+            }
+        });
+        return arrCompleted;
+    }
+
+    extractPathsFromRenamedCase(file: FileStatusSummaryView | FileStatusSummary) {
+        const splitPaths = file.path.split('->');
+        const deleted = this.directorySafePath(splitPaths[0].trim());
+        const added = this.directorySafePath(splitPaths[1].trim());
+        return {
+            deleted: deleted.slice(0, deleted.length - 1),
+            added: added.slice(0, added.length - 1)
+        };
     }
 }

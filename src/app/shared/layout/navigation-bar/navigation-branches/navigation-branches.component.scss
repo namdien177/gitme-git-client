@@ -4,9 +4,9 @@
     position: fixed;
     top: 112px;
     left: 0;
-    width: 300px;
-    height: calc(100% - 112px);
-    background-color: $background-primary-night-selected;
+    width: 100%;
+    height: 100%;
+    background-color: $primary-black;
 
     .container-fluid {
         display: grid;

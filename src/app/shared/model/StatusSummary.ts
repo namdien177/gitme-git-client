@@ -1,3 +1,5 @@
+import { FileStatusSummary } from './FileStatusSummary';
+
 export class StatusSummary {
     ahead: number;
     behind: number;
@@ -5,7 +7,7 @@ export class StatusSummary {
     created: string[];
     current: string;
     deleted: any[];
-    files: any[]; // file status summary
+    files: FileStatusSummary[]; // file status summary
     modified: string[];
     not_added: string[];
     renamed: any[];

@@ -49,4 +49,8 @@ export class NavigationRepositoriesComponent implements OnInit {
         this.isAddRepositoryActionOn = false;
         this.repositoriesMenuService.openRepositoryAddLocalDialog();
     }
+
+    trackBy(index, item: Repository) {
+        return item.id;
+    }
 }
