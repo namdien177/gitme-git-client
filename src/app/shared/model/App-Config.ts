@@ -20,10 +20,10 @@ export function DefaultConfig(machineID: string) {
             created_at: moment().valueOf()
         },
         repository_config: [
-            machineID + '.json'
+            machineID
         ],
         account_config: [
-            machineID + '.json'
+            machineID
         ]
     };
 }

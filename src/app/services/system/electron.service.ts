@@ -101,37 +101,48 @@ export class ElectronService implements OnDestroy {
              * Loading repository config files
              */
             const repositoryConfigFileName = [];
-            repository_config.forEach(fileName => {
+            for (const fileName of repository_config) {
                 if (
                     // ensure no duplicated repo config file in the app config
-                    repositoryConfigFileName.indexOf(fileName) === -1 &&
-                    // ensure the config file is existed
-                    this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))
+                    repositoryConfigFileName.indexOf(fileName) === -1
                 ) {
-                    // load to memory repos and other settings
-                    this.setupApplicationRepositories(
-                        this.fileService.getFileContext(
-                            fileName,
-                            DefineCommon.DIR_REPOSITORIES()
-                        )
-                    );
-                    repositoryConfigFileName.push(fileName);
+                    if (// ensure the config file is existed
+                        this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
+                        // load to memory repos and other settings
+                        await this.setupApplicationRepositories(
+                            this.fileService.getFileContext(
+                                fileName,
+                                DefineCommon.DIR_REPOSITORIES()
+                            )
+                        );
+                        repositoryConfigFileName.push(fileName);
+                    } else {
+                        const data: AppRepositories = {
+                            repositories: [],
+                        };
+                        await this.fileService.createFile(fileName, data, DefineCommon.DIR_REPOSITORIES()).then(
+                            resolve => {
+                                console.log(resolve);
+                            }, reject => {
+                                console.log(reject);
+                            }
+                        );
+                    }
+
                 }
-            });
+            }
         } else {
             /**
              * create default config for application
              */
             const configDefaultName = this.machine_id;
-
             /**
              * Update config if not linked to default repository app config
              */
             if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(configDefaultName))) {
                 const currentConfig = await this.fileService.getFileContext<AppConfig>(configDefaultName, DefineCommon.DIR_CONFIG());
                 currentConfig.value.repository_config.push(configDefaultName);
-
-                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig, DefineCommon.DIR_CONFIG());
+                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig.value, DefineCommon.DIR_CONFIG());
             } else {
                 const data: AppRepositories = {
                     repositories: [],
@@ -154,23 +165,38 @@ export class ElectronService implements OnDestroy {
              * Loading account config files
              */
             const accountConfigFileName = [];
-            account_config.forEach(fileName => {
+            for (const fileName of account_config) {
                 if (
                     // ensure no duplicated account config file in the app config
-                    accountConfigFileName.indexOf(fileName) === -1 &&
-                    // ensure the config file is existed
-                    this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))
+                    accountConfigFileName.indexOf(fileName) === -1
                 ) {
-                    // load to memory repos and other settings
-                    this.setupApplicationAccounts(
-                        this.fileService.getFileContext(
-                            fileName,
-                            DefineCommon.DIR_ACCOUNTS()
-                        )
-                    );
-                    accountConfigFileName.push(fileName);
+                    if (
+                        // ensure the config file is existed
+                        this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))
+                    ) {
+                        // load to memory repos and other settings
+                        await this.setupApplicationAccounts(
+                            this.fileService.getFileContext(
+                                fileName,
+                                DefineCommon.DIR_ACCOUNTS()
+                            )
+                        );
+                        accountConfigFileName.push(fileName);
+                    } else {
+                        const data: AppAccounts = {
+                            accounts: [],
+                        };
+                        await this.fileService.createFile(fileName, data, DefineCommon.DIR_ACCOUNTS()).then(
+                            resolve => {
+                                console.log(resolve);
+                            }, reject => {
+                                console.log(reject);
+                            }
+                        );
+                    }
+
                 }
-            });
+            }
         } else {
             /**
              * create default config for application
@@ -184,7 +210,7 @@ export class ElectronService implements OnDestroy {
                 const currentConfig = await this.fileService.getFileContext<AppConfig>(configDefaultName, DefineCommon.DIR_CONFIG());
                 currentConfig.value.account_config.push(configDefaultName);
 
-                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig, DefineCommon.DIR_CONFIG());
+                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig.value, DefineCommon.DIR_CONFIG());
             } else {
                 const data: AppAccounts = {
                     accounts: [],
@@ -225,16 +251,16 @@ export class ElectronService implements OnDestroy {
     }
 
     private setupApplicationConfiguration(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
-        fileContext.then(contextStatus => {
+        fileContext.then(async contextStatus => {
             const dataOutput: AppConfig = contextStatus.value;
             // Load repository configs
-            this.initializeRepositoriesFromLocalDatabase(dataOutput.repository_config);
-            this.initializeAccountsFromLocalDatabase(dataOutput.account_config);
+            await this.initializeRepositoriesFromLocalDatabase(dataOutput.repository_config);
+            await this.initializeAccountsFromLocalDatabase(dataOutput.account_config);
         });
     }
 
-    private setupApplicationRepositories(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
-        fileContext.then((contextStatus) => {
+    private async setupApplicationRepositories(fileContext: Promise<{ status: boolean; message: string; value: AppRepositories }>) {
+        return await fileContext.then((contextStatus) => {
             const dataOutput: AppRepositories = contextStatus.value;
             if (!!dataOutput.repositories && Array.isArray(dataOutput.repositories)) {
                 this.repositoriesList.add(dataOutput.repositories);
@@ -242,12 +268,14 @@ export class ElectronService implements OnDestroy {
         });
     }
 
-    private setupApplicationAccounts(fileContext: Promise<{ status: boolean; message: string; value: any }>) {
-        fileContext.then((contextStatus) => {
+    private async setupApplicationAccounts(fileContext: Promise<{ status: boolean; message: string; value: AppAccounts }>) {
+        return await fileContext.then((contextStatus) => {
             const dataOutput: AppAccounts = contextStatus.value;
             if (!!dataOutput.accounts && Array.isArray(dataOutput.accounts)) {
                 this.accountList.add(dataOutput.accounts);
             }
+
+            return;
         });
     }
 }
