@@ -80,8 +80,13 @@ export class ElectronService implements OnDestroy {
         } else {
             const data: AppConfig = DefaultConfig(configDefaultName);
             this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
-                resolve => {
-                    console.log(resolve);
+                () => {
+                    this.setupApplicationConfiguration(
+                        this.fileService.getFileContext(
+                            configDefaultName,
+                            DefineCommon.DIR_CONFIG()
+                        )
+                    );
                 }, reject => {
                     console.log(reject);
                 }
@@ -89,7 +94,7 @@ export class ElectronService implements OnDestroy {
         }
     }
 
-    initializeRepositoriesFromLocalDatabase(repository_config: string[]) {
+    async initializeRepositoriesFromLocalDatabase(repository_config: string[]) {
         this.repositoriesList.reset();
         if (!!repository_config && repository_config.length > 0) {
             /**
@@ -118,20 +123,31 @@ export class ElectronService implements OnDestroy {
              * create default config for application
              */
             const configDefaultName = this.machine_id;
-            const data: AppRepositories = {
-                repositories: [],
-            };
-            this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_REPOSITORIES()).then(
-                resolve => {
-                    console.log(resolve);
-                }, reject => {
-                    console.log(reject);
-                }
-            );
+
+            /**
+             * Update config if not linked to default repository app config
+             */
+            if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(configDefaultName))) {
+                const currentConfig = await this.fileService.getFileContext<AppConfig>(configDefaultName, DefineCommon.DIR_CONFIG());
+                currentConfig.value.repository_config.push(configDefaultName);
+
+                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig, DefineCommon.DIR_CONFIG());
+            } else {
+                const data: AppRepositories = {
+                    repositories: [],
+                };
+                await this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_REPOSITORIES()).then(
+                    resolve => {
+                        console.log(resolve);
+                    }, reject => {
+                        console.log(reject);
+                    }
+                );
+            }
         }
     }
 
-    initializeAccountsFromLocalDatabase(account_config: string[]) {
+    async initializeAccountsFromLocalDatabase(account_config: string[]) {
         this.accountList.reset();
         if (!!account_config && account_config.length > 0) {
             /**
@@ -160,16 +176,27 @@ export class ElectronService implements OnDestroy {
              * create default config for application
              */
             const configDefaultName = this.machine_id;
-            const data: AppAccounts = {
-                accounts: [],
-            };
-            this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_ACCOUNTS()).then(
-                resolve => {
-                    console.log(resolve);
-                }, reject => {
-                    console.log(reject);
-                }
-            );
+
+            /**
+             * Update config if not linked to default account app config
+             */
+            if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(configDefaultName))) {
+                const currentConfig = await this.fileService.getFileContext<AppConfig>(configDefaultName, DefineCommon.DIR_CONFIG());
+                currentConfig.value.account_config.push(configDefaultName);
+
+                await this.fileService.updateFileContext<AppConfig>(configDefaultName, currentConfig, DefineCommon.DIR_CONFIG());
+            } else {
+                const data: AppAccounts = {
+                    accounts: [],
+                };
+                await this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_ACCOUNTS()).then(
+                    resolve => {
+                        console.log(resolve);
+                    }, reject => {
+                        console.log(reject);
+                    }
+                );
+            }
         }
     }
 

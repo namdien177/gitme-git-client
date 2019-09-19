@@ -33,6 +33,7 @@
         display: flex;
 
         align-items: center;
+        font-size: var(--title);
     }
 
     .info-dialog {
@@ -47,6 +48,10 @@
 
         > * {
             margin-bottom: 0.5rem;
+        }
+
+        .block-secondary-title {
+            height: 36px;
         }
     }
 
@@ -75,6 +80,11 @@
         > * {
             margin-left: 1rem;
         }
+    }
+
+    .block-secondary-title {
+        display: flex;
+        align-items: center
     }
 }
 

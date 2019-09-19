@@ -19,8 +19,12 @@ export function DefaultConfig(machineID: string) {
         first_init: {
             created_at: moment().valueOf()
         },
-        repository_config: [],
-        account_config: []
+        repository_config: [
+            machineID + '.json'
+        ],
+        account_config: [
+            machineID + '.json'
+        ]
     };
 }
 

@@ -1,9 +1,7 @@
 <form [formGroup]="formRegisterRepository" class="main-form">
-    <div class="title-section">
-        <h2 class="text-white">
-            Adding existing local repository
-        </h2>
-    </div>
+    <h2 class="text-white title-section weight-lighter m-0">
+        Adding existing local repository
+    </h2>
 
     <div *ngIf="infoDialogs.type !== null"
          [class.bg-danger]="infoDialogs.type == 'ERROR'"
@@ -18,8 +16,12 @@
     </div>
 
     <div class="repository-information">
-        <h5>Local Repository</h5>
-        <label for="directory">Repository directory</label>
+        <h2 class="weight-lighter mb-0">Local Repository</h2>
+        <div class="block-secondary-title">
+            <label for="directory" class="m-0">
+                Repository directory
+            </label>
+        </div>
         <div class="wrap--ng">
             <input class="form-control form-control-dark form-control-float"
                    formControlName="repo_dir_display"
@@ -36,7 +38,7 @@
     </div>
 
     <div class="repository-credentials">
-        <h5>Repository credentials</h5>
+        <h2 class="weight-lighter">Repository Repository</h2>
         <div class="btn--section">
             <button (click)="isExistingAccount = true"
                     [class.bg-success]="isExistingAccount"

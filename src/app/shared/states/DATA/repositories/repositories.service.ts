@@ -254,6 +254,29 @@ export class RepositoriesService {
             this.securityService.appUUID, repositoryArray, DefineCommon.DIR_REPOSITORIES()
         );
 
+        // TODO: consider to post-append config location to app-config
+        // if (status.status) {
+        //     const appConfigData = await this.fileService.getFileContext<AppConfig>(
+        //         this.securityService.appUUID, DefineCommon.DIR_REPOSITORIES()
+        //     );
+        //     const configFileName = this.securityService.appUUID + '.json';
+        //     let isExistConfig = false;
+        //     appConfigData.value.repository_config.every(config => {
+        //         if (config === configFileName) {
+        //             isExistConfig = true;
+        //         }
+        //         return !isExistConfig;
+        //     });
+        //
+        //     if (!isExistConfig) {
+        //         appConfigData.value.repository_config.push(configFileName);
+        //     }
+        //
+        //     await this.fileService.updateFileContext<AppConfig>(
+        //         this.securityService.appUUID, appConfigData, DefineCommon.DIR_CONFIG()
+        //     );
+        // }
+
         await this.load();
 
         return status;
