@@ -215,7 +215,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         .subscribe(
             listBranch => {
                 this.activeBranch = listBranch.find(branch => {
-                    return branch.current || branch.current === 'true';
+                    return branch.current;
                 });
                 console.log(listBranch);
             }

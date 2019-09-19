@@ -84,7 +84,7 @@ export class FileSystemService {
      * @param extension currently only accepting .txt or .json file. Much prefer `.json`.
      * @param useRoot pre-appending %appdata% into the path
      */
-    createFile(
+    async createFile(
         fileName: string,
         data: object | string,
         directoryPath: string = '/',
@@ -107,12 +107,22 @@ export class FileSystemService {
         const writePromises = this.util.promisify(this.fs.writeFile);
         const writeDataStatus = this.parsingData(data, extension);
         if (!writeDataStatus.valid) {
-            return new Promise((resolve, reject) => reject(new Object({
+            return {
                 status: false,
                 message: writeDataStatus.data // for debugging purpose
-            })));
+            };
         }
-        return writePromises(finalDir, writeDataStatus.data);
+        return writePromises(finalDir, writeDataStatus.data).then(res => {
+            return {
+                status: true,
+                message: 'File was written successfully'
+            };
+        }, reject => {
+            return {
+                status: false,
+                message: 'File was written unsuccessfully'
+            };
+        });
     }
 
     /**
