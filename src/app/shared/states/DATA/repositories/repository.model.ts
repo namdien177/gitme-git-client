@@ -8,6 +8,10 @@ export interface Repository {
     remote?: RepositoryRemotes[];
     timestamp?: number;
 
+    options?: {
+        argument: string
+    }[];
+
     [key: string]: any;
 }
 
