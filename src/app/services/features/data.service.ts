@@ -22,7 +22,10 @@ export class DataService {
             return await this.fileSystemService
             .getFileContext<AppConfig>(fileName, DefineCommon.DIR_CONFIG())
             .then(val => val.status ? val.value : null)
-            .catch(err => null);
+            .catch(err => {
+                console.log(err);
+                return null;
+            });
         }
 
         return null;
@@ -33,7 +36,10 @@ export class DataService {
             return await this.fileSystemService
             .getFileContext<AppRepositories>(fileName, DefineCommon.DIR_REPOSITORIES())
             .then(val => val.status ? val.value : null)
-            .catch(err => null);
+            .catch(err => {
+                console.log(err);
+                return null;
+            });
         }
 
         return null;
@@ -44,7 +50,10 @@ export class DataService {
             return await this.fileSystemService
             .getFileContext<AppAccounts>(fileName, DefineCommon.DIR_ACCOUNTS())
             .then(val => val.status ? val.value : null)
-            .catch(err => null);
+            .catch(err => {
+                console.log(err);
+                return null;
+            });
         }
 
         return null;
