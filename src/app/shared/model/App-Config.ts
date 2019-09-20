@@ -12,7 +12,7 @@ export interface AppConfig {
     account_config: string[];
 }
 
-export function DefaultConfig(machineID: string) {
+export function InitializeAppConfig(machineID: string) {
     return {
         app_key: machineID,
         version: DefineCommon.APP_VERSION,

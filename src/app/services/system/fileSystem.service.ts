@@ -90,39 +90,36 @@ export class FileSystemService {
         directoryPath: string = '/',
         extension: '.json' | '.txt' = '.json',
         useRoot = true
-    ) {
+    ): Promise<{ status: boolean, message: string, value: any }> {
         const rootStoreDir = useRoot ? this.ROOT : '';
         const fileFullName = fileName + extension;
         const finalDir = rootStoreDir + directoryPath + fileFullName;
         if (!this.isDirectoryExist(rootStoreDir + directoryPath)) {
-            // @ts-ignore
             this.fs.mkdirSync(rootStoreDir + directoryPath, { recursive: true });
         }
         if (this.isFileExist(finalDir)) {
-            return new Promise((resolve, reject) => reject(new Object({
-                status: false,
-                message: 'File already existed' // for debugging purpose
-            })));
+            return new Promise<{ status: boolean, message: string, value: any }>(
+                (resolve, reject) => reject({
+                    status: false,
+                    message: 'File does not exist', // for debugging purpose
+                    value: null
+                })
+            );
         }
         const writePromises = this.util.promisify(this.fs.writeFile);
         const writeDataStatus = this.parsingData(data, extension);
         if (!writeDataStatus.valid) {
-            return {
-                status: false,
-                message: writeDataStatus.data // for debugging purpose
-            };
+            return this.promiseReturn(null, writeDataStatus.data, false);
         }
         return writePromises(finalDir, writeDataStatus.data).then(res => {
-            return {
-                status: true,
-                message: 'File was written successfully'
-            };
-        }, reject => {
-            return {
-                status: false,
-                message: 'File was written unsuccessfully'
-            };
-        });
+            console.log(res);
+            return this.promiseReturn(res, 'File was written successfully', true);
+        }).catch(
+            reject => {
+                console.log(reject);
+                return this.promiseReturn(null, 'File was written unsuccessfully', false);
+            }
+        );
     }
 
     /**
@@ -252,6 +249,16 @@ export class FileSystemService {
             }
             return list.concat([name]);
         }, []);
+    }
+
+    async removeFile(directory: string) {
+        if (!this.isFileExist(directory)) {
+            return this.promiseReturn(null, 'File does not exist', false);
+        }
+
+        const statusDeletePF = this.util.promisify(this.fs.unlink);
+        await statusDeletePF(directory);
+        return this.isFileExist(directory);
     }
 
     private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
