@@ -1,16 +1,15 @@
 export interface Repository {
     id: string;
-    id_remote?: string;
-    name?: string;
-    name_local?: string;
-    directory?: string;
+    name: string;
+    directory: string;
     credential?: RepositoryCredential;
     remote?: RepositoryRemotes[];
-    timestamp?: number;
+    branchesSummary?: RepositoryBranchSummary[];
 
-    options?: {
-        argument: string
-    }[];
+    options?: CommitOptions[];
+    tags?: CommitTags[];
+
+    timestamp?: number;
 
     [key: string]: any;
 }
@@ -25,4 +24,19 @@ export interface RepositoryRemotes {
 export interface RepositoryCredential {
     id_credential: string;
     name?: string;
+}
+
+export interface CommitOptions {
+    argument?: string;
+    value?: string;
+}
+
+export interface CommitTags {
+    name: string;
+    tracking: string;
+}
+
+export interface RepositoryBranchSummary {
+    name: string;
+    tracking: string;
 }

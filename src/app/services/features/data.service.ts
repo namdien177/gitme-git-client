@@ -17,7 +17,7 @@ export class DataService {
     ) {
     }
 
-    async getAppDataFromFile(fileName: string): Promise<AppConfig> {
+    async getConfigAppFromFile(fileName: string): Promise<AppConfig> {
         if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(fileName))) {
             return await this.fileSystemService
             .getFileContext<AppConfig>(fileName, DefineCommon.DIR_CONFIG())
@@ -101,7 +101,8 @@ export class DataService {
     }
 
     async updateAccountFile(account: Account, fileName: string): Promise<boolean> {
-        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))) {
+        const AccConfig = this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName));
+        if (!AccConfig) {
             return false;
         }
 

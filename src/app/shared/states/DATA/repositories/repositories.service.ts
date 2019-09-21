@@ -12,11 +12,10 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../repository-branches';
 import { Observable, of } from 'rxjs';
 import { Account, AccountListService } from '../account-list';
-import { AppRepositories } from '../../../model/App-Repositories';
 import { SecurityService } from '../../../../services/system/security.service';
-import { AppAccounts } from '../../../model/App-Accounts';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
+import { DataService } from '../../../../services/features/data.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -25,6 +24,7 @@ export class RepositoriesService {
         protected store: RepositoriesStore,
         protected query: RepositoriesQuery,
         private gitService: GitService,
+        private dataService: DataService,
         private fileService: FileSystemService,
         private localStorageService: LocalStorageService,
         private accountListService: AccountListService,
@@ -36,9 +36,7 @@ export class RepositoriesService {
     // Load all repositories from config
     async load() {
         const machineID = this.securityService.appUUID;
-        const configFile: AppConfig = await this.fileService.getFileContext<AppConfig>(
-            machineID, DefineCommon.DIR_CONFIG()
-        ).then(fulfilled => fulfilled.value);
+        const configFile: AppConfig = await this.dataService.getConfigAppFromFile(machineID);
 
         if (!!!configFile) {
             return;
@@ -47,21 +45,23 @@ export class RepositoriesService {
         const repositoryFile = configFile.repository_config;
         const repositories: Repository[] = [];
         for (const configName of repositoryFile) {
-            const repos = await this.fileService.getFileContext<AppRepositories>(
-                configName, DefineCommon.DIR_REPOSITORIES()
-            );
-            if (!!repos.value && !!repos.value.repositories && repos.value.repositories.length > 0) {
-                repos.value.repositories.forEach(repo => repositories.push(repo));
+            const repos = await this.dataService.getRepositoriesFromFile(configName);
+            if (!!repos && !!repos.repositories && repos.repositories.length > 0) {
+                repos.repositories.forEach(repo => repositories.push(repo));
             }
         }
 
         const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
             this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
                 repositories[0].id : null;
+
         if (repositories.length > 0) {
             let findCached = null;
             if (!!previousWorking) {
                 findCached = repositories.find(repo => repo.id === previousWorking);
+                if (!findCached) {
+                    findCached = repositories[0];
+                }
             } else {
                 findCached = repositories[0];
             }
@@ -149,7 +149,10 @@ export class RepositoriesService {
         );
 
         // If the repository does not contain any remote => retrieve a full update
-        return fromPromise(this.gitService.updateRemotesRepository(repository, branches)).pipe(
+        return fromPromise(
+            this.gitService.updateRemotesRepository(repository, branches)
+        )
+        .pipe(
             switchMap(updateData => {
                 repository = updateData.repository;
                 branches = updateData.branches;
@@ -182,10 +185,11 @@ export class RepositoriesService {
         // update timestamp
         repository.timestamp = moment().valueOf();
         return fromPromise(
-            this.gitService.fetchInfo(repository, credential).then(
+            this.gitService.fetchInfo(repository, credential)
+            .then(
                 res => {
                     if (typeof res !== 'boolean') {
-                        this.updateExistingRepositoryOnLocalDatabase(res.repository);
+                        this.updateExistingRepositoryOnLocalDatabase(res.repository).then(result => console.log(result));
                     }
                     return res;
                 }
@@ -211,30 +215,25 @@ export class RepositoriesService {
         this.store.reset();
     }
 
-    addExistingLocalRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
-        const existingAccounts: Account[] = this.accountListService.getSync();
-        existingAccounts.push(credentials);
-
+    createNewRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
+        const systemDefaultName = this.securityService.appUUID;
         if (isNewAccount) {
             return fromPromise(
                 /**
                  * Saving new account
                  */
-                this.fileService.updateFileContext<AppAccounts>(this.securityService.appUUID, {
-                    accounts: existingAccounts
-                }, DefineCommon.DIR_ACCOUNTS())
+                this.dataService.addNewAccountToFile(credentials, systemDefaultName)
             ).pipe(
                 switchMap(status => {
-                    if (status.status) {
+                    if (status) {
                         /**
                          * Saving new repository
                          */
                         return fromPromise(
                             this.addNewRepositoryToLocalDatabase(newRepository)
                         );
-                    } else {
-                        throw Error(status.message);
                     }
+                    return of({ status: false, message: 'Unable to update new account information', value: null });
                 })
             );
         } else {
@@ -245,41 +244,13 @@ export class RepositoriesService {
     }
 
     async addNewRepositoryToLocalDatabase(repositoryUpdate: Repository) {
-        const readRepositoryConfig = await this.getRepositoryInformation(this.securityService.appUUID);
-        const repositoryArray: AppRepositories = { ...readRepositoryConfig.value };
-
-        repositoryArray.repositories.push(repositoryUpdate);
-
-        const status = await this.fileService.updateFileContext(
-            this.securityService.appUUID, repositoryArray, DefineCommon.DIR_REPOSITORIES()
-        );
-
-        // TODO: consider to post-append config location to app-config
-        // if (status.status) {
-        //     const appConfigData = await this.fileService.getFileContext<AppConfig>(
-        //         this.securityService.appUUID, DefineCommon.DIR_REPOSITORIES()
-        //     );
-        //     const configFileName = this.securityService.appUUID + '.json';
-        //     let isExistConfig = false;
-        //     appConfigData.value.repository_config.every(config => {
-        //         if (config === configFileName) {
-        //             isExistConfig = true;
-        //         }
-        //         return !isExistConfig;
-        //     });
-        //
-        //     if (!isExistConfig) {
-        //         appConfigData.value.repository_config.push(configFileName);
-        //     }
-        //
-        //     await this.fileService.updateFileContext<AppConfig>(
-        //         this.securityService.appUUID, appConfigData, DefineCommon.DIR_CONFIG()
-        //     );
-        // }
-
+        const statusUpdate = await this.dataService.addNewRepositoryToFile(repositoryUpdate, this.securityService.appUUID);
         await this.load();
-
-        return status;
+        return {
+            value: repositoryUpdate,
+            message: '',
+            status: statusUpdate
+        };
     }
 
     async updateExistingRepositoryOnLocalDatabase(repositoryUpdate: Repository) {
@@ -289,8 +260,7 @@ export class RepositoriesService {
         const repositories: {
             repositories: Repository[],
             fileName: string
-        }[] = [];
-        repositories.push(...await this.getAllRepositoryFromConfig(repositoryFileDirectory));
+        }[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
 
         const statusUpdate: {
             status: boolean
@@ -308,15 +278,10 @@ export class RepositoriesService {
             });
 
             if (isChanged) {
-                const saveData: AppRepositories = {
-                    repositories: repository.repositories
-                };
-                const status = await this.fileService.updateFileContext(
-                    repository.fileName, saveData, DefineCommon.DIR_REPOSITORIES()
-                );
+                const status = await this.dataService.updateRepositoryFile(repositoryUpdate, repository.fileName);
                 statusUpdate.push(
                     {
-                        status: status.status,
+                        status: status,
                         repository: repositoryUpdate,
                         directory: DefineCommon.DIR_REPOSITORIES() + repository.fileName + '.json'
                     }
@@ -328,29 +293,19 @@ export class RepositoriesService {
         return statusUpdate;
     }
 
-    async getRepositoryInformation(directory: string): Promise<{
-        status: boolean,
-        message: string,
-        value: AppRepositories
-    }> {
-        return await this.fileService.getFileContext<AppRepositories>(
-            directory, DefineCommon.DIR_REPOSITORIES()
-        );
-    }
-
     async getAllRepositoryFromConfig(repositoryFileDirectory: string[]) {
         const repositories: {
             repositories: Repository[],
             fileName: string
         }[] = [];
 
-        for (const dir of repositoryFileDirectory) {
-            const repos = await this.getRepositoryInformation(dir);
+        for (const fileName of repositoryFileDirectory) {
+            const repos = await this.dataService.getRepositoriesFromFile(fileName);
 
-            if (!!repos.value && !!repos.value.repositories && repos.value.repositories.length > 0) {
+            if (!!repos && !!repos.repositories && repos.repositories.length > 0) {
                 repositories.push({
-                    repositories: repos.value.repositories,
-                    fileName: dir
+                    repositories: repos.repositories,
+                    fileName: fileName
                 });
             }
         }
@@ -358,10 +313,8 @@ export class RepositoriesService {
         return repositories;
     }
 
-    async getAppConfig() {
-        return await this.fileService.getFileContext<AppConfig>(
-            this.securityService.appUUID, DefineCommon.DIR_CONFIG()
-        ).then(fulfilled => fulfilled.value);
+    async getAppConfig(): Promise<AppConfig | null> {
+        return await this.dataService.getConfigAppFromFile(this.securityService.appUUID);
     }
 
     getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {

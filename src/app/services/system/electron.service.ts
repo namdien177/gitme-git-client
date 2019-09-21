@@ -15,7 +15,6 @@ import { AccountListService } from '../../shared/states/DATA/account-list';
 import { AppRepositories, InitializeRepositoryConfig } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, InitializeAppConfig } from '../../shared/model/App-Config';
-import { ApplicationStateService } from '../../shared/states/UI/Application-State';
 import { DataService } from '../features/data.service';
 
 @Injectable({ providedIn: 'root' })
@@ -36,7 +35,6 @@ export class ElectronService implements OnDestroy {
         private dataService: DataService,
         private repositoriesList: RepositoriesService,
         private accountList: AccountListService,
-        private applicationStateService: ApplicationStateService
     ) {
         // Conditional imports
         if (ElectronService.isElectron()) {
@@ -74,14 +72,14 @@ export class ElectronService implements OnDestroy {
         if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
             // load to memory repos and other settings
             this.setupApplicationConfiguration(
-                this.dataService.getAppDataFromFile(configDefaultName)
+                this.dataService.getConfigAppFromFile(configDefaultName)
             );
         } else {
             const data: AppConfig = InitializeAppConfig(configDefaultName);
             this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
                 () => {
                     this.setupApplicationConfiguration(
-                        this.dataService.getAppDataFromFile(configDefaultName)
+                        this.dataService.getConfigAppFromFile(configDefaultName)
                     );
                 }, reject => {
                     console.log(reject);
@@ -131,7 +129,7 @@ export class ElectronService implements OnDestroy {
              * Update config if not linked to default repository app config
              */
             if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(configDefaultName))) {
-                const currentConfig = await this.dataService.getAppDataFromFile(configDefaultName);
+                const currentConfig = await this.dataService.getConfigAppFromFile(configDefaultName);
                 currentConfig.repository_config.push(configDefaultName);
                 await this.dataService.updateAppConfigFile(currentConfig, configDefaultName);
             } else {
@@ -195,7 +193,7 @@ export class ElectronService implements OnDestroy {
              * Update config if not linked to default account app config
              */
             if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(configDefaultName))) {
-                const currentConfig = await this.dataService.getAppDataFromFile(configDefaultName);
+                const currentConfig = await this.dataService.getConfigAppFromFile(configDefaultName);
                 currentConfig.account_config.push(configDefaultName);
 
                 await this.dataService.updateAppConfigFile(currentConfig, configDefaultName);

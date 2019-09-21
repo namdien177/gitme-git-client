@@ -23,6 +23,22 @@ export class GitService {
         return git(dir);
     }
 
+    async getGitProjectName(arrayPath: string[]): Promise<string> {
+
+        if (arrayPath.length === 0) {
+            return null;
+        }
+
+        const joinPath = arrayPath.join('/');
+        const isGitRepository = await this.gitInstance(joinPath).checkIsRepo();
+
+        if (isGitRepository) {
+            return this.getGitProjectName(arrayPath.slice(0, arrayPath.length));
+        }
+
+        return arrayPath[arrayPath.length - 1];
+    }
+
     async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
         let urlRemote = cloneURL;
         directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);

@@ -33,6 +33,7 @@
 
 .files-commit {
     box-shadow: $shadow-light;
+    background: $primary-black-darker;
 
     .branch-actions {
         grid-area: fetch;
@@ -101,7 +102,7 @@
 }
 
 .function {
-    background-color: $primary-black-lighter;
+    background-color: $primary-black;
     user-select: none;
     display: grid;
     align-items: center;

@@ -29,7 +29,7 @@
 
             <div (click)="chooseDirectory()"
                  class="icon-folder--container">
-                <i class="fas fa-folder"></i>
+                <em class="fas fa-folder"></em>
             </div>
         </div>
         <small class="text-muted">
@@ -66,13 +66,16 @@
         </ng-container>
     </div>
     <div class="confirmation-action">
-        <button (click)="cancelAdding()" class="bg-transparent" mat-flat-button>
+        <button (click)="cancelDialogAdding()" class="bg-transparent" mat-flat-button>
             Cancel
         </button>
-        <button (click)="submitNewRepository()" color="primary" mat-raised-button>
+        <button (click)="submitNewRepository()"
+                [disabled]="formRegisterRepository.invalid || needCreateNewGitDirectory"
+                color="primary"
+                mat-raised-button>
             Confirm
         </button>
     </div>
 </form>
-<div (click)="cancelAdding()"
+<div (click)="cancelDialogAdding()"
      class="backdrop background-opacity-black"></div>

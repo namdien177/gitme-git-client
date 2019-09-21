@@ -20,6 +20,13 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
 
     accountForm: FormGroup;
 
+    arrayTemplateAvatar = [
+        '/assets/1.svg',
+        '/assets/2.svg',
+        '/assets/3.svg',
+        '/assets/4.png',
+    ];
+
     constructor(
         private fb: FormBuilder,
         private accountListQuery: AccountListQuery,
@@ -82,6 +89,7 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
         }
         const obEmit: Account = {
             id: this.uuid.value,
+            avatar_local: this.arrayTemplateAvatar[Math.floor(Math.random() * this.arrayTemplateAvatar.length)],
             name_local: this.author.value,
             username: this.username.value,
             password: this.secureService.encryptAES(this.password.value)

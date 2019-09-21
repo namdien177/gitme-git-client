@@ -2,12 +2,12 @@
 
 :host {
     position: fixed;
-    top: 108px;
+    top: calc(32px + 80px);
     left: 0;
     bottom: 0;
     width: calc(100vw - 700px);
     max-width: 350px;
-    background-color: $primary-black;
+    background-color: $primary-black-darker;
     z-index: 10050;
     padding: 0;
     box-shadow: $shadow-light;
