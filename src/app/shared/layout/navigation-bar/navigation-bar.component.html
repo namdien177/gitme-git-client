@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="right-feature">
-                <i class="fas fa-cog"></i>
+                <em class="fas fa-cog"></em>
             </div>
         </div>
 
@@ -45,12 +45,12 @@
                 <div class="status">
                     <div *ngIf="statusSummary?.behind > 0"
                          class="badge badge-pill badge-secondary bg-info pull-request">
-                        <i class="fas fa-angle-down"></i>
+                        <em class="fas fa-angle-down"></em>
                         {{statusSummary?.behind}}
                     </div>
                     <div *ngIf="statusSummary?.ahead > 0"
                          class="badge badge-pill badge-secondary bg-success push-request">
-                        <i class="fas fa-angle-up"></i>
+                        <em class="fas fa-angle-up"></em>
                         {{statusSummary?.ahead}}
                     </div>
                 </div>
@@ -75,18 +75,18 @@
                 <div class="status">
                     <div *ngIf="statusSummary?.behind > 0"
                          class="badge badge-pill badge-secondary bg-info pull-request">
-                        <i class="fas fa-angle-down"></i>
+                        <em class="fas fa-angle-down"></em>
                         {{statusSummary?.behind}}
                     </div>
                     <div *ngIf="statusSummary?.ahead > 0"
                          class="badge badge-pill badge-secondary bg-success push-request">
-                        <i class="fas fa-angle-up"></i>
+                        <em class="fas fa-angle-up"></em>
                         {{statusSummary?.ahead}}
                     </div>
                     <div *ngIf="statusSummary?.files.length > 0"
                          [title]="statusSummary?.files.length + ' file(s) changed'"
                          class="badge badge-pill badge-secondary bg-warning changes">
-                        <i class="fas fa-file-invoice"></i>
+                        <em class="fas fa-file-invoice"></em>
                         {{statusSummary?.files.length}}
                     </div>
                 </div>
@@ -105,13 +105,13 @@
         </button>
     </div>
 
-    <div class="commit-title">
+    <label class="commit-title">
         <input class="form-control form-control-dark"
                formControlName="title"
                placeholder="Commit title (Required)"
                type="text">
         <span class="focus-bg"></span>
-    </div>
+    </label>
 
     <div (click)="toggleCheckboxAllFile()"
          *ngIf="statusSummary?.files?.length > 0"
@@ -122,7 +122,7 @@
                    hidden
                    id="checkboxAllFile"
                    type="checkbox"/>
-            <label class="cbx">
+            <label class="cbx" for="checkboxAllFile">
                 <span>
                     <svg height="10px" viewbox="0 0 12 10" width="12px">
                         <polyline points="1.5 6 4.5 9 10.5 1"></polyline>

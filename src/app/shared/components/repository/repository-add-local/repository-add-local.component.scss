@@ -8,6 +8,7 @@
     bottom: 0;
     display: grid;
     place-content: center;
+    z-index: 10060;
 
     background-color: $transparent-backdrop;
 }
@@ -16,7 +17,7 @@
     z-index: 100;
     width: 100vw;
     height: calc(100vh - 32px);
-    background-color: $primary-black;
+    background-color: $primary-black-darker;
     box-shadow: $shadow-light;
 
     display: grid;
@@ -32,6 +33,7 @@
         display: flex;
 
         align-items: center;
+        font-size: var(--title);
     }
 
     .info-dialog {
@@ -40,15 +42,49 @@
 
     .repository-information {
         grid-area: repository;
+
+        display: flex;
+        flex-direction: column;
+
+        > * {
+            margin-bottom: 0.5rem;
+        }
+
+        .block-secondary-title {
+            height: 36px;
+        }
     }
 
     .repository-credentials {
         grid-area: account;
+        display: flex;
+        flex-direction: column;
+
+        > * {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn--section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 1rem;
+        }
     }
 
     .confirmation-action {
         grid-area: confirm;
+        display: flex;
+        align-items: center;
         justify-content: flex-end;
+
+        > * {
+            margin-left: 1rem;
+        }
+    }
+
+    .block-secondary-title {
+        display: flex;
+        align-items: center
     }
 }
 

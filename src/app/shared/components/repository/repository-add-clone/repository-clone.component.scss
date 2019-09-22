@@ -9,6 +9,7 @@
     display: grid;
     place-content: center;
     background: $transparent-backdrop;
+    z-index: 10060;
 
     .body-modal {
         display: grid;

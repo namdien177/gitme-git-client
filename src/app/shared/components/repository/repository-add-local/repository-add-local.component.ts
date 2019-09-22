@@ -38,10 +38,9 @@ export class RepositoryAddLocalComponent implements OnInit {
 
     private readonly electron: typeof electronNG.remote;
     private formFieldBuilder = {
-        repo_https: [''],
         repo_dir: [osNode.homedir(), Validators.required],
         repo_dir_display: [osNode.homedir(), Validators.required],
-        repo_name: [''],
+        repo_name: ['', [Validators.required, Validators.minLength(1)]],
         repo_account: [null, [Validators.required]]
     };
 
@@ -57,10 +56,6 @@ export class RepositoryAddLocalComponent implements OnInit {
         private securityService: SecurityService
     ) {
         this.electron = electronNG.remote;
-    }
-
-    get repo_https() {
-        return this.formRegisterRepository.get('repo_https');
     }
 
     get repo_name() {
@@ -84,7 +79,7 @@ export class RepositoryAddLocalComponent implements OnInit {
         this.listenerDirectory();
     }
 
-    cancelAdding() {
+    cancelDialogAdding() {
         this.repositoriesMenuService.closeRepositoryAddLocalDialog();
     }
 
@@ -124,18 +119,17 @@ export class RepositoryAddLocalComponent implements OnInit {
                 };
                 if (repositoryStatus === null) {
                     // Not valid repository
-                    // TODO: Display error message?
                     this.infoDialogs = {
                         type: 'ERROR',
                         message: 'The directory is invalid!'
                     };
                 } else if (repositoryStatus === false) {
                     // Not a git repository
-                    // TODO: Display option to create repository
                     this.infoDialogs = {
                         type: 'WARNING',
                         message: 'The directory is not initialized with git'
                     };
+                    this.needCreateNewGitDirectory = true;
                 } else {
                     // Is a valid repository
 
@@ -174,12 +168,12 @@ export class RepositoryAddLocalComponent implements OnInit {
          * * Update working repository
          * * Fetching new repository => reassign main branch
          */
-        this.repositoryService.addExistingLocalRepository(
+        this.repositoryService.createNewRepository(
             repositoryInstance, credentialsInstance, !this.isExistingAccount
         ).subscribe(
             addStatus => {
                 console.log(addStatus);
-                this.cancelAdding();
+                this.cancelDialogAdding();
             }
         );
     }
@@ -214,10 +208,13 @@ export class RepositoryAddLocalComponent implements OnInit {
         }
     }
 
-    private setupNameRepository(viewingDirectory: string) {
+    private async setupNameRepository(viewingDirectory: string) {
         const safeString = this.utilityService.slashFixer(viewingDirectory);
         const arrPaths = safeString.split('/');
-        const nameExpected = arrPaths[arrPaths.length - 1];
+        let nameExpected = await this.gitPackService.getGitProjectName(arrPaths);
+        if (!nameExpected) {
+            nameExpected = arrPaths[arrPaths.length - 1];
+        }
         this.repo_name.setValue(nameExpected);
         return nameExpected;
     }

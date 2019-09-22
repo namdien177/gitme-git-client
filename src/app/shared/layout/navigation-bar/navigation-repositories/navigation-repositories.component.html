@@ -1,11 +1,11 @@
 <div class="container-fluid w-100">
     <div (click)="isAddRepositoryActionOn = false" *ngIf="isAddRepositoryActionOn"
          class="backdrop background-opacity-black"></div>
-    <div class="search-repositories">
+    <label class="search-repositories">
         <input class="form-control form-control-dark form-control-float search w-100"
                placeholder="Find local repo"
                type="text">
-    </div>
+    </label>
 
     <div [class.repo-action-on]="isAddRepositoryActionOn"
          class="add-new-repository">
@@ -14,7 +14,7 @@
                 color="primary"
                 mat-flat-button
                 type="button">
-            <i class="fas fa-plus"></i>
+            <em class="fas fa-plus"></em>
             New Repository
         </button>
 
@@ -41,6 +41,11 @@
                 </small>
             </div>
         </div>
+
+        <gitme-repository-clone *ngIf="isCloneRepositoryDialogOn | async">
+        </gitme-repository-clone>
+        <gitme-repository-add-local *ngIf="isAddRepositoryDialogOn | async">
+        </gitme-repository-add-local>
     </div>
 
     <div class="list-repositories">
@@ -49,8 +54,3 @@
                                class="repo"></gitme-repository-item>
     </div>
 </div>
-
-<gitme-repository-clone *ngIf="isCloneRepositoryDialogOn | async">
-</gitme-repository-clone>
-<gitme-repository-add-local *ngIf="isAddRepositoryDialogOn | async">
-</gitme-repository-add-local>

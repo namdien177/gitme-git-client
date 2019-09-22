@@ -12,15 +12,19 @@ export interface AppConfig {
     account_config: string[];
 }
 
-export function DefaultConfig(machineID: string) {
+export function InitializeAppConfig(machineID: string) {
     return {
         app_key: machineID,
         version: DefineCommon.APP_VERSION,
         first_init: {
             created_at: moment().valueOf()
         },
-        repository_config: [],
-        account_config: []
+        repository_config: [
+            machineID
+        ],
+        account_config: [
+            machineID
+        ]
     };
 }
 
