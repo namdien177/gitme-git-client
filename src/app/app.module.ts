@@ -5,7 +5,7 @@ import { NgModule } from '@angular/core';
 
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
-import { AppRoutingModule } from './app-routing.module';
+import { AppRouting } from './app.routing';
 // NG Translate
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -57,7 +57,7 @@ const declareComps = [
         BrowserModule,
         CoreModule,
         HttpClientModule,
-        AppRoutingModule,
+        AppRouting,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,

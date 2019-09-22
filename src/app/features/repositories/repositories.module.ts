@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { RepositoriesRoutingModule } from './repositories-routing.module';
+import { RepositoriesRouting } from './repositories.routing';
 import { RepositoriesComponent } from './repositories.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CoreModule } from '../../shared/modules/core.module';
@@ -30,7 +30,7 @@ const declareComps = [
         CommonModule,
         XTerminalModule,
         CoreModule,
-        RepositoriesRoutingModule,
+        RepositoriesRouting,
         NavigationBarModule,
         HighlightModule
     ]

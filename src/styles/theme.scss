@@ -27,7 +27,22 @@ $transparent-backdrop: rgba(0, 0, 0, 0.75);
     background-color: dodgerblue;
 }
 
-
 .bg-transparent {
     background-color: transparent;
+}
+
+.bg-primary-black {
+    background: $primary-black;
+}
+
+.bg-primary-black-darker {
+    background: $primary-black-darker;
+}
+
+.bg-primary-black-foreground {
+    background: $primary-black-foreground;
+}
+
+.bg-primary-black-lighter {
+    background: $primary-black-lighter;
 }

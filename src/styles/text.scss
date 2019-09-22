@@ -4,12 +4,36 @@
     --small: 0.8rem;
 }
 
+.text-align-justify {
+    text-align: justify;
+}
+
+.text-center {
+    text-align: center;
+}
+
 .text-black {
     color: black;
 }
 
 .text-muted {
     color: #8d9ba2;
+}
+
+.text-success {
+    color: #00c851;
+}
+
+.text-warning {
+    color: #ffbb33;
+}
+
+.text-danger {
+    color: tomato;
+}
+
+.text-info {
+    color: dodgerblue;
 }
 
 .weight-lighter {
