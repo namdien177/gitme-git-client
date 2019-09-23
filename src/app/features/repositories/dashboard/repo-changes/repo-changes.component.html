@@ -9,13 +9,26 @@
             <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>
             <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>
         </div>
-        <div [lang]="outputHTML?.language"
-             class="row-diff-content"
-             dir="ltr">
-            <code (highlighted)="highlighted($event)"
-                  [highlight]="block.content"
-                  [languages]="[outputHTML?.language, 'css']"
-                  class="row-diff-content-sp"></code>
+        <pre class="language-{{outputHTML?.language}}"><code class="language-{{outputHTML?.language}}" [innerHTML]="block.content | gitDiff | safeHtml"></code></pre>
+    </div>
+    <div class="ng-row-diff">
+        <div class="row-index">
+            <div class="row-index-item old"></div>
+            <div class="row-index-item new">1</div>
         </div>
+        <div class="row-diff-type">
+        </div>
+        <pre class="row-diff-content"
+             dir="ltr"
+             lang="html"><code class="row-diff-content-sp language-{{'html'}}">class="row-diff-content"</code></pre>
+    </div>
+    <div class="ng-row-diff">
+        <div class="row-index">
+            <div class="row-index-item old"></div>
+            <div class="row-index-item new">1</div>
+        </div>
+        <div class="row-diff-type">
+        </div>
+        <pre class="language-{{'html'}}"><code class="language-{{'html'}}">class="row-index-item new"</code></pre>
     </div>
 </div>
