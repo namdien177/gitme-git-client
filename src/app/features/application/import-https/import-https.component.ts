@@ -7,6 +7,8 @@ import { GitService } from '../../../services/features/git.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { Router } from '@angular/router';
 import { DialogsInformation } from '../../../shared/model/DialogsInformation';
+import { isTypeAccount } from '../../../shared/validate/customFormValidate';
+import { Account } from '../../../shared/states/DATA/account-list';
 
 @Component({
     selector: 'gitme-import-https',
@@ -27,14 +29,11 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
 
     private readonly electron: typeof electronNG.remote;
     private formFieldBuilder = {
-        repo_https: [''],
+        repo_https: ['', [Validators.required, Validators.minLength(6)]],
         repo_dir: [osNode.homedir(), [Validators.required, Validators.minLength(1)]],
         repo_dir_display: [osNode.homedir(), [Validators.required, Validators.minLength(1)]],
         repo_name: ['', [Validators.required, Validators.minLength(1)]],
-        repo_account: [{
-            username: '',
-            password: ''
-        }, [Validators.required]]
+        repo_account: ['', [Validators.required, isTypeAccount]]
     };
 
     constructor(
@@ -93,6 +92,10 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
         });
     }
 
+    accountListener(account: Account) {
+        this.repo_account.setValue(account);
+    }
+
     cancelAdding() {
         this.router.navigateByUrl('/');
     }
@@ -100,12 +103,12 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
     formListener() {
         this.formRegisterRepository.valueChanges.subscribe(
             (formFields: any) => {
-                this.checkingStepOneRepo(formFields);
+                this.formValueListener(formFields);
             }
         );
     }
 
-    checkingStepOneRepo(formField: { [key: string]: string }) {
+    formValueListener(formField: { [key: string]: string }) {
         let dirDisplay = formField.repo_dir;
         if (!!formField.repo_https) {
             let testName = this.utilityService.repositoryNameFromHTTPS(formField.repo_https);
@@ -130,6 +133,10 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
         } else {
             this.repo_name.setValue(null);
         }
+    }
+
+    clone() {
+
     }
 
     test() {

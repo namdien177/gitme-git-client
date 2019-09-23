@@ -1,7 +1,7 @@
-<div class="main-form">
+<form [formGroup]="formRegisterRepository" class="main-form">
     <h2 class="text-white title-section weight-lighter m-0">
         Cloning from Remote
-        <span class="text-muted">HTTPS</span>
+        <span>HTTPS</span>
     </h2>
 
     <div *ngIf="infoDialogs.type !== null"
@@ -36,14 +36,14 @@
                 Directory
             </label>
         </div>
-        <div (click)="chooseDirectory()"
-             class="wrap--ng form-control form-control-dark form-control-float">
-            <div [class.text-muted]="!!repo_dir.value"
-                 class="illuminate_area">
+        <div class="wrap--ng" (click)="chooseDirectory()">
+            <div class="form-control form-control-dark form-control-float"
+                 [class.text-muted]="!!repo_dir.value">
                 {{illuminateValue_dir}}
             </div>
-            <div class="directory_copy">
-                <em class="fas fa-copy"></em>
+
+            <div class="icon-folder--container">
+                <em class="fas fa-folder"></em>
             </div>
         </div>
         <small *ngIf="repo_name.valid" class="text-muted">
@@ -70,11 +70,13 @@
             </button>
         </div>
         <ng-container *ngIf="isExistingAccount">
-            <gitme-credential-list></gitme-credential-list>
+            <gitme-credential-list (accountSelectedChange)="accountListener($event)">
+            </gitme-credential-list>
         </ng-container>
 
         <ng-container *ngIf="!isExistingAccount">
-            <gitme-credential-input></gitme-credential-input>
+            <gitme-credential-input (accountNewChange)="accountListener($event)">
+            </gitme-credential-input>
         </ng-container>
     </div>
 
@@ -89,4 +91,4 @@
         </button>
     </div>
 
-</div>
+</form>
