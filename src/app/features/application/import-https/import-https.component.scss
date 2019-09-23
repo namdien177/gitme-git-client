@@ -1,0 +1,28 @@
+@import "src/styles/theme";
+
+.wrap--ng {
+    display: flex;
+    flex-direction: column;
+
+    .illuminate_area {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        padding-left: 0.75rem;
+        overflow: auto;
+        white-space: nowrap;
+
+        &:hover {
+            background: $primary-black;
+        }
+    }
+
+    .directory_copy {
+        display: grid;
+        place-content: center;
+
+        &:hover {
+            background: $primary-black;
+        }
+    }
+}

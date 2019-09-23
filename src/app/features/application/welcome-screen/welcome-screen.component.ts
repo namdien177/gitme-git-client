@@ -1,15 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ElectronService } from '../../../services/system/electron.service';
+import { electronNG, electronNGTypeOf } from '../../../shared/types/types.electron';
 
 @Component({
-  selector: 'gitme-welcome-screen',
-  templateUrl: './welcome-screen.component.html',
-  styleUrls: ['./welcome-screen.component.scss']
+    selector: 'gitme-welcome-screen',
+    templateUrl: './welcome-screen.component.html',
+    styleUrls: ['./welcome-screen.component.scss']
 })
 export class WelcomeScreenComponent implements OnInit {
 
-  constructor() { }
+    private readonly electron: electronNGTypeOf;
 
-  ngOnInit() {
-  }
+    constructor(
+        private router: Router,
+        private cd: ChangeDetectorRef,
+        private electronService: ElectronService
+    ) {
+        this.electron = electronNG;
+    }
 
+    ngOnInit() {
+        console.log(this.router.url);
+    }
+
+    cloneHTTPBtn() {
+        console.log('click');
+        this.router.navigateByUrl('application/import-https');
+    }
+
+    importLocalBtn() {
+        this.router.navigateByUrl('application/import-local');
+    }
+
+    openGitHub() {
+        this.electron.shell.openExternal('https://github.com/namdien177/gitme-git-client');
+    }
 }

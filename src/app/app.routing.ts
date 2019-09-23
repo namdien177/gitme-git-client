@@ -6,7 +6,7 @@ import { NotExistRepositoryConfigGuard } from './shared/guard/not-exist-reposito
 const routes: Routes = [
     {
         path: '',
-        canActivate: [ExistRepositoryConfigGuard],
+        canActivateChild: [ExistRepositoryConfigGuard],
         loadChildren: () => import('./features/repositories/repositories.module').then(m => m.RepositoriesModule)
     },
     {

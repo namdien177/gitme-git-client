@@ -25,8 +25,9 @@ export class ElectronService implements OnDestroy {
     childProcess: typeof childProcess;
     fs: typeof fsNode;
     os: typeof os;
-    private window: BrowserWindow;
+    private readonly window: BrowserWindow;
     private readonly machine_id: string;
+    // private readonly shell:
 
     constructor(
         private localStorage: LocalStorageService,
@@ -55,6 +56,10 @@ export class ElectronService implements OnDestroy {
             this.setupUUID();
             this.initializeConfigFromLocalDatabase();
         }
+    }
+
+    get currentWindow() {
+        return this.window;
     }
 
     static isElectron() {

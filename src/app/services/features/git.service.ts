@@ -29,14 +29,14 @@ export class GitService {
             return null;
         }
 
-        const joinPath = arrayPath.join('/');
+        const joinPath = arrayPath.slice(0, arrayPath.length - 1).join('/');
         const isGitRepository = await this.gitInstance(joinPath).checkIsRepo();
 
         if (isGitRepository) {
-            return this.getGitProjectName(arrayPath.slice(0, arrayPath.length));
+            return await this.getGitProjectName(arrayPath.slice(0, arrayPath.length - 1));
+        } else {
+            return arrayPath[arrayPath.length - 1];
         }
-
-        return arrayPath[arrayPath.length - 1];
     }
 
     async cloneTo(cloneURL: string, directory: string, credentials?: Account) {

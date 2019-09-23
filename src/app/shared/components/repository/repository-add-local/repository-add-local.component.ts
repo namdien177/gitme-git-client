@@ -33,7 +33,6 @@ export class RepositoryAddLocalComponent implements OnInit {
     /**
      * Identify credentials
      */
-    isCredentialsValid = false;
     credentials: Account = null;
 
     private readonly electron: typeof electronNG.remote;

@@ -1,1 +1,80 @@
-<p>import-local works!</p>
+<form [formGroup]="formRegisterRepository"
+      class="main-form">
+    <h2 class="text-white title-section weight-lighter m-0">
+        Adding existing local repository
+    </h2>
+
+    <div *ngIf="infoDialogs.type !== null"
+         [class.bg-danger]="infoDialogs.type == 'ERROR'"
+         [class.bg-info]="infoDialogs.type == 'INFO'"
+         [class.bg-warning]="infoDialogs.type == 'WARNING'"
+         class="info-dialog card">
+        <div [class.text-black]="infoDialogs.type == 'WARNING'"
+             [class.text-white]="infoDialogs.type == 'ERROR' || infoDialogs.type == 'INFO'"
+             class="card-body">
+            {{infoDialogs.message}}
+        </div>
+    </div>
+
+    <div class="repository-information">
+        <h2 class="weight-lighter mb-0">Local Repository</h2>
+        <div class="block-secondary-title">
+            <label class="m-0" for="directory">
+                Repository directory
+            </label>
+        </div>
+        <div class="wrap--ng">
+            <input class="form-control form-control-dark form-control-float"
+                   formControlName="repo_dir_display"
+                   id="directory">
+
+            <div (click)="chooseDirectory()"
+                 class="icon-folder--container">
+                <em class="fas fa-folder"></em>
+            </div>
+        </div>
+        <small *ngIf="repo_name.valid" class="text-muted">
+            Repository will be added to manage list as "{{repo_name.value}}"
+        </small>
+    </div>
+
+    <div class="repository-credentials">
+        <h2 class="weight-lighter">Repository Repository</h2>
+        <div class="btn--section">
+            <button (click)="isExistingAccount = true"
+                    [class.bg-success]="isExistingAccount"
+                    [class.bg-transparent]="!isExistingAccount"
+                    class="text-white"
+                    mat-flat-button>
+                Saved Account
+            </button>
+            <button (click)="isExistingAccount = false"
+                    [class.bg-success]="!isExistingAccount"
+                    [class.bg-transparent]="isExistingAccount"
+                    class="text-white"
+                    mat-flat-button>
+                New Account
+            </button>
+        </div>
+        <ng-container *ngIf="isExistingAccount">
+            <gitme-credential-list (accountSelectedChange)="listenAccount($event)">
+            </gitme-credential-list>
+        </ng-container>
+
+        <ng-container *ngIf="!isExistingAccount">
+            <gitme-credential-input (accountNewChange)="listenAccount($event)">
+            </gitme-credential-input>
+        </ng-container>
+    </div>
+    <div class="confirmation-action">
+        <button (click)="cancel()" class="bg-transparent" mat-flat-button>
+            Cancel
+        </button>
+        <button (click)="submitNewRepository()"
+                [disabled]="formRegisterRepository.invalid || needCreateNewGitDirectory"
+                color="primary"
+                mat-raised-button>
+            Confirm
+        </button>
+    </div>
+</form>

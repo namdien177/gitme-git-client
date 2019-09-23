@@ -1,15 +1,167 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { electronNG, osNode } from '../../../shared/types/types.electron';
+import { UtilityService } from '../../../shared/utilities/utility.service';
+import { RepositoriesMenuService } from '../../../shared/states/UI/repositories-menu';
+import { GitService } from '../../../services/features/git.service';
+import { FileSystemService } from '../../../services/system/fileSystem.service';
+import { Router } from '@angular/router';
+import { DialogsInformation } from '../../../shared/model/DialogsInformation';
 
 @Component({
-  selector: 'gitme-import-https',
-  templateUrl: './import-https.component.html',
-  styleUrls: ['./import-https.component.scss']
+    selector: 'gitme-import-https',
+    templateUrl: './import-https.component.html',
+    styleUrls: ['./import-https.component.scss']
 })
-export class ImportHttpsComponent implements OnInit {
+export class ImportHttpsComponent implements OnInit, AfterViewInit {
 
-  constructor() { }
+    formRegisterRepository: FormGroup;
+    directoryVerified = false;
+    illuminateValue_dir: string = osNode.homedir();
+    isExistingAccount = true;
 
-  ngOnInit() {
-  }
+    infoDialogs: DialogsInformation = {
+        type: null,
+        message: null
+    };
+
+    private readonly electron: typeof electronNG.remote;
+    private formFieldBuilder = {
+        repo_https: [''],
+        repo_dir: [osNode.homedir(), [Validators.required, Validators.minLength(1)]],
+        repo_dir_display: [osNode.homedir(), [Validators.required, Validators.minLength(1)]],
+        repo_name: ['', [Validators.required, Validators.minLength(1)]],
+        repo_account: [{
+            username: '',
+            password: ''
+        }, [Validators.required]]
+    };
+
+    constructor(
+        private formBuilder: FormBuilder,
+        private utilityService: UtilityService,
+        private repositoriesMenuService: RepositoriesMenuService,
+        private gitPackService: GitService,
+        private fileSystemService: FileSystemService,
+        private cd: ChangeDetectorRef,
+        private router: Router
+    ) {
+        this.electron = electronNG.remote;
+    }
+
+    get repo_https() {
+        return this.formRegisterRepository.get('repo_https');
+    }
+
+    get repo_name() {
+        return this.formRegisterRepository.get('repo_name');
+    }
+
+    get repo_dir_display() {
+        return this.formRegisterRepository.get('repo_dir_display');
+    }
+
+    get repo_account() {
+        return this.formRegisterRepository.get('repo_account');
+    }
+
+    get repo_dir() {
+        return this.formRegisterRepository.get('repo_dir');
+    }
+
+    ngOnInit() {
+        this.formRegisterRepository = this.formBuilder.group(this.formFieldBuilder);
+    }
+
+    ngAfterViewInit(): void {
+        this.formListener();
+    }
+
+    chooseDirectory() {
+        this.electron.dialog.showOpenDialog(this.electron.getCurrentWindow(), {
+            title: 'Choose clone repository',
+            properties: ['openDirectory'],
+            defaultPath: osNode.homedir()
+        }, (dir) => {
+            let dirSafe = this.repo_dir.value;
+            if (Array.isArray(dir) && !!dir[0]) {
+                dirSafe = dir[0];
+            }
+            if (dirSafe) {
+                this.repo_dir.setValue(dirSafe);
+            }
+        });
+    }
+
+    cancelAdding() {
+        this.router.navigateByUrl('/');
+    }
+
+    formListener() {
+        this.formRegisterRepository.valueChanges.subscribe(
+            (formFields: any) => {
+                this.checkingStepOneRepo(formFields);
+            }
+        );
+    }
+
+    checkingStepOneRepo(formField: { [key: string]: string }) {
+        let dirDisplay = formField.repo_dir;
+        if (!!formField.repo_https) {
+            let testName = this.utilityService.repositoryNameFromHTTPS(formField.repo_https);
+            if (testName) {
+                if (dirDisplay[dirDisplay.length - 1] !== '\\') {
+                    testName = '\\' + testName;
+                }
+                dirDisplay += testName;
+            }
+        }
+        if (this.repo_dir_display.value !== dirDisplay) {
+            this.illuminateValue_dir = dirDisplay;
+            this.repo_dir_display.setValue(dirDisplay);
+            const slided = this.utilityService.slashFixer(dirDisplay).split('/');
+            this.cd.detectChanges();
+        }
+    }
+
+    retrieveNameRepository(name: string) {
+        if (!!name && name.length > 0) {
+            this.repo_name.setValue(name);
+        } else {
+            this.repo_name.setValue(null);
+        }
+    }
+
+    test() {
+        // const safeHTTPS = this.repo_https.value;
+        // const directory = this.utilityService.directorySafePath(this.repo_dir.value);
+        //
+        // if (!safeHTTPS) {
+        //   return;
+        // }
+        // const credentials: GitCredentials = {
+        //   username: 'do.hoangnam9x@gmail.com',
+        //   password: 'CA8Z2joN4MEu'
+        // };
+        // this.gitPackService.cloneTo(safeHTTPS, directory, credentials)
+        // .then(data => {
+        //     console.log(data);
+        //   },
+        //   err => {
+        //     console.log(err);
+        //   });
+
+        // console.log('start');
+        // this.fileSystemService.getFileContext(
+        //   'test',
+        //   '/user/'
+        // ).then(resolve => {
+        //   console.log(resolve);
+        // }, error => {
+        //   console.log(error);
+        // }).finally(() => {
+        //   console.log('done');
+        // });
+    }
 
 }

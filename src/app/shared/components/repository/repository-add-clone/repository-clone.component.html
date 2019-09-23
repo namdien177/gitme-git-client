@@ -19,7 +19,7 @@
                         {{illuminateValue_dir}}
                     </div>
                     <div class="directory_copy">
-                        <i class="fas fa-copy"></i>
+                        <em class="fas fa-copy"></em>
                     </div>
                 </div>
             </div>
@@ -30,9 +30,8 @@
                     <button (click)="isExistingAccount = true"
                             [class.bg-dark]="!isExistingAccount"
                             [class.bg-success]="isExistingAccount"
-                            block="true"
                             class="text-white"
-                            mdbBtn size="sm">
+                            mat-flat-button>
                         Stored Account
                     </button>
                 </div>
@@ -59,12 +58,11 @@
     </form>
     <div class="action-form">
         <button (click)="cancelAdding(true)"
-                [size]="'sm'"
-                class="btn-warning bg-transparent mr-1" mdbBtn>
+                class="btn-warning bg-transparent mr-1" mat-flat-button>
             Cancel
         </button>
         <p (click)="test()">aasss</p>
-        <button [disabled]="!directoryVerified" [size]="'sm'" class="btn-info" mdbBtn>
+        <button [disabled]="!directoryVerified" class="btn-info" mat-flat-button>
             Clone
         </button>
     </div>
