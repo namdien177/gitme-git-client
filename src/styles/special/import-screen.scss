@@ -1,0 +1,108 @@
+@import "../theme";
+
+.main-form {
+    z-index: 100;
+    width: 100vw;
+    height: calc(100vh - 32px);
+    background-color: $primary-black-darker;
+    box-shadow: $shadow-light;
+
+    display: grid;
+    grid-template-areas: '. title title .' '. info info .' '. repository account .' '. confirm confirm .' '. . . .';
+    grid-template-columns: 1fr 360px 360px 1fr;
+    grid-template-rows: repeat(4, max-content) auto;
+    grid-gap: 2rem;
+    padding: 3rem;
+    overflow: auto;
+
+    .title-section {
+        grid-area: title;
+        display: flex;
+        align-items: center;
+        font-size: var(--title);
+    }
+
+    .info-dialog {
+        grid-area: info;
+    }
+
+    .repository-information {
+        grid-area: repository;
+
+        display: flex;
+        flex-direction: column;
+
+        > * {
+            margin-bottom: 0.5rem;
+        }
+
+        .block-secondary-title {
+            height: 36px;
+        }
+    }
+
+    .repository-credentials {
+        grid-area: account;
+        display: flex;
+        flex-direction: column;
+
+        > * {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn--section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 1rem;
+        }
+    }
+
+    .confirmation-action {
+        grid-area: confirm;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        > * {
+            margin-left: 1rem;
+        }
+    }
+
+    .block-secondary-title {
+        display: flex;
+        align-items: center
+    }
+}
+
+.wrap--ng {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.25rem;
+
+    .form-control {
+        padding-right: calc(36px + 0.5rem);
+    }
+
+    .icon-folder--container {
+        position: absolute;
+        right: 1px;
+        top: 1px;
+        bottom: 1px;
+        width: 36px;
+        display: grid;
+        place-content: center;
+        cursor: pointer;
+        user-select: none;
+        background-color: transparent;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        i {
+            color: whitesmoke;
+            font-size: 1.25rem;
+        }
+    }
+}
