@@ -95,7 +95,6 @@ export class CommitFilesComponent implements OnInit {
                     diff,
                     fileSummary.path
                 );
-                console.log(diff);
             })
         )
         .subscribe(() => {

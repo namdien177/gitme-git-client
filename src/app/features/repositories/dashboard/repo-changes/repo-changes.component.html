@@ -1,34 +1,17 @@
 <div class="tb-container">
     <div *ngFor="let block of outputHTML?.blocks[0].lines"
+         [class.d2h--ng--insert]="block.type == 'd2h-ins'"
+         [class.d2h--ng--remove]="block.type == 'd2h-del'"
          class="ng-row-diff">
-        <div class="row-index">
+        <div class="row-index nonSelectable">
             <div class="row-index-item old">{{block.oldNumber}}</div>
             <div class="row-index-item new">{{block.newNumber}}</div>
         </div>
-        <div class="row-diff-type">
+        <div class="row-diff-type nonSelectable">
             <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>
             <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>
         </div>
-        <pre class="language-{{outputHTML?.language}}"><code class="language-{{outputHTML?.language}}" [innerHTML]="block.content | gitDiff | safeHtml"></code></pre>
-    </div>
-    <div class="ng-row-diff">
-        <div class="row-index">
-            <div class="row-index-item old"></div>
-            <div class="row-index-item new">1</div>
-        </div>
-        <div class="row-diff-type">
-        </div>
-        <pre class="row-diff-content"
-             dir="ltr"
-             lang="html"><code class="row-diff-content-sp language-{{'html'}}">class="row-diff-content"</code></pre>
-    </div>
-    <div class="ng-row-diff">
-        <div class="row-index">
-            <div class="row-index-item old"></div>
-            <div class="row-index-item new">1</div>
-        </div>
-        <div class="row-diff-type">
-        </div>
-        <pre class="language-{{'html'}}"><code class="language-{{'html'}}">class="row-index-item new"</code></pre>
+        <div [innerHTML]="block.content | safeHtml"
+             class="row-diff-content language-{{outputHTML?.language}}"></div>
     </div>
 </div>

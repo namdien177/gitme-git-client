@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { Diff2Html } from 'diff2html';
 import { GitDiffService } from '../../../../shared/states/DATA/git-diff';
 import { GitDiff } from '../../../../shared/model/GitDiff';
 import { HighlightResult } from 'ngx-highlightjs';
@@ -24,16 +23,12 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
         this.gitDiffService.getDiff().subscribe(
             diffStatus => {
                 if (!!diffStatus.diff && diffStatus.diff.length > 0) {
-                    const diff: GitDiff = Diff2Html.getJsonFromDiff(diffStatus.diff, {
-                        inputFormat: 'diff',
-                        showFiles: true,
-                        matching: 'lines'
-                    })[0];
-                    diff.blocks[0].lines.forEach((val, index, currentArr) => {
-                        currentArr[index].content = this.codeHighlight.getHighlighted(val.content);
-                    });
-                    this.outputHTML = diff;
-                    console.log(this.outputHTML);
+                    // const diff = Diff2Html.getJsonFromDiff(diffStatus.diff, {
+                    //     inputFormat: 'diff',
+                    //     showFiles: true,
+                    //     matching: 'lines'
+                    // })[0];
+                    this.outputHTML = this.codeHighlight.getDiffHTML(diffStatus);
                     // this.codeHighlight.highlight();
                 } else {
                     this.outputHTML = null;
