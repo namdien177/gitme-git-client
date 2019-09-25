@@ -16,6 +16,7 @@ import { Diff2Html } from 'diff2html';
 import { utilNode } from '../../shared/types/types.electron';
 import { DiffBlockLines, GitDiff, GitDiffBlocks } from '../../shared/model/GitDiff';
 import { GitDiffState } from '../../shared/states/DATA/git-diff';
+import { Grammar } from '../../shared/types/grammar.define';
 
 @Injectable({
     providedIn: 'root'
@@ -37,25 +38,8 @@ export class CodeHighlightService {
     }
 
     getHighlighted(st: string, langType: string = 'typescript') {
-        let grammar = null;
-        switch (langType) {
-            case 'typescript':
-                grammar = prism.languages.typescript;
-                break;
-            case 'html':
-                grammar = prism.languages.html;
-                break;
-            case 'css':
-                grammar = prism.languages.css;
-                break;
-            case 'scss':
-                grammar = prism.languages.scss;
-                break;
-            case 'json':
-                grammar = prism.languages.json;
-                break;
-        }
-        return this.prismJS.highlight(st, grammar, langType);
+        const primsLangConfig = Grammar(langType);
+        return this.prismJS.highlight(st, primsLangConfig.grammar, primsLangConfig.lang);
     }
 
     getDiffHTML(diffString: GitDiffState) {
