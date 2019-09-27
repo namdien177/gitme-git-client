@@ -5,7 +5,7 @@
     grid-template-areas: 'information' 'diffs';
     grid-gap: 0;
     grid-template-columns: 1fr;
-    grid-template-rows: max-content auto;
+    grid-template-rows: 4rem calc(100vh - 112px - 4rem);
 
     .file-information {
         grid-area: information;
@@ -13,5 +13,6 @@
 
     .file-diffs {
         grid-area: diffs;
+        overflow: auto;
     }
 }

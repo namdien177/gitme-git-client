@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesService } from '../../../shared/states/DATA/repositories';
 import { GitDiffService, GitDiffState } from '../../../shared/states/DATA/git-diff';
 
 @Component({
@@ -12,7 +11,6 @@ export class DashboardComponent implements OnInit {
     diffStatus: GitDiffState = null;
 
     constructor(
-        private repositoriesService: RepositoriesService,
         private gitDiffService: GitDiffService
     ) {
     }

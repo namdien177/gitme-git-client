@@ -1,24 +1,27 @@
 import * as prism from 'prismjs';
 
-export function Grammar(langType: string): GrammarInterface {
+import 'prismjs/components';
+
+export async function Grammar(langType: string): Promise<GrammarInterface> {
+    langType = fixingShortCall(langType);
     let grammar = null;
-    switch (langType) {
-        case 'typescript':
-        case 'ts':
-            grammar = prism.languages.typescript;
-            break;
-        case 'html':
-            grammar = prism.languages.html;
-            break;
-        case 'css':
-            grammar = prism.languages.css;
-            break;
-        case 'scss':
-            grammar = prism.languages.scss;
-            break;
-        case 'json':
-            grammar = prism.languages.json;
-            break;
+    if (langType) {
+        switch (langType) {
+            case 'html':
+            case 'markup':
+            case 'css':
+            case 'scss':
+            case 'json':
+            case 'java':
+            case 'javascript':
+            case 'js':
+            case 'typescript':
+            case 'ts':
+            case 'c':
+                await import('prismjs/components/prism-' + langType);
+                grammar = prism.languages[langType];
+                break;
+        }
     }
 
     return {
@@ -29,5 +32,17 @@ export function Grammar(langType: string): GrammarInterface {
 
 export interface GrammarInterface {
     lang: string;
-    grammar: any
+    grammar: any;
+}
+
+function fixingShortCall(langShort: string) {
+    if (langShort === 'ts') {
+        return 'typescript';
+    }
+
+    if (langShort === 'html') {
+        return 'markup';
+    }
+
+    return langShort;
 }

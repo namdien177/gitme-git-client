@@ -4,8 +4,12 @@
          [class.d2h--ng--remove]="block.type == 'd2h-del'"
          class="ng-row-diff">
         <div class="row-index nonSelectable">
-            <div class="row-index-item old">{{block.oldNumber}}</div>
-            <div class="row-index-item new">{{block.newNumber}}</div>
+            <div class="row-index-item old">
+                {{block.oldNumber}}
+            </div>
+            <div class="row-index-item new">
+                {{block.newNumber}}
+            </div>
         </div>
         <div class="row-diff-type nonSelectable">
             <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>

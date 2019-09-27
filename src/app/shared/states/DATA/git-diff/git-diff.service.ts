@@ -1,23 +1,34 @@
 import { Injectable } from '@angular/core';
-import { GitDiffStore } from './git-diff.store';
+import { GitDiffState, GitDiffStore } from './git-diff.store';
 import { GitDiffQuery } from './git-diff.query';
+import { CodeHighlightService } from '../../../../services/features/code-highlight.service';
+import { Observable } from 'rxjs';
+import { GitDiff } from '../../../model/GitDiff';
 
 @Injectable({ providedIn: 'root' })
 export class GitDiffService {
 
     constructor(
-        private gitDiffStore: GitDiffStore,
-        private query: GitDiffQuery
+        private store: GitDiffStore,
+        private query: GitDiffQuery,
+        private codeHighLightService: CodeHighlightService
     ) {
     }
 
-    setDiff(diff: string, fileDirectory: string) {
-        this.gitDiffStore.update({
-            diff
+    async setDiff(diff: string, fileDirectory: string) {
+        this.store.setLoading(true);
+        let diffState: GitDiff = null;
+        if (!!diff && diff.length > 0) {
+            diffState = await this.codeHighLightService.getDiffHTML(diff);
+        }
+        this.store.setLoading(false);
+        this.store.update({
+            diff: diffState,
+            directory: fileDirectory
         });
     }
 
-    getDiff() {
+    getDiff(): Observable<GitDiffState> {
         return this.query.select();
     }
 
@@ -26,6 +37,6 @@ export class GitDiffService {
     }
 
     reset() {
-        this.gitDiffStore.reset();
+        this.store.reset();
     }
 }

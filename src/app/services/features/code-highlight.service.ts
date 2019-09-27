@@ -3,19 +3,12 @@ import { Injectable } from '@angular/core';
 import 'clipboard';
 
 import * as prism from 'prismjs';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-sass';
-import 'prismjs/components/prism-scss';
+
 
 import { Diff2Html } from 'diff2html';
 
 import { utilNode } from '../../shared/types/types.electron';
 import { DiffBlockLines, GitDiff, GitDiffBlocks } from '../../shared/model/GitDiff';
-import { GitDiffState } from '../../shared/states/DATA/git-diff';
 import { Grammar } from '../../shared/types/grammar.define';
 
 @Injectable({
@@ -32,24 +25,19 @@ export class CodeHighlightService {
         this.util = utilNode;
     }
 
-    async highlight() {
-        prism.highlightAll();
-        // return this.util.promisify(this.prismJS.highlightAll);
+    async getHighlighted(st: string, langType: string = 'typescript') {
+        const prismLangConfig = await Grammar(langType);
+        return this.prismJS.highlight(st, prismLangConfig.grammar, prismLangConfig.lang);
     }
 
-    getHighlighted(st: string, langType: string = 'typescript') {
-        const primsLangConfig = Grammar(langType);
-        return this.prismJS.highlight(st, primsLangConfig.grammar, primsLangConfig.lang);
-    }
-
-    getDiffHTML(diffString: GitDiffState) {
-        const diffJSON: GitDiff = Diff2Html.getJsonFromDiff(diffString.diff, {
+    async getDiffHTML(diffString: string) {
+        const diffJSON: GitDiff = Diff2Html.getJsonFromDiff(diffString, {
             inputFormat: 'diff',
             showFiles: true,
             matching: 'lines'
         })[0];
 
-        const lines: DiffBlockLines[] = this.retrieveHighlightContent(diffJSON.blocks[0].lines, diffJSON.language);
+        const lines: DiffBlockLines[] = await this.retrieveHighlightContent(diffJSON.blocks[0].lines, diffJSON.language);
 
         const block: GitDiffBlocks = {
             header: diffJSON.blocks[0].header,
@@ -62,20 +50,37 @@ export class CodeHighlightService {
         return returnGitDiff;
     }
 
-    retrieveHighlightContent(arrLines: DiffBlockLines[], lang: string) {
+    async retrieveHighlightContent(arrLines: DiffBlockLines[], lang: string) {
         let contentParsing = '';
-        arrLines.forEach(line => {
+        let smallestSpace = -1;
+        arrLines.forEach((line, index) => {
             let content = line.content;
+
             if (content.indexOf('+') === 0 || content.indexOf('-') === 0) {
                 // Remove prefix status
                 content = ' ' + content.slice(1);
+            }
+            const firstNonSpaceChar = content.search(/\S/);
+            if (index < 2) {
+                console.log(firstNonSpaceChar);
+            }
+            if (smallestSpace === -1) {
+                smallestSpace = firstNonSpaceChar;
+            }
+            if (firstNonSpaceChar > -1) {
+                if (smallestSpace > firstNonSpaceChar) {
+                    smallestSpace = firstNonSpaceChar;
+                }
             }
             contentParsing += content + '\n';
         });
         // remove last \n
         contentParsing = contentParsing.slice(0, contentParsing.length - 1);
-        const strTest = this.getHighlighted(contentParsing);
-        const arrSplit = strTest.split('\n');
+
+        const strTest = await this.getHighlighted(contentParsing, lang);
+        const arrSplit = strTest.split('\n').map(
+            row => row.slice(smallestSpace)
+        );
 
         const lines: DiffBlockLines[] = [];
 
