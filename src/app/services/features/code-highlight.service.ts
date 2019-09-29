@@ -31,22 +31,26 @@ export class CodeHighlightService {
     }
 
     async getDiffHTML(diffString: string) {
-        const diffJSON: GitDiff = Diff2Html.getJsonFromDiff(diffString, {
+        const diffJSONAllBlock: GitDiff = await Diff2Html.getJsonFromDiff(diffString, {
             inputFormat: 'diff',
             showFiles: true,
             matching: 'lines'
-        })[0];
+        })[0]; // single view mode
 
-        const lines: DiffBlockLines[] = await this.retrieveHighlightContent(diffJSON.blocks[0].lines, diffJSON.language);
+        const blocksCode: GitDiffBlocks[] = [];
+        const blocksCodeRaw: GitDiffBlocks[] = diffJSONAllBlock.blocks;
+        for (const blockDiff of blocksCodeRaw) {
+            const lines: DiffBlockLines[] = await this.retrieveHighlightContent(blockDiff.lines, diffJSONAllBlock.language);
+            const block: GitDiffBlocks = {
+                header: blockDiff.header,
+                lines: lines,
+                newStartLine: blockDiff.newStartLine,
+                oldStartLine: blockDiff.oldStartLine
+            };
+            blocksCode.push(block);
+        }
 
-        const block: GitDiffBlocks = {
-            header: diffJSON.blocks[0].header,
-            lines: lines,
-            newStartLine: diffJSON.blocks[0].newStartLine,
-            oldStartLine: diffJSON.blocks[0].oldStartLine
-        };
-
-        const returnGitDiff: GitDiff = Object.assign({}, diffJSON, { blocks: [block] });
+        const returnGitDiff: GitDiff = Object.assign({}, diffJSONAllBlock, { blocks: blocksCode });
         return returnGitDiff;
     }
 
@@ -61,9 +65,7 @@ export class CodeHighlightService {
                 content = ' ' + content.slice(1);
             }
             const firstNonSpaceChar = content.search(/\S/);
-            if (index < 2) {
-                console.log(firstNonSpaceChar);
-            }
+
             if (smallestSpace === -1) {
                 smallestSpace = firstNonSpaceChar;
             }

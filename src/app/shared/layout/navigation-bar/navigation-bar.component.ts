@@ -141,7 +141,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             result => {
                 this.loading.commit = false;
                 this.formCommitment.reset();
-                console.log(result);
             }
         );
     }
@@ -155,7 +154,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.repositoriesService.push(this.repository, branches).subscribe(
             result => {
                 this.loading.commit = false;
-                console.log(result);
             }
         );
     }
@@ -165,7 +163,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.repositoriesService.getRemotes(this.repository).subscribe(
             result => {
                 this.loading.fetch = false;
-                console.log(result);
             }
         );
     }
@@ -199,7 +196,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         )
         .subscribe(
             (status: StatusSummary) => {
-                console.log(status);
                 this.statusSummary = status;
                 if (status) {
                     this.repositoryStatusService.set(status);
@@ -217,7 +213,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 this.activeBranch = listBranch.find(branch => {
                     return branch.current;
                 });
-                console.log(listBranch);
             }
         );
     }

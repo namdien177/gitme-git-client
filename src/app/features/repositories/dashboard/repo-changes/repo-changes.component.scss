@@ -1,13 +1,12 @@
 @import "src/styles/theme";
 
-.whitespace-pre {
-    white-space: pre;
-}
-
 .tb-container {
-    height: max-content;
-    width: calc(100vw - 350px);
-    position: relative;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     margin: 0;
 
     .ng-row-diff {
@@ -18,12 +17,45 @@
         padding-left: calc(180px + 1.3rem);
         min-height: 21px;
 
+        &.ng-row-blank {
+            background-color: #1e1e1e;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='21' height='21' viewBox='0 0 120 120'%3E%3Cpolygon fill='%238d9ba2' fill-opacity='0.06' points='120 120 60 120 90 90 120 60 120 0 120 0 60 60 0 0 0 60 30 90 60 120 120 120 '/%3E%3C/svg%3E");
+        }
+
+        &:not(.ng-row-blank):hover {
+            background: rgba(0, 0, 0, 0.05);
+
+            .row-index {
+                background: rgba(51, 51, 51, 0.4);
+            }
+        }
+
+        &:last-child {
+            border-bottom: 1px solid $primary-black;
+        }
+
         &.d2h--ng--insert {
             background: rgba(74, 135, 100, 0.3);
+
+            &:hover {
+                background: rgba(74, 135, 100, 0.1);
+            }
+
+            .row-index {
+                background: rgba(51, 51, 51, 0.4);
+            }
         }
 
         &.d2h--ng--remove {
             background: rgba(175, 83, 55, 0.3);
+
+            &:hover {
+                background: rgba(175, 83, 55, 0.1);
+            }
+
+            .row-index {
+                background: rgba(51, 51, 51, 0.4);
+            }
         }
 
         .row-index {
@@ -31,7 +63,7 @@
             grid-template-rows: 1fr;
             grid-template-columns: 1fr 1fr;
             grid-gap: 0;
-            background: $primary-light;
+            background: $primary-black;
             height: 100%;
             width: 180px;
             position: absolute;
@@ -41,6 +73,11 @@
             .row-index-item {
                 text-align: right;
                 padding: 2px 0.3rem;
+                font-family: "Courier New", monospace;
+
+                &.new {
+                    border-left: 1px solid $primary-black-foreground;
+                }
             }
         }
 
@@ -64,23 +101,9 @@
             padding: 0 5px 0 0;
             font-variant-ligatures: contextual;
             font-family: "Courier New", monospace;
-            //border: none;
-            //height: 100%;
-            width: calc(100vw - 530px - 1.3rem);
-            //overflow: auto;
-            //cursor: text;
+            width: 100%;
             font-size: 0.8rem;
             line-height: 21px;
-
-            .row-diff-content-sp {
-                word-break: break-all;
-                white-space: pre;
-                word-wrap: normal;
-                font-size: 1rem;
-                line-height: 1.3rem;
-                margin: 0;
-                padding: 0;
-            }
         }
     }
 }

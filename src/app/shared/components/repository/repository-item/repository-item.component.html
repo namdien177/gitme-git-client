@@ -3,7 +3,7 @@
      class="card">
     <div class="card-body row">
         <div class="icon">
-            <i class="fas fa-project-diagram"></i>
+            <em class="fas fa-project-diagram"></em>
         </div>
         <div class="name">
             {{repository?.name}}
@@ -32,7 +32,7 @@
 
         <div [title]="repository.timestamp != null ? (repository.timestamp | date) : 'Never fetched'"
              class="timestamp text-muted">
-            <i class="far fa-clock"></i>
+            <em class="far fa-clock"></em>
             <span>
                 {{repository.timestamp != null ? (repository.timestamp | recentTime) : 'Never fetched'}}
             </span>

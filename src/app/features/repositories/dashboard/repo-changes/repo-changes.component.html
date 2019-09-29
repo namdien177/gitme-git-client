@@ -1,21 +1,34 @@
 <div class="tb-container">
-    <div *ngFor="let block of outputHTML?.blocks[0].lines"
-         [class.d2h--ng--insert]="block.type == 'd2h-ins'"
-         [class.d2h--ng--remove]="block.type == 'd2h-del'"
-         class="ng-row-diff">
-        <div class="row-index nonSelectable">
-            <div class="row-index-item old">
-                {{block.oldNumber}}
-            </div>
-            <div class="row-index-item new">
-                {{block.newNumber}}
+    <ng-container *ngFor="let block of outputHTML?.blocks; let i = index">
+        <div *ngIf="outputHTML?.blocks.length > 1 && i !== 0"
+             class="ng-row-diff ng-row-blank">
+            <div class="row-index nonSelectable">
+                <div class="row-index-item old">
+                </div>
+                <div class="row-index-item new">
+                </div>
             </div>
         </div>
-        <div class="row-diff-type nonSelectable">
-            <ng-container *ngIf="block.type == 'd2h-del'">-</ng-container>
-            <ng-container *ngIf="block.type == 'd2h-ins'">+</ng-container>
-        </div>
-        <div [innerHTML]="block.content | safeHtml"
-             class="row-diff-content language-{{outputHTML?.language}}"></div>
-    </div>
+
+        <ng-container *ngFor="let lineDiff of block.lines; let iLine = index">
+            <div [class.d2h--ng--insert]="lineDiff.type == 'd2h-ins'"
+                 [class.d2h--ng--remove]="lineDiff.type == 'd2h-del'"
+                 class="ng-row-diff">
+                <div class="row-index nonSelectable">
+                    <div class="row-index-item old">
+                        {{lineDiff.oldNumber}}
+                    </div>
+                    <div class="row-index-item new">
+                        {{lineDiff.newNumber}}
+                    </div>
+                </div>
+                <div class="row-diff-type nonSelectable">
+                    <ng-container *ngIf="lineDiff.type == 'd2h-del'">-</ng-container>
+                    <ng-container *ngIf="lineDiff.type == 'd2h-ins'">+</ng-container>
+                </div>
+                <div [innerHTML]="lineDiff.content | safeHtml"
+                     class="row-diff-content"></div>
+            </div>
+        </ng-container>
+    </ng-container>
 </div>

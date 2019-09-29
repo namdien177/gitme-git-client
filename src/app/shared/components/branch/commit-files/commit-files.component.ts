@@ -8,7 +8,7 @@ import {
     RepositoryStatusState
 } from '../../../states/DATA/repository-status';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { tap } from 'rxjs/operators';
+import { distinctUntilChanged, tap } from 'rxjs/operators';
 import { GitDiffService } from '../../../states/DATA/git-diff';
 
 @Component({
@@ -31,6 +31,10 @@ export class CommitFilesComponent implements OnInit {
     @Output()
     checkingFiles = new EventEmitter<FileStatusSummaryView[]>();
 
+    @Output()
+    fileActivated = new EventEmitter<FileStatusSummaryView>();
+    private _fileActivated: FileStatusSummaryView = null;
+
     constructor(
         protected utilities: UtilityService,
         private repositoriesService: RepositoriesService,
@@ -39,10 +43,17 @@ export class CommitFilesComponent implements OnInit {
         private gitDiffService: GitDiffService
     ) {
         this.repositoryStatusService.select()
+        .pipe(
+            distinctUntilChanged()
+        )
         .subscribe(
             summary => {
                 this.statusSummary = summary;
                 this.emitStatusCheckedFile(summary.files);
+                if (summary.files.length > 0 && !summary.files[0].active && !this._fileActivated) {
+                    // auto select the first file
+                    this.viewDiffFile(summary.files[0], 0);
+                }
             }
         );
     }
@@ -79,26 +90,36 @@ export class CommitFilesComponent implements OnInit {
         };
     }
 
-    getAllChecked() {
-
-    }
-
     trackByPath(item: FileStatusSummaryView) {
         return item.path;
     }
 
     viewDiffFile(fileSummary: FileStatusSummaryView, index: number) {
+        if (!!this._fileActivated && fileSummary.path === this._fileActivated.path) {
+            return;
+        }
         fromPromise(this.repositoriesService.getDiffOfFile(this.repository, fileSummary))
         .pipe(
             tap(diff => {
+                let status: 'change' | 'new' | 'delete' = 'new';
+                if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created)) {
+                    status = 'new';
+                } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted)) {
+                    status = 'delete';
+                } else {
+                    status = 'change';
+                }
                 this.gitDiffService.setDiff(
                     diff,
-                    fileSummary.path
+                    fileSummary.path,
+                    status
                 );
             })
         )
         .subscribe(() => {
-            this.repositoryStatusService.toggleActive(index);
+            this.fileActivated.emit(fileSummary);
+            this._fileActivated = fileSummary;
+            this.repositoryStatusService.setActive(index);
         });
     }
 }
