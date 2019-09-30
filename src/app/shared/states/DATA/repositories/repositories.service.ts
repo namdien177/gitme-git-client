@@ -83,10 +83,28 @@ export class RepositoriesService {
         this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
     }
 
-    selectActive(): Observable<Repository> {
+    selectActive(initLoad: boolean = true): Observable<Repository> {
         this.setLoading();
+        if (!initLoad) {
+            return this.query.selectActive().pipe(
+                map(active => {
+                    if (Array.isArray(active)) {
+                        return active[0];
+                    } else {
+                        return active;
+                    }
+                })
+            );
+        }
         return fromPromise(this.load()).pipe(
             switchMap(() => this.query.selectActive()),
+            map(active => {
+                if (Array.isArray(active)) {
+                    return active[0];
+                } else {
+                    return active;
+                }
+            }),
             tap(() => {
                 this.finishLoading();
             })

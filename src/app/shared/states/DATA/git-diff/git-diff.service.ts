@@ -22,11 +22,9 @@ export class GitDiffService {
     ) {
         this.store.setLoading(true);
         let diffState: GitDiff = null;
-        console.log(diff);
         if (!!diff && diff.length > 0) {
             diffState = await this.codeHighLightService.getDiffHTML(diff);
         }
-        console.log(diffState);
         this.store.setLoading(false);
         this.store.update({
             diff: diffState,

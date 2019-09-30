@@ -14,6 +14,7 @@ import { SafeHtmlPipe } from '../pipe/safe-html.pipe';
 import { GitDiffPipe } from '../pipe/git-diff.pipe';
 import { MaterialModule } from './material.module';
 import { RecentTimeDirective } from '../pipe/recentTime.pipe';
+import { SectionLoadComponent } from '../components/UI/section-load/section-load.component';
 
 const importModules = [];
 const exportModules = [];
@@ -48,6 +49,7 @@ const declareComps = [
 @NgModule({
     declarations: [
         ...declareComps,
+        SectionLoadComponent,
     ],
     imports: [
         CommonModule,

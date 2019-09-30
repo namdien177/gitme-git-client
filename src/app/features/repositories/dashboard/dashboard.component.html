@@ -33,9 +33,10 @@
 </ng-container>
 
 <ng-container *ngIf="!info.dir">
-    <ng-container *ngIf="statusSummary.files.length > 0">
-        <div class="wait-file-option">
-            <h2>f</h2>
-        </div>
-    </ng-container>
+    <div class="wait-file-option">
+        <h2>Overview</h2>
+        <small class="text-muted">
+            No file change detected!
+        </small>
+    </div>
 </ng-container>

@@ -29,10 +29,6 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        // this.codeHighlight.highlight().then(
-        //     status => {
-        //         console.log(status);
-        //     }
-        // );
+
     }
 }

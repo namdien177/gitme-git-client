@@ -48,7 +48,7 @@ export class RepositoryItemComponent implements OnInit {
             }
         );
 
-        this.repositoriesService.selectActive().pipe(
+        this.repositoriesService.selectActive(false).pipe(
             distinctUntilChanged()
         ).subscribe(activeRepository => {
             this.isActive = activeRepository.id === this.repository.id;

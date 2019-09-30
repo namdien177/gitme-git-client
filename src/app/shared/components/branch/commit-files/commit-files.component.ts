@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { UtilityService } from '../../../utilities/utility.service';
 import { RepositoriesQuery, RepositoriesService, Repository } from '../../../states/DATA/repositories';
 import {
@@ -8,7 +8,7 @@ import {
     RepositoryStatusState
 } from '../../../states/DATA/repository-status';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { distinctUntilChanged, tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { GitDiffService } from '../../../states/DATA/git-diff';
 
 @Component({
@@ -16,11 +16,8 @@ import { GitDiffService } from '../../../states/DATA/git-diff';
     templateUrl: './commit-files.component.html',
     styleUrls: ['./commit-files.component.scss']
 })
-export class CommitFilesComponent implements OnInit {
-
+export class CommitFilesComponent implements OnInit, AfterViewInit {
     statusSummary: RepositoryStatusState = createInitialState();
-
-    @Input() repository: Repository;
 
     @Output()
     isAllFileChecked = new EventEmitter<boolean>();
@@ -33,6 +30,8 @@ export class CommitFilesComponent implements OnInit {
 
     @Output()
     fileActivated = new EventEmitter<FileStatusSummaryView>();
+
+    repository: Repository;
     private _fileActivated: FileStatusSummaryView = null;
 
     constructor(
@@ -42,11 +41,12 @@ export class CommitFilesComponent implements OnInit {
         private repositoryStatusService: RepositoryStatusService,
         private gitDiffService: GitDiffService
     ) {
-        this.repositoryStatusService.select()
-        .pipe(
-            distinctUntilChanged()
-        )
-        .subscribe(
+        this.repositoriesService.selectActive(false).pipe(
+            switchMap(repository => {
+                this.repository = repository;
+                return this.repositoryStatusService.select();
+            })
+        ).subscribe(
             summary => {
                 this.statusSummary = summary;
                 this.emitStatusCheckedFile(summary.files);
@@ -56,6 +56,10 @@ export class CommitFilesComponent implements OnInit {
                 }
             }
         );
+    }
+
+    ngAfterViewInit(): void {
+
     }
 
     ngOnInit() {

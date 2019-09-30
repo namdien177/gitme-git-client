@@ -139,8 +139,7 @@
     <div class="commit-flies">
         <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
                             (isAllFileChecked)="eventEmitCheckBoxFile($event)"
-                            *ngIf="statusSummary?.files?.length > 0"
-                            [repository]="repository">
+                            *ngIf="statusSummary?.files?.length > 0">
         </gitme-commit-files>
         <p *ngIf="statusSummary?.files?.length == 0"
            class="text-muted text-center nonSelectable">
