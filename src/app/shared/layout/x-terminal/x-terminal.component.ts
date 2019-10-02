@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { XTerminalQuery, XTerminalService, XTerminalState } from '../../states/x-terminal';
+import { XTerminalQuery, XTerminalService, XTerminalState } from '../../state/x-terminal';
 
 @Component({
     selector: 'gitme-x-terminal',

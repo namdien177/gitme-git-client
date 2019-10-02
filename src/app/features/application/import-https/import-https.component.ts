@@ -2,13 +2,13 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/co
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { electronNG, osNode } from '../../../shared/types/types.electron';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { RepositoriesMenuService } from '../../../shared/states/UI/repositories-menu';
+import { RepositoriesMenuService } from '../../../shared/state/UI/repositories-menu';
 import { GitService } from '../../../services/features/git.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { Router } from '@angular/router';
 import { DialogsInformation } from '../../../shared/model/DialogsInformation';
 import { isTypeAccount } from '../../../shared/validate/customFormValidate';
-import { Account } from '../../../shared/states/DATA/account-list';
+import { Account } from '../../../shared/state/DATA/account-list';
 
 @Component({
     selector: 'gitme-import-https',

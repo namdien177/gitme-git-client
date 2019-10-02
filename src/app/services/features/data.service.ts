@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { FileSystemService } from '../system/fileSystem.service';
-import { Repository } from '../../shared/states/DATA/repositories';
+import { Repository } from '../../shared/state/DATA/repositories';
 import { AppRepositories, InitializeRepositoryConfig } from '../../shared/model/App-Repositories';
 import { DefineCommon } from '../../common/define.common';
 import { AppConfig } from '../../shared/model/App-Config';
-import { Account } from '../../shared/states/DATA/account-list';
+import { Account } from '../../shared/state/DATA/account-list';
 import { AppAccounts, InitializeAccountConfig } from '../../shared/model/App-Accounts';
 
 @Injectable({

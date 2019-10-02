@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Account } from '../states/DATA/account-list';
+import { Account } from '../state/DATA/account-list';
 import { SecurityService } from '../../services/system/security.service';
-import { FileStatusSummaryView } from '../states/DATA/repository-status';
+import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
 
 

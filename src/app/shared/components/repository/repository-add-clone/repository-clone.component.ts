@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/co
 import { electronNG, osNode } from '../../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UtilityService } from '../../../utilities/utility.service';
-import { RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { RepositoriesMenuService } from '../../../state/UI/repositories-menu';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
 

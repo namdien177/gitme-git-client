@@ -1,15 +1,15 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { UtilityService } from '../../../utilities/utility.service';
-import { RepositoriesQuery, RepositoriesService, Repository } from '../../../states/DATA/repositories';
+import { RepositoriesQuery, RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import {
     createInitialState,
     FileStatusSummaryView,
     RepositoryStatusService,
     RepositoryStatusState
-} from '../../../states/DATA/repository-status';
+} from '../../../state/DATA/repository-status';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap, tap } from 'rxjs/operators';
-import { GitDiffService } from '../../../states/DATA/git-diff';
+import { GitDiffService } from '../../../state/DATA/git-diff';
 
 @Component({
     selector: 'gitme-commit-files',

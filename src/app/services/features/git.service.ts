@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
-import { Account } from '../../shared/states/DATA/account-list';
-import { RepositoryBranchSummary } from '../../shared/states/DATA/repository-branches';
-import { Repository, RepositoryRemotes } from '../../shared/states/DATA/repositories';
+import { Account } from '../../shared/state/DATA/account-list';
+import { RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
+import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositories';
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
-import { FileStatusSummaryView } from '../../shared/states/DATA/repository-status';
+import { FileStatusSummaryView } from '../../shared/state/DATA/repository-status';
 
 @Injectable()
 export class GitService {

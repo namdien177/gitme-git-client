@@ -1,4 +1,4 @@
-import { Repository } from '../states/DATA/repositories';
+import { Repository } from '../state/DATA/repositories';
 
 export interface AppRepositories {
     repositories: Repository[];

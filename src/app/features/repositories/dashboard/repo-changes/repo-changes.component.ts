@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { GitDiffService } from '../../../../shared/states/DATA/git-diff';
+import { GitDiffService } from '../../../../shared/state/DATA/git-diff';
 import { GitDiff } from '../../../../shared/model/GitDiff';
 
 @Component({

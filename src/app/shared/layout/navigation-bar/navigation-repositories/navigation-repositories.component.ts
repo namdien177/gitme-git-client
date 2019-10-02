@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../states/UI/repositories-menu';
-import { RepositoriesQuery, Repository } from '../../../states/DATA/repositories';
+import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../state/UI/repositories-menu';
+import { RepositoriesQuery, Repository } from '../../../state/DATA/repositories';
 import { Observable } from 'rxjs';
 
 @Component({
