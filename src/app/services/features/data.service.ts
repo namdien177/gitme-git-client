@@ -17,7 +17,7 @@ export class DataService {
     ) {
     }
 
-    async getConfigAppFromFile(fileName: string): Promise<AppConfig> {
+    async getConfigAppData(fileName: string): Promise<AppConfig> {
         if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(fileName))) {
             return await this.fileSystemService
             .getFileContext<AppConfig>(fileName, DefineCommon.DIR_CONFIG())
@@ -31,10 +31,10 @@ export class DataService {
         return null;
     }
 
-    async getRepositoriesFromFile(fileName: string): Promise<AppRepositories> {
-        if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
+    async getRepositoriesConfigData(idRepository: string): Promise<AppRepositories> {
+        if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(idRepository))) {
             return await this.fileSystemService
-            .getFileContext<AppRepositories>(fileName, DefineCommon.DIR_REPOSITORIES())
+            .getFileContext<AppRepositories>(idRepository, DefineCommon.DIR_REPOSITORIES())
             .then(val => val.status ? val.value : null)
             .catch(err => {
                 console.log(err);
@@ -45,10 +45,10 @@ export class DataService {
         return null;
     }
 
-    async getAccountsFromFile(fileName: string): Promise<AppAccounts> {
-        if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))) {
+    async getAccountsConfigData(idAccount: string): Promise<AppAccounts> {
+        if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(idAccount))) {
             return await this.fileSystemService
-            .getFileContext<AppAccounts>(fileName, DefineCommon.DIR_ACCOUNTS())
+            .getFileContext<AppAccounts>(idAccount, DefineCommon.DIR_ACCOUNTS())
             .then(val => val.status ? val.value : null)
             .catch(err => {
                 console.log(err);
@@ -59,139 +59,142 @@ export class DataService {
         return null;
     }
 
-    async addNewAccountToFile(account: Account, fileName: string) {
-        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName))) {
-            // file does not exist => create the file
-            const defaultRepositoryConfig: AppAccounts = InitializeAccountConfig();
-            const createStatus = await this.fileSystemService
-            .createFile(fileName, defaultRepositoryConfig, DefineCommon.DIR_ACCOUNTS());
-
-            if (!createStatus.status) {
-                return null;
-            }
-
-            // Add to system config file
-            const systemAppConfig: AppRepositories = await this.fileSystemService
-            .getFileContext<AppConfig>(fileName, DefineCommon.DIR_CONFIG())
-            .then(val => val.value)
-            .catch(err => null);
-            if (!!!systemAppConfig) {
-                await this.fileSystemService.removeFile(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName));
-                return null;
-            }
-        }
-
-        // retrieve account config data
-        const systemAccConfig: AppAccounts = await this.fileSystemService
-        .getFileContext<AppAccounts>(fileName, DefineCommon.DIR_ACCOUNTS())
+    /**
+     * Create new account json file.
+     * @param account   New account information. Account's id will be used as filename
+     * @param idFile    id of application configuration
+     */
+    async createAccountData(account: Account, idFile: string): Promise<boolean> {
+        // prepare system config file
+        const systemAppConfig: AppConfig = await this.fileSystemService
+        .getFileContext<AppConfig>(idFile, DefineCommon.DIR_CONFIG())
         .then(val => val.value)
         .catch(err => null);
-        if (!!!systemAccConfig) {
-            return null;
-        }
-        systemAccConfig.accounts.push(account);
-        // update back to system config
-        return await this.fileSystemService
-        .updateFileContext<AppAccounts>(fileName, systemAccConfig, DefineCommon.DIR_ACCOUNTS())
-        .then(status => status.status)
-        .catch(err => {
-            console.log(err);
+
+        if (!systemAppConfig) {
             return false;
+        }
+
+        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(account.id))) {
+            // file does not exist => create the file
+            const defaultRepositoryConfig: AppAccounts = InitializeAccountConfig(account);
+            const createStatus = await this.fileSystemService
+            .createFile(account.id, defaultRepositoryConfig, DefineCommon.DIR_ACCOUNTS());
+
+            if (!createStatus.status) {
+                return false;
+            }
+        } else {
+            const statusUpdate = await this.updateAccountData(account, true);
+            if (!statusUpdate) {
+                return false;
+            }
+        }
+
+        if (systemAppConfig.account_config.find(data => data === account.id)) {
+            // somehow already had the config
+            return true;
+        }
+        systemAppConfig.account_config.push(account.id);
+        return await this.updateAppConfigFile(systemAppConfig, idFile).then(async updateStatus => {
+            if (!updateStatus) {
+                await this.fileSystemService.removeFile(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(account.id));
+            }
+
+            return updateStatus;
         });
     }
 
-    async updateAccountFile(account: Account, fileName: string): Promise<boolean> {
-        const AccConfig = this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(fileName));
-        if (!AccConfig) {
+    /**
+     * Create repository json file.
+     * @param repository    New repository information. Repository's id will be used as filename
+     * @param idFile        id of application configuration
+     */
+    async createRepositoryData(repository: Repository, idFile: string): Promise<boolean> {
+        // prepare system config file
+        const systemAppConfig: AppConfig = await this.fileSystemService
+        .getFileContext<AppConfig>(idFile, DefineCommon.DIR_CONFIG())
+        .then(val => val.value)
+        .catch(err => null);
+
+        if (!systemAppConfig) {
             return false;
         }
 
-        const fileData: AppAccounts = await this.fileSystemService
-        .getFileContext<AppAccounts>(fileName, DefineCommon.DIR_ACCOUNTS())
-        .then(resolve => resolve.status ? resolve.value : null);
-        if (!fileData) {
-            return false;
-        }
+        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(repository.id))) {
+            // file does not exist => create the file
+            const defaultAccountConfig: AppRepositories = InitializeRepositoryConfig(repository);
+            const createStatus = await this.fileSystemService
+            .createFile(repository.id, defaultAccountConfig, DefineCommon.DIR_REPOSITORIES());
 
-        fileData.accounts.every((acc, index, currentArray) => {
-            if (acc.id === account.id) {
-                currentArray[index] = account;
+            if (!createStatus.status) {
                 return false;
             }
-            return true;
-        });
+        } else {
+            const statusUpdate = await this.updateRepositoryData(repository, true);
+            if (!statusUpdate) {
+                return false;
+            }
+        }
 
-        return await this.fileSystemService.updateFileContext<AppAccounts>(fileName, fileData, DefineCommon.DIR_ACCOUNTS()).then(
+        if (systemAppConfig.repository_config.find(data => data === repository.id)) {
+            // somehow already had the config
+            return true;
+        }
+        systemAppConfig.repository_config.push(repository.id);
+        return await this.updateAppConfigFile(systemAppConfig, idFile).then(async updateStatus => {
+            if (!updateStatus) {
+                await this.fileSystemService.removeFile(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(repository.id));
+            }
+
+            return updateStatus;
+        });
+    }
+
+    /**
+     * Update account information
+     * @param account               New account information. Account's id will be used as filename
+     * @param isSkipIntegrityCheck  Skip checking exist file for better performance
+     */
+    async updateAccountData(account: Account, isSkipIntegrityCheck: boolean = false): Promise<boolean> {
+        if (!isSkipIntegrityCheck) {
+            const AccConfig = this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(account.id));
+            if (!AccConfig) {
+                return false;
+            }
+        }
+
+        return await this.fileSystemService.updateFileContext<AppAccounts>(account.id, { account }, DefineCommon.DIR_ACCOUNTS()).then(
             resolve => resolve.status
         );
     }
 
-    async addNewRepositoryToFile(repository: Repository, fileName: string) {
-        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
-            // file does not exist => create the file
-            const defaultRepositoryConfig: AppRepositories = InitializeRepositoryConfig();
-            const createStatus = await this.fileSystemService
-            .createFile(fileName, defaultRepositoryConfig, DefineCommon.DIR_REPOSITORIES());
-
-            if (!createStatus.status) {
-                return null;
-            }
-
-            // Add to system config file
-            const systemAppConfig: AppRepositories = await this.fileSystemService
-            .getFileContext<AppConfig>(fileName, DefineCommon.DIR_CONFIG())
-            .then(val => val.value)
-            .catch(err => null);
-            if (!!!systemAppConfig) {
-                await this.fileSystemService.removeFile(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName));
-                return null;
-            }
-        }
-
-        // retrieve repository config data
-        const systemRepoConfig: AppRepositories = await this.fileSystemService
-        .getFileContext<AppRepositories>(fileName, DefineCommon.DIR_REPOSITORIES())
-        .then(val => val.value)
-        .catch(err => null);
-        if (!!!systemRepoConfig) {
-            return null;
-        }
-        systemRepoConfig.repositories.push(repository);
-        // update back to system config
-        return await this.fileSystemService
-        .updateFileContext<AppRepositories>(fileName, systemRepoConfig, DefineCommon.DIR_REPOSITORIES())
-        .then(status => status.status)
-        .catch(err => {
-            console.log(err);
-            return false;
-        });
-    }
-
-    async updateRepositoryFile(repository: Repository, fileName: string): Promise<boolean> {
-        if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
-            return false;
-        }
-
-        const fileData: AppRepositories = await this.fileSystemService
-        .getFileContext<AppRepositories>(fileName, DefineCommon.DIR_REPOSITORIES())
-        .then(resolve => resolve.status ? resolve.value : null);
-        if (!fileData) {
-            return false;
-        }
-
-        fileData.repositories.every((repo, index, currentArray) => {
-            if (repo.id === repository.id) {
-                currentArray[index] = repository;
+    /**
+     * Update repository information
+     * @param repository            New repository information. Repository's id will be used as filename
+     * @param skipIntegrityCheck    Skip checking exist file for better performance
+     */
+    async updateRepositoryData(repository: Repository, skipIntegrityCheck: boolean = false): Promise<boolean> {
+        if (!skipIntegrityCheck) {
+            if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(repository.id))) {
                 return false;
             }
-            return true;
-        });
+        }
 
-        return await this.fileSystemService.updateFileContext<AppRepositories>(fileName, fileData, DefineCommon.DIR_REPOSITORIES()).then(
+        return await this.fileSystemService.updateFileContext<AppRepositories>(
+            repository.id,
+            { repository },
+            DefineCommon.DIR_REPOSITORIES()
+        ).then(
             resolve => resolve.status
         );
     }
 
+    /**
+     * Update repository information
+     * @param appConfig     New config information.
+     * @param fileName      Config to be overwrite
+     */
     async updateAppConfigFile(appConfig: AppConfig, fileName: string): Promise<boolean> {
         if (!this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(fileName))) {
             return false;

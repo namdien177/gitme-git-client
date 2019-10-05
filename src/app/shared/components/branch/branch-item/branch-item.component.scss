@@ -38,15 +38,15 @@
         color: white;
 
         display: grid;
-        grid-template-columns: 1.25rem auto 2rem;
+        grid-template-columns: 1.25rem auto max-content;
         grid-template-rows: 1fr;
-        grid-gap: 0.55rem;
+        grid-gap: 0.25rem;
 
         .icon {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             width: 1rem;
             height: 1rem;
         }
@@ -69,28 +69,9 @@
 
         .status {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-gap: 0.1rem;
-            font-size: 0.5rem;
-            align-content: center;
-            justify-content: center;
+            place-content: center;
             align-self: center;
-
-            > * {
-                display: grid;
-                place-content: center;
-                width: 0.6rem;
-                height: 0.6rem;
-
-                .circle-status {
-                    display: block;
-                    width: 0.5rem;
-                    height: 0.5rem;
-                    border-radius: 50%;
-                    justify-self: center;
-                    align-self: center;
-                }
-            }
+            font-size: 0.7rem;
         }
     }
 }
@@ -102,8 +83,14 @@
     bottom: 0;
     z-index: 1;
     opacity: 0;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     line-height: 1rem;
     width: 40px;
     background: $primary-black-darker;
+
+    transition: opacity 0.2s;
+
+    i {
+        transform: rotate(270deg);
+    }
 }

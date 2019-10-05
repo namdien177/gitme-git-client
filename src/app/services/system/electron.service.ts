@@ -12,7 +12,7 @@ import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
 import { RepositoriesService } from '../../shared/state/DATA/repositories';
 import { AccountListService } from '../../shared/state/DATA/account-list';
-import { AppRepositories, InitializeRepositoryConfig } from '../../shared/model/App-Repositories';
+import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, InitializeAppConfig } from '../../shared/model/App-Config';
 import { DataService } from '../features/data.service';
@@ -27,7 +27,6 @@ export class ElectronService implements OnDestroy {
     os: typeof os;
     private readonly window: BrowserWindow;
     private readonly machine_id: string;
-    // private readonly shell:
 
     constructor(
         private localStorage: LocalStorageService,
@@ -43,23 +42,13 @@ export class ElectronService implements OnDestroy {
             this.webFrame = electronNG.webFrame;
             this.remote = electronNG.remote;
             this.window = electronNG.remote.getCurrentWindow();
-            // this.window.on('blur', () => {
-            //     this.applicationStateService.setBlur();
-            // });
-            // this.window.on('focus', () => {
-            //     this.applicationStateService.setFocus();
-            // });
-
             this.childProcess = window.require('child_process');
+
             this.fs = fsNode;
             this.machine_id = machineIdSync();
             this.setupUUID();
             this.initializeConfigFromLocalDatabase();
         }
-    }
-
-    get currentWindow() {
-        return this.window;
     }
 
     static isElectron() {
@@ -77,14 +66,14 @@ export class ElectronService implements OnDestroy {
         if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
             // load to memory repos and other settings
             this.setupApplicationConfiguration(
-                this.dataService.getConfigAppFromFile(configDefaultName)
+                this.dataService.getConfigAppData(configDefaultName)
             );
         } else {
             const data: AppConfig = InitializeAppConfig(configDefaultName);
             this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
                 () => {
                     this.setupApplicationConfiguration(
-                        this.dataService.getConfigAppFromFile(configDefaultName)
+                        this.dataService.getConfigAppData(configDefaultName)
                     );
                 }, reject => {
                     console.log(reject);
@@ -109,45 +98,11 @@ export class ElectronService implements OnDestroy {
                         this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
                         // load to memory repos and other settings
                         await this.setupApplicationRepositories(
-                            this.dataService.getRepositoriesFromFile(fileName)
+                            this.dataService.getRepositoriesConfigData(fileName)
                         );
                         repositoryConfigFileName.push(fileName);
-                    } else {
-                        const data: AppRepositories = InitializeRepositoryConfig();
-                        await this.fileService.createFile(fileName, data, DefineCommon.DIR_REPOSITORIES()).then(
-                            resolve => {
-                                console.log(resolve);
-                            }, reject => {
-                                console.log(reject);
-                            }
-                        );
                     }
-
                 }
-            }
-        } else {
-            /**
-             * create default config for application
-             */
-            const configDefaultName = this.machine_id;
-            /**
-             * Update config if not linked to default repository app config
-             */
-            if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(configDefaultName))) {
-                const currentConfig = await this.dataService.getConfigAppFromFile(configDefaultName);
-                currentConfig.repository_config.push(configDefaultName);
-                await this.dataService.updateAppConfigFile(currentConfig, configDefaultName);
-            } else {
-                const data: AppRepositories = {
-                    repositories: [],
-                };
-                await this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_REPOSITORIES()).then(
-                    resolve => {
-                        console.log(resolve);
-                    }, reject => {
-                        console.log(reject);
-                    }
-                );
             }
         }
     }
@@ -170,49 +125,11 @@ export class ElectronService implements OnDestroy {
                     ) {
                         // load to memory repos and other settings
                         await this.setupApplicationAccounts(
-                            this.dataService.getAccountsFromFile(fileName)
+                            this.dataService.getAccountsConfigData(fileName)
                         );
                         accountConfigFileName.push(fileName);
-                    } else {
-                        const data: AppAccounts = {
-                            accounts: [],
-                        };
-                        await this.fileService.createFile(fileName, data, DefineCommon.DIR_ACCOUNTS()).then(
-                            resolve => {
-                                console.log(resolve);
-                            }, reject => {
-                                console.log(reject);
-                            }
-                        );
                     }
-
                 }
-            }
-        } else {
-            /**
-             * create default config for application
-             */
-            const configDefaultName = this.machine_id;
-
-            /**
-             * Update config if not linked to default account app config
-             */
-            if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(configDefaultName))) {
-                const currentConfig = await this.dataService.getConfigAppFromFile(configDefaultName);
-                currentConfig.account_config.push(configDefaultName);
-
-                await this.dataService.updateAppConfigFile(currentConfig, configDefaultName);
-            } else {
-                const data: AppAccounts = {
-                    accounts: [],
-                };
-                await this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_ACCOUNTS()).then(
-                    resolve => {
-                        console.log(resolve);
-                    }, reject => {
-                        console.log(reject);
-                    }
-                );
             }
         }
     }
@@ -250,17 +167,17 @@ export class ElectronService implements OnDestroy {
     }
 
     private async setupApplicationRepositories(fileContext: Promise<AppRepositories>) {
-        return await fileContext.then((contextStatus) => {
-            if (!!contextStatus.repositories && Array.isArray(contextStatus.repositories)) {
-                this.repositoriesList.add(contextStatus.repositories);
+        return await fileContext.then((contextStatus: AppRepositories) => {
+            if (!!contextStatus.repository) {
+                this.repositoriesList.add(contextStatus.repository);
             }
         });
     }
 
     private async setupApplicationAccounts(fileContext: Promise<AppAccounts>) {
-        return await fileContext.then((contextStatus) => {
-            if (!!contextStatus.accounts && Array.isArray(contextStatus.accounts)) {
-                this.accountList.add(contextStatus.accounts);
+        return await fileContext.then((contextStatus: AppAccounts) => {
+            if (!!contextStatus.account) {
+                this.accountList.add(contextStatus.account);
             }
         });
     }

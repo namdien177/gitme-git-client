@@ -15,7 +15,6 @@ import { StatusSummary } from '../../../shared/model/StatusSummary';
 export class DashboardComponent implements OnInit, OnDestroy {
 
     diffStatus: GitDiffState = null;
-    repository: Repository = null;
 
     statusSummary: StatusSummary = null;
 

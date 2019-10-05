@@ -1,11 +1,11 @@
 import { Account } from '../state/DATA/account-list';
 
 export interface AppAccounts {
-    accounts: Account[];
+    account: Account;
 }
 
-export function InitializeAccountConfig() {
+export function InitializeAccountConfig(account: Account) {
     return {
-        accounts: []
-    };
+        account: account
+    } as AppAccounts;
 }

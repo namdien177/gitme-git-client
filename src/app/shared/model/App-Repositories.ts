@@ -1,11 +1,11 @@
 import { Repository } from '../state/DATA/repositories';
 
 export interface AppRepositories {
-    repositories: Repository[];
+    repository: Repository;
 }
 
-export function InitializeRepositoryConfig() {
+export function InitializeRepositoryConfig(repository: Repository) {
     return {
-        repositories: []
-    };
+        repository: repository
+    } as AppRepositories;
 }

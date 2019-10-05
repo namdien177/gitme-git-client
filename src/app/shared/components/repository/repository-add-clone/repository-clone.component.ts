@@ -100,8 +100,7 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
     }
 
     checkingStepOneRepo(formField: { [key: string]: string }) {
-        const dir = formField.repo_dir;
-        let dirDisplay = dir;
+        let dirDisplay = formField.repo_dir;
         if (!!formField.repo_https) {
             let testName = this.utilityService.repositoryNameFromHTTPS(formField.repo_https);
             if (testName) {

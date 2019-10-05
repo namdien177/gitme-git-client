@@ -1,11 +1,22 @@
 export interface RepositoryBranchSummary {
     id: string;
-    commit: string;
-    label: string;
     name: string;
-    current: boolean;
+    commit?: string;
+    current?: boolean;
+    label?: string;
+    // additional
+    tracking?: BranchTracking[];
+    has_remote?: boolean;
+    has_local?: boolean;
+    last_update?: number;
+}
+
+export interface BranchTracking {
+    name: string;
+    fetch: string;
+    push: string;
 }
 
 export function createRepositoryBranch(params: Partial<RepositoryBranchSummary>) {
-    return {} as RepositoryBranchSummary;
+    return params as RepositoryBranchSummary;
 }

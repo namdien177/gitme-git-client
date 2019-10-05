@@ -161,9 +161,9 @@ export class ImportLocalComponent implements OnInit {
          * * Update working repository
          * * Fetching new repository => reassign main branch
          */
-        this.repositoryService.createNewRepository(
+        fromPromise(this.repositoryService.newRepository(
             repositoryInstance, credentialsInstance, !this.isExistingAccount
-        ).subscribe(
+        )).subscribe(
             addStatus => {
                 console.log(addStatus);
                 this.cancel();
@@ -204,7 +204,7 @@ export class ImportLocalComponent implements OnInit {
     private async setupNameRepository(viewingDirectory: string) {
         const safeString = this.utilityService.slashFixer(viewingDirectory);
         const arrPaths = safeString.split('/');
-        let nameExpected = await this.gitPackService.getGitProjectName(arrPaths);
+        let nameExpected = await this.gitPackService.getRepositoryName(arrPaths);
         if (!nameExpected) {
             nameExpected = arrPaths[arrPaths.length - 1];
         }

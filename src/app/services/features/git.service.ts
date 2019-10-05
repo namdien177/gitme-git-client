@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/state/DATA/account-list';
-import { RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
+import { BranchTracking, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
 import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositories';
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
@@ -23,7 +23,11 @@ export class GitService {
         return git(dir);
     }
 
-    async getGitProjectName(arrayPath: string[]): Promise<string> {
+    /**
+     * Get the name of the repository by looping out from array of paths
+     * @param arrayPath
+     */
+    async getRepositoryName(arrayPath: string[]): Promise<string> {
 
         if (arrayPath.length === 0) {
             return null;
@@ -33,10 +37,128 @@ export class GitService {
         const isGitRepository = await this.gitInstance(joinPath).checkIsRepo();
 
         if (isGitRepository) {
-            return await this.getGitProjectName(arrayPath.slice(0, arrayPath.length - 1));
+            return await this.getRepositoryName(arrayPath.slice(0, arrayPath.length - 1));
         } else {
             return arrayPath[arrayPath.length - 1];
         }
+    }
+
+    /**
+     * Get all branches of the repository.
+     * @param directory
+     * @param oldBranches
+     */
+    async getBranchInfo(directory: string, oldBranches: RepositoryBranchSummary[] = []): Promise<RepositoryBranchSummary[]> {
+        // const branchAll = await this.gitInstance(directory).branch(['-a']);
+        const branchRemoteRaw = await this.gitInstance(directory).branch(['-r']);
+        const branchLocalRaw = await this.gitInstance(directory).branch([]);
+        const branchTracking = await this.getBranchTracking(directory);
+
+        if (!branchTracking) {
+            return null;
+        }
+
+        const branchesOutPut: RepositoryBranchSummary[] = [];
+
+        if (branchRemoteRaw.all.length > branchLocalRaw.all.length) {
+            // In case there is no local-only branch.
+            Object.keys(branchRemoteRaw.branches).forEach(branchRemoteInstance => {
+                const slidedSlash = branchRemoteInstance.split('/');
+                const trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
+                const extractedNameRemote = slidedSlash.slice(1).join('/');   // remove origin/
+                const existInstanceLocal = branchLocalRaw.all.find(nameLocalBranch => nameLocalBranch === extractedNameRemote);
+                if (!!existInstanceLocal && existInstanceLocal.length > 0) {
+                    const branchItem: RepositoryBranchSummary =
+                        Object.assign(
+                            {},
+                            branchRemoteRaw.branches[branchRemoteInstance],
+                            { name: existInstanceLocal },
+                            { current: branchLocalRaw.branches[existInstanceLocal].current },
+                            { tracking: trackingOn },
+                            { has_remote: true },
+                            { has_local: true }
+                        );
+                    branchesOutPut.push(branchItem);
+                } else {
+                    const branchItem: RepositoryBranchSummary =
+                        Object.assign(
+                            {},
+                            branchRemoteRaw.branches[branchRemoteInstance],
+                            { name: branchRemoteInstance },
+                            { current: branchRemoteRaw.branches[branchRemoteInstance].current },
+                            { tracking: trackingOn },
+                            { has_remote: true },
+                            { has_local: false }
+                        );
+                    branchesOutPut.push(branchItem);
+                }
+            });
+        } else {
+            // In case there are local-only branch.
+            Object.keys(branchLocalRaw.branches).forEach(branchLocalInstance => {
+                let trackingOn = null;
+                const existRemoteLocal = branchRemoteRaw.all.find(nameRemoteBranch => {
+                    const slidedSlash = nameRemoteBranch.split('/');
+                    trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
+                    const extractedNameRemote = slidedSlash.slice(1).join('/');   // remove origin/
+                    return branchLocalInstance === extractedNameRemote;
+                });
+                if (!!existRemoteLocal && existRemoteLocal.length > 0) {
+                    const branchItem: RepositoryBranchSummary =
+                        Object.assign(
+                            {},
+                            branchRemoteRaw.branches[existRemoteLocal],
+                            { name: branchLocalInstance },
+                            { current: branchLocalRaw.branches[branchLocalInstance].current },
+                            { tracking: trackingOn },
+                            { has_remote: true },
+                            { has_local: true }
+                        );
+                    branchesOutPut.push(branchItem);
+                } else {
+                    const branchItem: RepositoryBranchSummary =
+                        Object.assign(
+                            {},
+                            branchRemoteRaw.branches[existRemoteLocal],
+                            { name: branchLocalInstance },
+                            { current: branchLocalRaw.branches[branchLocalInstance].current },
+                            { tracking: trackingOn },
+                            { has_remote: false },
+                            { has_local: true }
+                        );
+                    branchesOutPut.push(branchItem);
+                }
+            });
+        }
+
+        // update from oldBranch
+        if (branchesOutPut.length > oldBranches.length) {
+            branchesOutPut.forEach((branch, index, selfArr) => {
+                const findFromOld = this.findBranchFromListBranch(branch, oldBranches);
+
+                if (findFromOld) {
+                    selfArr[index].id = findFromOld.id;
+                    selfArr[index].last_update = findFromOld.last_update;
+                } else {
+                    selfArr[index].id = this.securityService.randomID;
+                    selfArr[index].last_update = null;
+                }
+            });
+        } else {
+            oldBranches.forEach((branch, index, selfArr) => {
+                const findFromNew = this.findBranchFromListBranch(branch, branchesOutPut);
+
+                if (findFromNew) {
+                    findFromNew.id = selfArr[index].id;
+                    findFromNew.last_update = selfArr[index].last_update;
+                } else {
+                    // do nothing, will be removed as both local and remote cannot be found
+                    // This can be due to branch removed, renamed, etc.
+                }
+            });
+        }
+
+        return branchesOutPut;
     }
 
     async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
@@ -46,27 +168,6 @@ export class GitService {
             urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
         }
         return git().clone(urlRemote, directory);
-    }
-
-    async allBranches(directory: string, credentials?: Account) {
-        directory = this.utilities.directorySafePath(directory);
-        const branchAll = await this.gitInstance(directory).branch(['-a']);
-        const branchRemote = await this.gitInstance(directory).branch(['-r']);
-        const branchMerged: RepositoryBranchSummary[] = [];
-
-        Object.keys(branchRemote.branches).forEach(branchName => {
-            const viewBranch: RepositoryBranchSummary = {
-                id: this.securityService.randomID,
-                ...branchRemote.branches[branchName],
-                current: branchRemote.branches[branchName].current === 'true'
-            };
-            const arrSplitName = viewBranch.name.split('origin/');
-            if (arrSplitName.length > 1 && arrSplitName[1] === branchAll.current) {
-                Object.assign(viewBranch, { ...viewBranch }, { current: true });
-            }
-            branchMerged.push(viewBranch);
-        });
-        return branchMerged;
     }
 
     async getRemotes(repository: Repository) {
@@ -174,6 +275,26 @@ export class GitService {
         };
     }
 
+    /**
+     * TODO: fetching all remotes, branches and status of current branch. If no branch is selected, default fetching master
+     * @param directory
+     */
+    async getBranchTracking(directory: string) {
+        const stringRemotes: string = await this.gitInstance(directory).remote(['-v']).then(
+            res => !!res ? res : ''
+        );
+        if (stringRemotes.length < 1) {
+            return false;
+        }
+        /**
+         * Each remote will have structure as:
+         *  <type>      <url>       <action>
+         *  origin      abc.git     pull/fetch
+         */
+        const remoteArray = stringRemotes.split('\n');
+        return this.retrieveBranchTrackingArray(remoteArray);
+    }
+
     async getStatusOnBranch(repository: Repository) {
         return this.gitInstance(repository.directory).status();
     }
@@ -279,6 +400,48 @@ export class GitService {
             return false;
         }
         return !!repository.remote.find(any => any.push != null);
+    }
+
+    private findBranchFromListBranch(branchToFind: RepositoryBranchSummary, listBranch: RepositoryBranchSummary[]) {
+        return listBranch.find(remoteBranch => {
+            // remote type, has origin/
+            const extractedNameOutput = remoteBranch.has_local ? remoteBranch.name : () => {
+                const slidedSlashOutput = remoteBranch.name.split('/');
+                return slidedSlashOutput.slice(1).join('/');   // remove origin/
+            };
+            const extractedNameOld = branchToFind.has_local ? branchToFind.name : () => {
+                const slidedSlashOld = branchToFind.name.split('/');
+                return slidedSlashOld.slice(1).join('/');   // remove origin/
+            };
+            return extractedNameOld === extractedNameOutput;
+        });
+    }
+
+    private retrieveBranchTrackingArray(arrayStringRemote: string[]) {
+        const branchTracking: BranchTracking[] = [];
+
+        arrayStringRemote.forEach(remoteRaw => {
+            if (remoteRaw.trim().length > 0) {
+                const components = remoteRaw.split(/[\s\t]/g);
+                const existedData = branchTracking.find(track => track.name === components[0]);
+                const action = components[2].slice(1, components[2].length - 1);
+                if (existedData) {
+                    if (action === 'push') {
+                        existedData.push = components[1];
+                    } else {
+                        existedData.fetch = components[1];
+                    }
+                } else {
+                    branchTracking.push({
+                        name: components[0],
+                        fetch: action === 'fetch' ? components[1] : null,
+                        push: action === 'push' ? components[1] : null
+                    });
+                }
+            }
+        });
+
+        return branchTracking;
     }
 
     private getURLRemoteFromListGitRemotes(remoteInfo: {
