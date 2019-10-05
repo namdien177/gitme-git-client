@@ -22,11 +22,11 @@ export class NotExistRepositoryConfigGuard implements CanActivate {
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
         return fromPromise(
-            this.dataService.getRepositoriesFromFile(this.securityService.appUUID)
+            this.dataService.getRepositoriesConfigData(this.securityService.appUUID)
         ).pipe(
             switchMap(appRepo => {
                 console.log(appRepo);
-                if (appRepo && appRepo.repositories.length > 0) {
+                if (appRepo && appRepo.repository.length > 0) {
                     this.router.navigate(['/']);
                     return of(false);
                 }

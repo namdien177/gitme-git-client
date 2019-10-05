@@ -20,22 +20,28 @@
 
         .branch-action {
             grid-area: action;
-            padding: 0 1rem;
+            padding: 0 0.5rem;
+
+            button {
+                background: $primary-black-darker;
+            }
+
+            i {
+                margin-right: 0.25rem;
+            }
         }
 
         .search-branches {
             grid-area: search;
             display: flex;
             flex-direction: column;
+            margin: 0;
+            padding: 0.5rem 0.5rem 0 0.5rem;
 
-            input.search {
-                background: transparent;
-                border: none;
-                box-shadow: none;
-
-                :focus {
-                    background: rgba(0, 0, 0, 0.2);
-                }
+            input {
+                font-size: 1rem;
+                line-height: 1.8rem;
+                transition: font-size 0.25s;
             }
         }
 
@@ -48,7 +54,7 @@
             flex-direction: column;
 
             .branch {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.25rem;
             }
         }
     }

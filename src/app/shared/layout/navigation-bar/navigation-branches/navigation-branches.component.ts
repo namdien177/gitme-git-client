@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { Observable } from 'rxjs';
 
 @Component({

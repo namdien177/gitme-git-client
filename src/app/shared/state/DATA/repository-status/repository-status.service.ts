@@ -49,7 +49,7 @@ export class RepositoryStatusService {
         return updateState;
     }
 
-    toggleActive(indexState: number) {
+    setActive(indexState: number) {
         this.repositoryStatusStore.update({
             files: this.retrieveToggledActivatedArray(indexState)
         });
@@ -127,7 +127,7 @@ export class RepositoryStatusService {
         mutableState.forEach((file, i, allFiles) => {
             allFiles[i] = Object.assign({
                 ...file,
-                active: i === index ? !file.active : false
+                active: i === index
             });
         });
         return mutableState;

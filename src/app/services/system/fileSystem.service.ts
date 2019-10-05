@@ -112,7 +112,6 @@ export class FileSystemService {
             return this.promiseReturn(null, writeDataStatus.data, false);
         }
         return writePromises(finalDir, writeDataStatus.data).then(res => {
-            console.log(res);
             return this.promiseReturn(res, 'File was written successfully', true);
         }).catch(
             reject => {

@@ -16,7 +16,7 @@ export class AccountListService {
         this.store.set(arrData);
     }
 
-    add(arrData: Account[]) {
+    add(arrData: Account) {
         this.store.add(arrData, { prepend: true });
     }
 

@@ -106,6 +106,7 @@
         "animate.css": "^3.7.2",
         "chart.js": "^2.5.0",
         "chokidar": "^3.1.0",
+        "clipboard": "^2.0.4",
         "diff2html": "^2.11.3",
         "hammerjs": "^2.0.8",
         "highlight.js": "^9.15.10",
@@ -113,6 +114,7 @@
         "ngx-highlightjs": "^3.0.3",
         "node-machine-id": "^1.1.12",
         "node-pty": "0.9.0-beta22",
+        "prismjs": "^1.17.1",
         "simple-git": "^1.126.0",
         "uniqid": "^5.0.3",
         "xterm": "^4.0.1"

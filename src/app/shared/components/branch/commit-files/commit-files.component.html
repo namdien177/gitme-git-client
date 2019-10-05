@@ -27,17 +27,17 @@
             </div>
             <div class="type-action">
                 <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.created)">
-                    <span class="created">
+                    <span class="created text-success">
                         <i class="far fa-plus-square"></i>
                     </span>
                 </ng-container>
                 <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.deleted)">
-                    <span class="deleted">
+                    <span class="deleted text-danger">
                         <i class="far fa-minus-square"></i>
                     </span>
                 </ng-container>
                 <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.modified)">
-                    <span class="modified">
+                    <span class="modified text-warning">
                         <i class="fas fa-pen-square"></i>
                     </span>
                 </ng-container>

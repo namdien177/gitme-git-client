@@ -1,16 +1,13 @@
 <div class="container-fluid">
-    <div class="search-branches">
-        <input class="form-control search"
-               mdbInput
+    <label class="search-branches">
+        <input class="form-control form-control-dark form-control-float"
                placeholder="Find branch"
                type="text">
-        <hr class="m-0 p-0">
-    </div>
+    </label>
 
     <div class="branch-action">
-        <button [color]="'primary'"
-                class="btn-block"
-                mat-icon-button
+        <button class="btn-block"
+                mat-flat-button
                 type="button">
             <i class="fas fa-plus"></i>
             New Branch
@@ -19,6 +16,11 @@
 
     <div class="list-branches">
         <gitme-branch-item *ngFor="let branch of branches | async"
+                           class="branch"
+                           [branchSummary]="branch">
+        </gitme-branch-item>
+        <gitme-branch-item *ngFor="let branch of branches | async"
+                           class="branch"
                            [branchSummary]="branch">
         </gitme-branch-item>
     </div>

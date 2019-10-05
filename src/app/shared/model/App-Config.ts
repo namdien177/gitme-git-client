@@ -8,7 +8,13 @@ export interface AppConfig {
         created_at: number
         [key: string]: any;
     };
+    /**
+     * ID of the repository config json file
+     */
     repository_config: string[];
+    /**
+     * ID of the account config json file
+     */
     account_config: string[];
 }
 
@@ -19,13 +25,9 @@ export function InitializeAppConfig(machineID: string) {
         first_init: {
             created_at: moment().valueOf()
         },
-        repository_config: [
-            machineID
-        ],
-        account_config: [
-            machineID
-        ]
-    };
+        repository_config: [],
+        account_config: []
+    } as AppConfig;
 }
 
 export function isValidAppConfig(config: AppConfig) {

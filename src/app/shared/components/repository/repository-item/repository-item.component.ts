@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RepositoriesService, Repository } from '../../../states/DATA/repositories';
+import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { GitService } from '../../../../services/features/git.service';
 import { StatusSummary } from '../../../model/StatusSummary';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Account, AccountListService } from '../../../states/DATA/account-list';
+import { Account, AccountListService } from '../../../state/DATA/account-list';
 import { of } from 'rxjs';
 
 @Component({
@@ -48,11 +48,12 @@ export class RepositoryItemComponent implements OnInit {
             }
         );
 
-        this.repositoriesService.selectActive().pipe(
+        this.repositoriesService.selectActive(false).pipe(
             distinctUntilChanged()
         ).subscribe(activeRepository => {
             this.isActive = activeRepository.id === this.repository.id;
         });
+
         // const test: Repository = {
         //     id: 'cy8fcjzinl5yl',
         //     id_remote: null,
@@ -70,7 +71,6 @@ export class RepositoryItemComponent implements OnInit {
         //     name_local: 'Onaya',
         //     avatar_local: 'https://nvzaqa.bn.files.1drv.com/y4mYLUEthiaB_9EF0AaRx5FMxDXEn6DgRuDp8xcmXydtg2hwIRSZnV7r57PCOKn5n48VEidRtpEs95WNxYE8QCHwfeIo_43qJI4o_I5DRcQikCL-f4dhHgQO0ouif7EszbmtZ9ubA44c-VjA9zU19rAa1Y8IY82rP5vPcSt1Cvf5HibKSFsXGBt1woCx_uHHTQPBHste6sCpFt1x9hH5UMuzA?width=281&height=179&cropmode=none',
         //     username: 'do.hoangnam9x@gmail.com',
-        //     password: '1666bc43be92c738d7a3b6a094b8cabc:294308e8d8f36b0b3cf53f4a7c8f821e'
         // };
         // this.gitService.fetchInfo(this.repository, this.account).then(
         //     res => {

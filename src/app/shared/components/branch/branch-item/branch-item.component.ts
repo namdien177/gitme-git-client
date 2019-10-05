@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RepositoryBranchSummary } from '../../../states/DATA/repository-branches';
+import { RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 
 @Component({
     selector: 'gitme-branch-item',
@@ -9,10 +9,6 @@ import { RepositoryBranchSummary } from '../../../states/DATA/repository-branche
 export class BranchItemComponent implements OnInit {
 
     @Input() branchSummary: RepositoryBranchSummary;
-
-    pullTitle = '4 Pull request';
-    pushTitle = '4 Push request';
-    changesTitle = '4 changes';
 
     constructor() {
     }

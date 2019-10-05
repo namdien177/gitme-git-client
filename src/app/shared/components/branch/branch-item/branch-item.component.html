@@ -4,18 +4,14 @@
             <i class="fas fa-code-branch"></i>
         </div>
         <div class="name">
-            {{branchSummary?.name}}
+            {{branchSummary?.name | branchNameShorten}}
         </div>
         <div class="status">
-            <div [title]="pullTitle" class="pull">
-                <div class="circle-status bg-info"></div>
-            </div>
-            <div [title]="pushTitle" class="push">
-                <div class="circle-status bg-success"></div>
-            </div>
-            <div [title]="changesTitle" class="changes">
-                <div class="circle-status bg-warning"></div>
-            </div>
+            a minute ago
         </div>
     </div>
+</div>
+
+<div class="merge-btn btn-raw" title="Merge from branch...">
+    <i class="fas fa-project-diagram"></i>
 </div>

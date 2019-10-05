@@ -19,7 +19,7 @@ export class RepositoryBranchesService {
     }
 
     async load(repository: Repository, credentials?: Account) {
-        const repoSum = await this.gitService.allBranches(repository.directory, credentials);
+        const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
         this.set(repoSum);
     }
 

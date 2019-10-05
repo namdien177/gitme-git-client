@@ -1,9 +1,42 @@
-<div class="file-information">
-    <div class="file-name">
-        {{diffStatus?.directory}}
-    </div>
-</div>
+<ng-container *ngIf="!!info.dir">
+    <div class="file-information">
+        <div class="icon">
+            <div (click)="openDirectory()" class="circle">
+                <i class="fas fa-file-alt"></i>
+            </div>
+        </div>
 
-<div class="file-diffs">
-    <gitme-repo-changes></gitme-repo-changes>
-</div>
+        <div class="info">
+            <div class="directory-status text-muted">
+                <div class="directory">{{info.dir}}</div>
+            </div>
+            <div class="name">
+                {{info.name}}
+            </div>
+        </div>
+
+        <div class="features">
+            <button color="primary"
+                    mat-icon-button>
+                <i class="fas fa-folder-open"></i>
+            </button>
+            <button color="primary"
+                    mat-icon-button>
+                <i class="fas fa-edit"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="file-diffs">
+        <gitme-repo-changes></gitme-repo-changes>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="!info.dir">
+    <div class="wait-file-option">
+        <h2>Overview</h2>
+        <small class="text-muted">
+            No file change detected!
+        </small>
+    </div>
+</ng-container>

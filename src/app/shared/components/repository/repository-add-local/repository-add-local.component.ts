@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UtilityService } from '../../../utilities/utility.service';
-import { RepositoriesMenuService } from '../../../states/UI/repositories-menu';
+import { RepositoriesMenuService } from '../../../state/UI/repositories-menu';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
 import { electronNG, osNode } from '../../../types/types.electron';
@@ -9,9 +9,9 @@ import { switchMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { of } from 'rxjs';
 import { DialogsInformation } from '../../../model/DialogsInformation';
-import { RepositoriesService, Repository } from '../../../states/DATA/repositories';
+import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { SecurityService } from '../../../../services/system/security.service';
-import { Account, AccountListService } from '../../../states/DATA/account-list';
+import { Account, AccountListService } from '../../../state/DATA/account-list';
 
 @Component({
     selector: 'gitme-repository-add-local',
@@ -167,9 +167,9 @@ export class RepositoryAddLocalComponent implements OnInit {
          * * Update working repository
          * * Fetching new repository => reassign main branch
          */
-        this.repositoryService.createNewRepository(
+        fromPromise(this.repositoryService.newRepository(
             repositoryInstance, credentialsInstance, !this.isExistingAccount
-        ).subscribe(
+        )).subscribe(
             addStatus => {
                 console.log(addStatus);
                 this.cancelDialogAdding();
@@ -210,7 +210,7 @@ export class RepositoryAddLocalComponent implements OnInit {
     private async setupNameRepository(viewingDirectory: string) {
         const safeString = this.utilityService.slashFixer(viewingDirectory);
         const arrPaths = safeString.split('/');
-        let nameExpected = await this.gitPackService.getGitProjectName(arrPaths);
+        let nameExpected = await this.gitPackService.getRepositoryName(arrPaths);
         if (!nameExpected) {
             nameExpected = arrPaths[arrPaths.length - 1];
         }

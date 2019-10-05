@@ -1,17 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RepositoriesMenuService } from '../../states/UI/repositories-menu';
-import { RepositoriesQuery, RepositoriesService, Repository } from '../../states/DATA/repositories';
-import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../states/DATA/repository-branches';
-import { AccountListService } from '../../states/DATA/account-list';
+import { RepositoriesMenuService } from '../../state/UI/repositories-menu';
+import { RepositoriesQuery, RepositoriesService, Repository } from '../../state/DATA/repositories';
+import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../state/DATA/repository-branches';
+import { AccountListService } from '../../state/DATA/account-list';
 import { auditTime, debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { StatusSummary } from '../../model/StatusSummary';
 import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
-import { FileWatchesQuery, FileWatchesService } from '../../states/system/File-Watches';
+import { FileWatchesQuery, FileWatchesService } from '../../state/system/File-Watches';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FileStatusSummaryView, RepositoryStatusService } from '../../states/DATA/repository-status';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../state/DATA/repository-status';
 import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
-import { ApplicationStateService } from '../../states/UI/Application-State';
+import { ApplicationStateService } from '../../state/UI/Application-State';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
@@ -141,7 +141,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
             result => {
                 this.loading.commit = false;
                 this.formCommitment.reset();
-                console.log(result);
             }
         );
     }
@@ -155,7 +154,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.repositoriesService.push(this.repository, branches).subscribe(
             result => {
                 this.loading.commit = false;
-                console.log(result);
             }
         );
     }
@@ -165,7 +163,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         this.repositoriesService.getRemotes(this.repository).subscribe(
             result => {
                 this.loading.fetch = false;
-                console.log(result);
             }
         );
     }
@@ -199,7 +196,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         )
         .subscribe(
             (status: StatusSummary) => {
-                console.log(status);
                 this.statusSummary = status;
                 if (status) {
                     this.repositoryStatusService.set(status);
@@ -217,7 +213,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 this.activeBranch = listBranch.find(branch => {
                     return branch.current;
                 });
-                console.log(listBranch);
             }
         );
     }

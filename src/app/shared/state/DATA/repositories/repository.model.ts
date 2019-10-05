@@ -1,10 +1,11 @@
+import { RepositoryBranchSummary } from '../repository-branches';
+
 export interface Repository {
     id: string;
     name: string;
     directory: string;
     credential?: RepositoryCredential;
-    remote?: RepositoryRemotes[];
-    branchesSummary?: RepositoryBranchSummary[];
+    branches?: RepositoryBranchSummary[];
 
     options?: CommitOptions[];
     tags?: CommitTags[];
@@ -27,16 +28,12 @@ export interface RepositoryCredential {
 }
 
 export interface CommitOptions {
+    branch?: string;
     argument?: string;
     value?: string;
 }
 
 export interface CommitTags {
-    name: string;
-    tracking: string;
-}
-
-export interface RepositoryBranchSummary {
     name: string;
     tracking: string;
 }

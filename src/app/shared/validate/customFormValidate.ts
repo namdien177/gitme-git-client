@@ -1,5 +1,5 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { isAccountType } from '../states/DATA/account-list';
+import { isAccountType } from '../state/DATA/account-list';
 
 /**
  * Check if length of the array larger than the specified length.
