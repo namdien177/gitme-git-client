@@ -23,7 +23,7 @@ const exportModules = [];
 const reExportModules = [
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
 ];
 
 const providers = [

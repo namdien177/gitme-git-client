@@ -1,26 +1,149 @@
 @import "src/styles/theme";
 
 :host {
-    //position: relative;
-    //
-    //display: grid;
-    //grid-template-areas: 'navigation-bar router-ng';
-    //grid-template-rows: 1fr;
-    //grid-template-columns: 300px auto;
-    //grid-gap: 0;
-    //height: 100%;
-    //
-    //.router-ng {
-    //    grid-area: router-ng;
-    //}
-    //
-    //.navigation-bar {
-    //    grid-area: navigation-bar;
-    //}
+    position: relative;
+
+    display: grid;
+    grid-template-areas: 'commit main';
+    grid-template-columns: minmax(350px, max-content) auto;
+    grid-template-rows: 1fr;
+    grid-gap: 0;
+    height: 100%;
+
+    .right-panel {
+        grid-area: main;
+        display: grid;
+        grid-template-areas: 'branches  push  settings' 'router router router';
+        grid-template-columns: 350px auto 80px;
+        grid-template-rows: 60px auto;
+    }
+
+    .left-panel {
+        grid-area: commit;
+    }
 }
 
-.navigation-bar {
-    position: relative;
+.left-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 80px auto;
+
+    .gm--repository {
+        position: relative;
+        width: 100%;
+    }
+
+    .gm--file-changes {
+        box-shadow: $shadow-light;
+        background: $primary-black-darker;
+        display: grid;
+        grid-template-rows: max-content auto;
+        grid-gap: 0.25rem;
+        padding: 0.25rem;
+
+        button {
+            background: $primary-black;
+        }
+
+        &.current {
+            grid-template-columns: auto max-content;
+
+            .current-btn {
+                background: $primary-black-lighter;
+            }
+        }
+
+        &.history {
+            grid-template-columns: min-content auto;
+
+            .history-btn {
+                background: $primary-black-lighter;
+            }
+        }
+    }
+}
+
+.right-panel {
+
+    .gm--branches {
+        position: relative;
+        grid-area: branches;
+
+        .gm--branches-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            height: calc(100vh - 112px);
+            z-index: 99;
+        }
+    }
+
+    .gm--push {
+        grid-area: push;
+    }
+
+    .gm--settings {
+        grid-area: settings;
+
+        .inner-title {
+            align-items: center;
+        }
+    }
+
+    .router-ng {
+        grid-area: router;
+    }
+}
+
+.function {
+    background-color: $primary-black;
+    user-select: none;
+    display: grid;
+    align-items: center;
+    transition: all 0.2s;
+    box-shadow: $shadow-light;
     width: 100%;
     height: 100%;
+    min-height: 80px;
+    z-index: 2;
+
+    .inner-title {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        .status, .title-secondary {
+            font-size: 0.7rem;
+            line-height: 0.7rem;
+            display: flex;
+            align-items: center;
+
+            .badge {
+                padding: 0.15rem 0.3rem;
+                font-size: 0.6rem;
+                line-height: 0.6rem;
+
+                &:not(:first-child) {
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+    }
+
+    &.active {
+        background-color: $primary-black;
+    }
 }

@@ -13,6 +13,7 @@ import { FileStatusSummaryView, RepositoryStatusService } from '../../state/DATA
 import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
 import { ApplicationStateService } from '../../state/UI/Application-State';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { LoadingIndicatorService } from '../../state/system/Loading-Indicator';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -30,14 +31,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     checkboxAllFileStatus = false;
     formCommitment: FormGroup;
 
-    loading = {
-        commit: false,
-        fetch: false,
-        push: false,
-        branch: false,
-        repository: false,
-    };
-
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -52,7 +45,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         private repositoryStatusService: RepositoryStatusService,
         public utilities: UtilityService,
         private fb: FormBuilder,
-        private applicationStateService: ApplicationStateService
+        private applicationStateService: ApplicationStateService,
     ) {
         this.watchingUIState();
         this.watchingRepository();
@@ -134,12 +127,10 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         if (this.formCommitment.invalid) {
             return;
         }
-        this.loading.commit = true;
         const listFilesCommit: FileStatusSummaryView[] = this.filesCommit.value;
         const paths: string[] = this.utilities.extractFilePathFromGitStatus(listFilesCommit);
         this.repositoriesService.commit(this.repository, this.titleCommit.value, paths).subscribe(
             result => {
-                this.loading.commit = false;
                 this.formCommitment.reset();
             }
         );
@@ -149,20 +140,16 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         if (this.statusSummary.ahead < 1) {
             return;
         }
-        this.loading.push = true;
         const branches = this.repositoryBranchesService.getSync();
         this.repositoriesService.push(this.repository, branches).subscribe(
             result => {
-                this.loading.commit = false;
             }
         );
     }
 
     fetch() {
-        this.loading.fetch = true;
         this.repositoriesService.getRemotes(this.repository).subscribe(
             result => {
-                this.loading.fetch = false;
             }
         );
     }
@@ -180,9 +167,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     private watchingRepository() {
         this.repositoriesService.selectActive()
         .pipe(
-            switchMap(selectedRepo => {
-                this.loading.branch = true;
-                this.loading.repository = true;
+            switchMap((selectedRepo: Repository) => {
                 this.repository = selectedRepo;
                 let account = null;
                 if (this.repository) {
@@ -200,8 +185,6 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
                 if (status) {
                     this.repositoryStatusService.set(status);
                 }
-                this.loading.branch = false;
-                this.loading.repository = false;
             }
         );
     }
@@ -280,12 +263,12 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         .pipe(
             auditTime(200)
         )
-        .subscribe(status => this.loading.branch = status);
+        .subscribe(status => {});
 
         this.repositoriesQuery.selectLoading()
         .pipe(
             auditTime(200)
         )
-        .subscribe(status => this.loading.repository = status);
+        .subscribe(status => {});
     }
 }

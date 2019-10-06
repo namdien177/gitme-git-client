@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NavigationBranchesComponent } from './navigation-branches.component';
+import { ListBranchesComponent } from './list-branches.component';
 
 describe('RepoBranchesComponent', () => {
-    let component: NavigationBranchesComponent;
-    let fixture: ComponentFixture<NavigationBranchesComponent>;
+    let component: ListBranchesComponent;
+    let fixture: ComponentFixture<ListBranchesComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [NavigationBranchesComponent]
+            declarations: [ListBranchesComponent]
         })
         .compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(NavigationBranchesComponent);
+        fixture = TestBed.createComponent(ListBranchesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -23,10 +23,10 @@ export class ExistRepositoryConfigGuard implements CanActivateChild {
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
         return fromPromise(
-            this.dataService.getRepositoriesConfigData(this.securityService.appUUID)
+            this.dataService.getConfigAppData(this.securityService.appUUID)
         ).pipe(
             switchMap(appRepo => {
-                if (appRepo && appRepo.repository.length > 0) {
+                if (appRepo && appRepo.repository_config.length > 0) {
                     return of(true);
                 }
 

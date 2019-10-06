@@ -4,10 +4,10 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'gitme-repo-branches',
-    templateUrl: './navigation-branches.component.html',
-    styleUrls: ['./navigation-branches.component.scss']
+    templateUrl: './list-branches.component.html',
+    styleUrls: ['./list-branches.component.scss']
 })
-export class NavigationBranchesComponent implements OnInit {
+export class ListBranchesComponent implements OnInit {
 
     branches: Observable<RepositoryBranchSummary[]>;
 

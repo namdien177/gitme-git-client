@@ -71,10 +71,10 @@ export class RepositoriesService {
 
         const repositoryFile = configFile.repository_config;
         const repositories: Repository[] = [];
-        for (const configName of repositoryFile) {
-            const repos = await this.dataService.getRepositoriesConfigData(configName);
-            if (!!repos && !!repos.repository && repos.repository.length > 0) {
-                repos.repository.forEach(repo => repositories.push(repo));
+        for (const idRepository of repositoryFile) {
+            const repos = await this.dataService.getRepositoriesConfigData(idRepository);
+            if (!!repos && !!repos.repository) {
+                repositories.push(repos.repository);
             }
         }
 
@@ -83,7 +83,7 @@ export class RepositoriesService {
                 repositories[0].id : null;
 
         if (repositories.length > 0) {
-            let findCached = null;
+            let findCached: Repository = null;
             if (!!previousWorking) {
                 findCached = repositories.find(repo => repo.id === previousWorking);
                 if (!findCached) {
@@ -111,7 +111,6 @@ export class RepositoriesService {
     }
 
     selectActive(initLoad: boolean = true): Observable<Repository> {
-        this.setLoading();
         if (!initLoad) {
             return this.query.selectActive().pipe(
                 map(active => {
@@ -123,7 +122,9 @@ export class RepositoriesService {
                 })
             );
         }
-        return fromPromise(this.load()).pipe(
+        return fromPromise(
+            this.load()
+        ).pipe(
             switchMap(() => this.query.selectActive()),
             map(active => {
                 if (Array.isArray(active)) {
@@ -131,9 +132,6 @@ export class RepositoriesService {
                 } else {
                     return active;
                 }
-            }),
-            tap(() => {
-                this.finishLoading();
             })
         );
     }

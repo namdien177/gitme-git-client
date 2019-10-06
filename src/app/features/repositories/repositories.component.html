@@ -1,5 +1,89 @@
-<gitme-navigation-bar class="navigation-bar">
+<div [ngStyle]="{'width': '350px'}"
+     class="left-panel">
+    <div (isOutside)="clickOutSide($event, 'repositories')"
+         [class.active]="isRepositoryBoxOpen"
+         appIsClickOutside
+         class="function gm--repository">
+
+        <div (click)="toggleRepositoryBox()"
+             class="inner-title raw">
+            <div class="title-secondary text-muted">
+                Current Repository
+            </div>
+            <div class="title">
+                <!--                        {{repository?.name}}-->123
+            </div>
+        </div>
+
+        <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"></gitme-navigation-repositories>
+    </div>
+
+    <div [class.current]="isViewChangeTo === 'changes'"
+         [class.history]="isViewChangeTo === 'history'"
+         class="gm--file-changes">
+        <button (click)="switchView('changes')"
+                [disabled]="isViewChangeTo === 'changes'"
+                class="w-100 current-btn"
+                mat-flat-button>
+            Changes
+        </button>
+        <button (click)="switchView('history')"
+                [disabled]="isViewChangeTo === 'history'"
+                class="w-100 history-btn"
+                mat-flat-button>
+            History
+        </button>
+
+        <div class="content">
+
+        </div>
+    </div>
+</div>
+
+<div class="right-panel">
+    <div (isOutside)="clickOutSide($event, 'branches')"
+         [class.active]="isBranchBoxOpen"
+         appIsClickOutside
+         class="function gm--branches">
+        <div (click)="toggleBranchBox()"
+             class="inner-title raw">
+            <div class="title-secondary text-muted">
+                Current Branch
+            </div>
+            <div class="title">
+                <span class="text-nowrap">
+                    123123
+                </span>
+                <div class="status">
+                    <!--                    <div *ngIf="statusSummary?.behind > 0"-->
+                    <!--                         class="badge badge-pill badge-secondary bg-info pull-request">-->
+                    <!--                        <em class="fas fa-angle-down"></em>-->
+                    <!--                        {{statusSummary?.behind}}-->
+                    <!--                    </div>-->
+                    <!--                    <div *ngIf="statusSummary?.ahead > 0"-->
+                    <!--                         class="badge badge-pill badge-secondary bg-success push-request">-->
+                    <!--                        <em class="fas fa-angle-up"></em>-->
+                    <!--                        {{statusSummary?.ahead}}-->
+                    <!--                    </div>-->
+                </div>
+            </div>
+        </div>
+
+        <gitme-repo-branches *ngIf="isBranchBoxOpen"
+                             class="gm--branches-list"></gitme-repo-branches>
+    </div>
+
+    <div class="function gm--push">
+
+    </div>
+
+    <div class="function gm--settings">
+        <div class="inner-title">
+            <em class="fas fa-cog"></em>
+        </div>
+    </div>
+
     <div class="router-ng">
         <router-outlet></router-outlet>
     </div>
-</gitme-navigation-bar>
+</div>

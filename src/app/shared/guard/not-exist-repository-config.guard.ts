@@ -5,6 +5,7 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
 import { DataService } from '../../services/features/data.service';
 import { SecurityService } from '../../services/system/security.service';
+import { FileSystemService } from '../../services/system/fileSystem.service';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,7 @@ export class NotExistRepositoryConfigGuard implements CanActivate {
     constructor(
         private dataService: DataService,
         private securityService: SecurityService,
+        private fileService: FileSystemService,
         private router: Router
     ) {
 
@@ -22,11 +24,10 @@ export class NotExistRepositoryConfigGuard implements CanActivate {
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
         return fromPromise(
-            this.dataService.getRepositoriesConfigData(this.securityService.appUUID)
+            this.dataService.getConfigAppData(this.securityService.appUUID)
         ).pipe(
-            switchMap(appRepo => {
-                console.log(appRepo);
-                if (appRepo && appRepo.repository.length > 0) {
+            switchMap(appConfig => {
+                if (appConfig && appConfig.repository_config.length > 0) {
                     this.router.navigate(['/']);
                     return of(false);
                 }
