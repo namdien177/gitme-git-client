@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
-import { Observable } from 'rxjs';
 
 @Component({
     selector: 'gitme-repo-branches',
@@ -9,12 +8,16 @@ import { Observable } from 'rxjs';
 })
 export class ListBranchesComponent implements OnInit {
 
-    branches: Observable<RepositoryBranchSummary[]>;
+
+    @Input()
+    branches: RepositoryBranchSummary[] = [];
+
+    @Output()
+    branchesChange: EventEmitter<RepositoryBranchSummary[]> = new EventEmitter<RepositoryBranchSummary[]>();
 
     constructor(
         private repositoryBranchesService: RepositoryBranchesService,
     ) {
-        this.branches = this.repositoryBranchesService.get();
     }
 
     ngOnInit() {

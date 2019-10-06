@@ -169,13 +169,11 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         .pipe(
             switchMap((selectedRepo: Repository) => {
                 this.repository = selectedRepo;
-                let account = null;
                 if (this.repository) {
                     const dir = this.repository.directory;
                     this.fileWatchesService.switchTo(dir);
-                    account = this.accountService.getOneSync(this.repository.credential.id_credential);
                 }
-                return fromPromise(this.repositoryBranchesService.load(selectedRepo, account));
+                return fromPromise(this.repositoryBranchesService.load(selectedRepo));
             }),
             switchMap(() => this.observingBranchStatus())
         )

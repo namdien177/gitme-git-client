@@ -8,7 +8,7 @@
     grid-template-columns: minmax(350px, max-content) auto;
     grid-template-rows: 1fr;
     grid-gap: 0;
-    height: 100%;
+    height: calc(100vh - 112px);
 
     .right-panel {
         grid-area: main;
@@ -27,6 +27,7 @@
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 80px auto;
+    height: inherit;
 
     .gm--repository {
         position: relative;
@@ -36,17 +37,28 @@
     .gm--file-changes {
         box-shadow: $shadow-light;
         background: $primary-black-darker;
+        width: inherit;
+        height: inherit;
         display: grid;
+        grid-template-areas: 'btn' 'content';
         grid-template-rows: max-content auto;
         grid-gap: 0.25rem;
-        padding: 0.25rem;
+
+        .gm--file-btn {
+            grid-area: btn;
+            padding: 0.25rem;
+            display: grid;
+            grid-gap: 0.25rem;
+        }
 
         button {
             background: $primary-black;
         }
 
         &.current {
-            grid-template-columns: auto max-content;
+            .gm--file-btn {
+                grid-template-columns: auto max-content;
+            }
 
             .current-btn {
                 background: $primary-black-lighter;
@@ -54,11 +66,21 @@
         }
 
         &.history {
-            grid-template-columns: min-content auto;
+            .gm--file-btn {
+                grid-template-columns: min-content auto;
+            }
 
             .history-btn {
                 background: $primary-black-lighter;
             }
+        }
+
+        .content {
+            grid-area: content;
+            width: inherit;
+            height: available;
+            overflow: auto;
+            padding: 0.25rem;
         }
     }
 }

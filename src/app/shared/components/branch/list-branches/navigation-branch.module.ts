@@ -6,9 +6,6 @@ import { BranchItemComponent } from '../branch-item/branch-item.component';
 import { BranchAddComponent } from '../branch-add/branch-add.component';
 
 const declareComps = [
-    ListBranchesComponent,
-    BranchItemComponent,
-    BranchAddComponent,
 ];
 
 @NgModule({

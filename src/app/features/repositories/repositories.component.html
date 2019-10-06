@@ -11,7 +11,7 @@
                 Current Repository
             </div>
             <div class="title">
-                <!--                        {{repository?.name}}-->123
+                {{repository?.name}}
             </div>
         </div>
 
@@ -21,21 +21,29 @@
     <div [class.current]="isViewChangeTo === 'changes'"
          [class.history]="isViewChangeTo === 'history'"
          class="gm--file-changes">
-        <button (click)="switchView('changes')"
-                [disabled]="isViewChangeTo === 'changes'"
-                class="w-100 current-btn"
-                mat-flat-button>
-            Changes
-        </button>
-        <button (click)="switchView('history')"
-                [disabled]="isViewChangeTo === 'history'"
-                class="w-100 history-btn"
-                mat-flat-button>
-            History
-        </button>
+        <div class="gm--file-btn">
+            <button (click)="switchView('changes')"
+                    [disabled]="isViewChangeTo === 'changes'"
+                    class="w-100 current-btn"
+                    mat-flat-button>
+                Changes
+            </button>
+            <button (click)="switchView('history')"
+                    [disabled]="isViewChangeTo === 'history'"
+                    class="w-100 history-btn"
+                    mat-flat-button>
+                History
+            </button>
+        </div>
 
         <div class="content">
-
+            <div class="commit-flies">
+                <gitme-commit-files *ngIf="statusSummary?.files?.length > 0"></gitme-commit-files>
+                <p *ngIf="statusSummary?.files?.length == 0"
+                   class="text-muted text-center nonSelectable">
+                    No change file to be committed
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -52,24 +60,25 @@
             </div>
             <div class="title">
                 <span class="text-nowrap">
-                    123123
+                    {{activeBranch?.name}}
                 </span>
                 <div class="status">
-                    <!--                    <div *ngIf="statusSummary?.behind > 0"-->
-                    <!--                         class="badge badge-pill badge-secondary bg-info pull-request">-->
-                    <!--                        <em class="fas fa-angle-down"></em>-->
-                    <!--                        {{statusSummary?.behind}}-->
-                    <!--                    </div>-->
-                    <!--                    <div *ngIf="statusSummary?.ahead > 0"-->
-                    <!--                         class="badge badge-pill badge-secondary bg-success push-request">-->
-                    <!--                        <em class="fas fa-angle-up"></em>-->
-                    <!--                        {{statusSummary?.ahead}}-->
-                    <!--                    </div>-->
+                    <div *ngIf="statusSummary?.behind > 0"
+                         class="badge badge-pill badge-secondary bg-info pull-request">
+                        <em class="fas fa-angle-down"></em>
+                        {{statusSummary?.behind}}
+                    </div>
+                    <div *ngIf="statusSummary?.ahead > 0"
+                         class="badge badge-pill badge-secondary bg-success push-request">
+                        <em class="fas fa-angle-up"></em>
+                        {{statusSummary?.ahead}}
+                    </div>
                 </div>
             </div>
         </div>
 
         <gitme-repo-branches *ngIf="isBranchBoxOpen"
+                             [(branches)]="branches"
                              class="gm--branches-list"></gitme-repo-branches>
     </div>
 
