@@ -14,6 +14,8 @@
     grid-template-areas: 'btn' 'content' 'commitment';
     grid-template-rows: max-content auto max-content;
     grid-gap: 0.25rem;
+    padding-bottom: 1rem;
+
 
     .gm--file-btn {
         grid-area: btn;
@@ -58,7 +60,7 @@
         grid-area: commitment;
         display: grid;
         grid-template-areas: 'statistic statistic' 'input input' 'btn-commit option' 'expanded expanded';
-        grid-template-columns: auto 40px;
+        grid-template-columns: auto 48px;
         grid-template-rows: 1fr 1fr max-content max-content;
         grid-gap: 0 0.25rem;
         width: inherit;
@@ -114,15 +116,22 @@
 
         .commitment-btn {
             grid-area: btn-commit;
-
-            button {
-                background: $primary-black-darker;
-            }
+            padding: 0.25rem 0 0.25rem 0.25rem;
         }
 
         .commitment-btn-more {
             grid-area: option;
+            padding: 0.25rem 0.25rem 0.25rem 0;
             width: min-content;
+
+            button {
+                background: $primary-black-foreground;
+                transition: background-color 0.2s;
+
+                &.active-option {
+                    background: $primary-black-lighter;
+                }
+            }
         }
 
         .commitment-option-expanded {
@@ -136,19 +145,22 @@
                 margin: 0 0 0.25rem;
                 width: inherit;
                 display: grid;
-                grid-template-columns: 32px auto;
+                padding-right: 0.25rem;
+                grid-template-columns: 32px calc(100% - 32px);
                 align-items: center;
                 grid-gap: 0.25rem;
 
                 .option-title {
                     font-size: 0.8rem;
                     display: flex;
+                    width: available;
                     flex-direction: column;
                     justify-content: center;
                     padding: 0 0.25rem 0 0;
 
                     .option-info {
                         font-size: 0.7rem;
+                        width: inherit;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;

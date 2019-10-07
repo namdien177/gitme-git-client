@@ -23,6 +23,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
     formCommitment: FormGroup;
 
     checkboxAllFileStatus = false;
+    customOptionCommit = false;
 
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -32,11 +33,15 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
     ) {
     }
 
-    get titleCommit() {
+    get title() {
         return this.formCommitment.get('title');
     }
 
-    get filesCommit() {
+    get optional() {
+        return this.formCommitment.get('optional');
+    }
+
+    get files() {
         return this.formCommitment.get('files');
     }
 
@@ -48,6 +53,16 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
         this.componentDestroyed.next(true);
     }
 
+    eventEmitCheckBoxFile(event: boolean) {
+        this.checkboxAllFileStatus = event;
+    }
+
+    setNewFilesCommit(files: FileStatusSummaryView[]) {
+        const newFileList: FileStatusSummaryView[] = [];
+        files.forEach(
+        );
+        // Update the formData
+        this.customOptionCommit = !this.customOptionCommit;
     switchView(toView: string) {
         switch (toView) {
             case 'changes':
@@ -67,28 +82,11 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
         }
     }
 
-    eventEmitCheckBoxFile(event: boolean) {
-        this.checkboxAllFileStatus = event;
-    }
-
-    setNewFilesCommit(files: FileStatusSummaryView[]) {
-        const newFileList: FileStatusSummaryView[] = [];
-        files.forEach(
-            file => {
-                if (file.checked) {
-                    newFileList.push(file);
-                }
-            }
-        );
-
-        // Update the formData
-        this.filesCommit.setValue(newFileList);
-    }
-
     private setupFormCommitment() {
         this.formCommitment = this.fb.group({
             title: ['', [Validators.required]],
-            files: [[], [ArrayLengthShouldLargerThan(0)]]
+            files: [[], [ArrayLengthShouldLargerThan(0)]],
+            optional: ['', []]
         });
     }
 }

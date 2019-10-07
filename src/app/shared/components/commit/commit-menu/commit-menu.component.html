@@ -20,7 +20,8 @@
         <div class="commit-flies">
             <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
                                 (isAllFileChecked)="eventEmitCheckBoxFile($event)"
-                                *ngIf="statusSummary?.files?.length > 0"></gitme-commit-files>
+                                *ngIf="statusSummary?.files?.length > 0">
+            </gitme-commit-files>
             <p *ngIf="statusSummary?.files?.length == 0"
                class="text-muted text-center nonSelectable">
                 No change file to be committed
@@ -28,7 +29,7 @@
         </div>
     </div>
 
-    <form class="commitment">
+    <form [formGroup]="formCommitment" class="commitment">
         <div (click)="toggleCheckboxAllFile()"
              *ngIf="statusSummary?.files?.length > 0"
              class="files-checkAll">
@@ -53,28 +54,34 @@
 
         <label class="commit-title">
             <input class="form-control form-control-dark"
-                   placeholder="Commit title (Required)"
+                   formControlName="title"
+                   placeholder="Commit title"
                    type="text">
             <span class="focus-bg"></span>
         </label>
 
         <div class="commitment-btn w-100 h-100">
-            <button class="w-100 h-100" mat-flat-button>Commit</button>
+            <button [disabled]="!formCommitment.valid"
+                    class="w-100 h-100 rounded-0"
+                    color="primary"
+                    mat-flat-button>Commit
+            </button>
         </div>
 
         <div class="commitment-btn-more">
-            <button mat-icon-button>
+            <button (click)="toggleOptionCommit()"
+                    class="rounded-0"
+                    [class.active-option]="customOptionCommit"
+                    mat-icon-button>
                 <i class="fas fa-ellipsis-v"></i>
             </button>
         </div>
 
-        <div class="commitment-option-expanded">
+        <div *ngIf="customOptionCommit" class="commitment-option-expanded">
             <div class="option">
                 <div class="added-checkbox acomi-checkbox-control">
-                    <input class="acomi-input-box"
-                           hidden
-                           id="preOption"
-                           name="preOptionCheckbox"
+                    <input class="acomi-input-box" hidden
+                           id="preOption" name="preOptionCheckbox"
                            type="checkbox"/>
                     <label class="cbx" for="preOption">
                         <span>
