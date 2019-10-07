@@ -33,56 +33,6 @@
         position: relative;
         width: 100%;
     }
-
-    .gm--file-changes {
-        box-shadow: $shadow-light;
-        background: $primary-black-darker;
-        width: inherit;
-        height: inherit;
-        display: grid;
-        grid-template-areas: 'btn' 'content';
-        grid-template-rows: max-content auto;
-        grid-gap: 0.25rem;
-
-        .gm--file-btn {
-            grid-area: btn;
-            padding: 0.25rem;
-            display: grid;
-            grid-gap: 0.25rem;
-        }
-
-        button {
-            background: $primary-black;
-        }
-
-        &.current {
-            .gm--file-btn {
-                grid-template-columns: auto max-content;
-            }
-
-            .current-btn {
-                background: $primary-black-lighter;
-            }
-        }
-
-        &.history {
-            .gm--file-btn {
-                grid-template-columns: min-content auto;
-            }
-
-            .history-btn {
-                background: $primary-black-lighter;
-            }
-        }
-
-        .content {
-            grid-area: content;
-            width: inherit;
-            height: available;
-            overflow: auto;
-            padding: 0.25rem;
-        }
-    }
 }
 
 .right-panel {

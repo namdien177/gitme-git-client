@@ -72,16 +72,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
     }
 
-    switchView(toView: string) {
-        switch (toView) {
-            case 'changes':
-            case 'history':
-                this.isViewChangeTo = toView;
-                break;
-            default:
-                this.isViewChangeTo = 'changes';
-        }
-    }
 
     private watchingUIState() {
         this.repoMenuService.select().subscribe(state => {

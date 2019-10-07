@@ -14,7 +14,8 @@ const declareComps = [
         CommitMenuComponent
     ],
     exports: [
-        ...declareComps
+        ...declareComps,
+        CommitMenuComponent
     ],
     imports: [
         CommonModule,
