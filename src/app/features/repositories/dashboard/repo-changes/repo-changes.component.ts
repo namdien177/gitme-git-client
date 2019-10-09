@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { GitDiffService } from '../../../../shared/state/DATA/git-diff';
-import { GitDiff } from '../../../../shared/model/GitDiff';
+import { GitDiff } from '../../../../shared/model/gitDiff.model';
 
 @Component({
     selector: 'gitme-repo-changes',

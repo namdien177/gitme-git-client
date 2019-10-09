@@ -150,6 +150,14 @@
                 align-items: center;
                 grid-gap: 0.25rem;
 
+                &.opacity-nonFocus {
+                    opacity: 0.2;
+                }
+
+                &.swap-col {
+                    grid-template-columns: calc(100% - 32px) 32px;
+                }
+
                 .option-title {
                     font-size: 0.8rem;
                     display: flex;
@@ -165,6 +173,14 @@
                         text-overflow: ellipsis;
                         white-space: nowrap;
                     }
+
+                    input.custom-commit {
+                        padding-left: 0.5rem;
+                    }
+                }
+
+                .option-btn {
+
                 }
             }
         }

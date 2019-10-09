@@ -6,16 +6,15 @@ import { CommitMenuComponent } from './commit-menu/commit-menu.component';
 
 const declareComps = [
     CommitFilesComponent,
+    CommitMenuComponent
 ];
 
 @NgModule({
     declarations: [
-        ...declareComps,
-        CommitMenuComponent
+        ...declareComps
     ],
     exports: [
         ...declareComps,
-        CommitMenuComponent
     ],
     imports: [
         CommonModule,

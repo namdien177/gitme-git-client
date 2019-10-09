@@ -8,7 +8,7 @@ import * as prism from 'prismjs';
 import { Diff2Html } from 'diff2html';
 
 import { utilNode } from '../../shared/types/types.electron';
-import { DiffBlockLines, GitDiff, GitDiffBlocks } from '../../shared/model/GitDiff';
+import { DiffBlockLines, GitDiff, GitDiffBlocks } from '../../shared/model/gitDiff.model';
 import { Grammar } from '../../shared/types/grammar.define';
 
 @Injectable({

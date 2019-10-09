@@ -4,7 +4,7 @@ import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu
 import { switchMap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { StatusSummary } from '../../shared/model/StatusSummary';
+import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { FileWatchesService } from '../../shared/state/system/File-Watches';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
 import { RepositoryStatusService } from '../../shared/state/DATA/repository-status';

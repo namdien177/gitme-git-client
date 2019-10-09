@@ -45,13 +45,13 @@ const declareComps = [
     SafeHtmlPipe,
     GitDiffPipe,
     BranchMinimizedPipe,
-    RecentTimeDirective
+    RecentTimeDirective,
+    SectionLoadComponent
 ];
 
 @NgModule({
     declarations: [
         ...declareComps,
-        SectionLoadComponent,
     ],
     imports: [
         CommonModule,

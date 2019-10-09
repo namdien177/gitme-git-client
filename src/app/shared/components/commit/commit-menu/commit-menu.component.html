@@ -61,7 +61,8 @@
         </label>
 
         <div class="commitment-btn w-100 h-100">
-            <button [disabled]="!formCommitment.valid"
+            <button (click)="commitSelected()"
+                    [disabled]="!formCommitment.valid"
                     class="w-100 h-100 rounded-0"
                     color="primary"
                     mat-flat-button>Commit
@@ -70,19 +71,22 @@
 
         <div class="commitment-btn-more">
             <button (click)="toggleOptionCommit()"
-                    class="rounded-0"
                     [class.active-option]="customOptionCommit"
+                    class="rounded-0"
                     mat-icon-button>
                 <i class="fas fa-ellipsis-v"></i>
             </button>
         </div>
 
         <div *ngIf="customOptionCommit" class="commitment-option-expanded">
-            <div class="option">
+            <div [class.opacity-nonFocus]="optional.value !== 'default'"
+                 class="option">
                 <div class="added-checkbox acomi-checkbox-control">
-                    <input class="acomi-input-box" hidden
-                           id="preOption" name="preOptionCheckbox"
-                           type="checkbox"/>
+                    <input [value]="'default'" class="acomi-input-box"
+                           formControlName="optional" hidden
+                           id="preOption"
+                           name="optional"
+                           type="radio"/>
                     <label class="cbx" for="preOption">
                         <span>
                             <svg height="10px" viewbox="0 0 12 10" width="12px">
@@ -92,20 +96,22 @@
                     </label>
                 </div>
                 <div class="option-title">
-                    <div>Using default option</div>
+                    <div [class.text-muted]="optional.value !== 'default'">
+                        Using default option
+                    </div>
                     <div class="option-info text-muted">
                         -m -n Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, quisquam?
                     </div>
                 </div>
             </div>
 
-            <div class="option">
+            <div [class.opacity-nonFocus]="optional.value !== 'custom'"
+                 class="option">
                 <div class="added-checkbox acomi-checkbox-control">
-                    <input class="acomi-input-box"
-                           hidden
-                           id="preOption-custom"
-                           name="preOptionCheckbox"
-                           type="checkbox"/>
+                    <input [value]="'custom'"
+                           class="acomi-input-box" formControlName="optional"
+                           hidden id="preOption-custom"
+                           name="optional" type="radio"/>
                     <label class="cbx" for="preOption-custom">
                         <span>
                             <svg height="10px" viewbox="0 0 12 10" width="12px">
@@ -115,8 +121,25 @@
                     </label>
                 </div>
                 <label class="option-title">
-                    <input class="form-control form-control-dark" type="text">
+                    <input [(ngModel)]="customOptionCommitInput"
+                           [disabled]="optional.value !== 'custom'"
+                           [ngModelOptions]="{standalone: true}"
+                           [placeholder]="'-n --author \'\'Another Person <another@person.com>\'\''"
+                           class="form-control form-control-dark custom-commit"
+                           type="text">
                 </label>
+            </div>
+
+            <div class="option">
+                <div class="option-title">
+                    -n --author \'\'Another Person < another@person.com>\'\''
+                </div>
+
+                <div class="option-btn">
+                    <button mat-flat-button (click)="openCommitOptions()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </form>

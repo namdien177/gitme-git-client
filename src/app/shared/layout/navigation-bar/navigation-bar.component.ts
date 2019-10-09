@@ -4,7 +4,7 @@ import { RepositoriesQuery, RepositoriesService, Repository } from '../../state/
 import { RepositoryBranchesQuery, RepositoryBranchesService, RepositoryBranchSummary } from '../../state/DATA/repository-branches';
 import { AccountListService } from '../../state/DATA/account-list';
 import { auditTime, debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
-import { StatusSummary } from '../../model/StatusSummary';
+import { StatusSummary } from '../../model/statusSummary.model';
 import { interval, of, Subject } from 'rxjs';
 import { UtilityService } from '../../utilities/utility.service';
 import { FileWatchesQuery, FileWatchesService } from '../../state/system/File-Watches';

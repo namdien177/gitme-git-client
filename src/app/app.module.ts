@@ -28,6 +28,7 @@ import scss from 'highlight.js/lib/languages/scss';
 import typescript from 'highlight.js/lib/languages/typescript';
 import javascript from 'highlight.js/lib/languages/javascript';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DialogsModule } from './shared/modules/dialogs.module';
 
 export function hljsLanguages() {
     return [
@@ -68,6 +69,8 @@ const declareComps = [
         AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
         AkitaNgRouterStoreModule.forRoot(),
         BrowserAnimationsModule,
+        // Dialogs
+        DialogsModule,
     ],
     providers: [
         ElectronService,

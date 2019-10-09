@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FileChangesStore } from './file-changes.store';
 import { HttpClient } from '@angular/common/http';
-import { StatusSummary } from '../../../model/StatusSummary';
+import { StatusSummary } from '../../../model/statusSummary.model';
 
 @Injectable({ providedIn: 'root' })
 export class FileChangesService {

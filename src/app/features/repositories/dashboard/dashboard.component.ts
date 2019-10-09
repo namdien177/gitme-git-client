@@ -4,7 +4,7 @@ import { UtilityService } from '../../../shared/utilities/utility.service';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
-import { StatusSummary } from '../../../shared/model/StatusSummary';
+import { StatusSummary } from '../../../shared/model/statusSummary.model';
 
 @Component({
     selector: 'gitme-dashboard',
