@@ -3,6 +3,7 @@ import { Account } from '../state/DATA/account-list';
 import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
+import { CommitOptions } from '../state/DATA/repository-branches';
 
 
 @Injectable()
@@ -189,11 +190,14 @@ export class UtilityService {
         };
     }
 
-    objectifyGitOption(strOptions: string) {
-        let paramsName = '';
-        let value = null;
-        const arrCharacter = strOptions.split('');
+    stringifyObjectOption(objOptions: CommitOptions) {
+        let stringFinal = '';
+        Object.keys(objOptions).forEach(argu => {
+            stringFinal += argu + (argu.trim().indexOf('--') === 0 ? '=' : ' ');
+            // appending value
+            stringFinal += objOptions[argu] + ' ';
+        });
 
-        const splitOption = strOptions.split(/\s-/g);
+        return stringFinal;
     }
 }

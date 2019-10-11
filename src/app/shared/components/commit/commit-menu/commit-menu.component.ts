@@ -8,6 +8,7 @@ import { UtilityService } from '../../../utilities/utility.service';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
 import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
+import { RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 
 @Component({
     selector: 'gitme-commit-menu',
@@ -18,6 +19,9 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
 
     @Input()
     statusSummary: StatusSummary;
+
+    @Input()
+    activeBranch: RepositoryBranchSummary;
 
     @Input()
     isViewChangeTo: 'changes' | 'history' = 'changes';
@@ -83,7 +87,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
     toggleOptionCommit() {
         this.customOptionCommit = !this.customOptionCommit;
         if (this.customOptionCommit) {
-            this.optional.setValue('default');
+            this.optional.setValue(this.activeBranch.options);
         } else {
             this.optional.setValue(null);
         }
@@ -116,16 +120,13 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
         const listFilesCommit: FileStatusSummaryView[] = this.files.value;
         const paths: string[] = this.utilitiesService.extractFilePathFromGitStatus(listFilesCommit);
         const activeRepository: Repository = this.repositoriesService.getActive();
-        let objectOption = {};
         if (this.customOptionCommit) {
             // having custom option when commit
-            objectOption[this.customOptionCommitInput.trim()] = '';
         }
 
         console.log(this.title.value);
         console.log(this.files.value);
         console.log(this.optional.value);
-        console.log(objectOption);
         return;
         this.repositoriesService.commit(activeRepository, this.title.value, paths).subscribe(
             result => {
@@ -140,7 +141,8 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
             CommitOptionsComponent, {
                 width: '350px',
                 height: '400px',
-                data: 'test'
+                data: 'test',
+                panelClass: 'bg-primary-black-mat-dialog',
             }
         );
 

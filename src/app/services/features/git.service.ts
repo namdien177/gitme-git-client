@@ -74,6 +74,7 @@ export class GitService {
                             branchRemoteRaw.branches[branchRemoteInstance],
                             { name: existInstanceLocal },
                             { current: branchLocalRaw.branches[existInstanceLocal].current },
+                            { options: null },
                             { tracking: trackingOn },
                             { has_remote: true },
                             { has_local: true }
@@ -86,6 +87,7 @@ export class GitService {
                             branchRemoteRaw.branches[branchRemoteInstance],
                             { name: branchRemoteInstance },
                             { current: branchRemoteRaw.branches[branchRemoteInstance].current },
+                            { options: null },
                             { tracking: trackingOn },
                             { has_remote: true },
                             { has_local: false }
@@ -110,6 +112,7 @@ export class GitService {
                             branchRemoteRaw.branches[existRemoteLocal],
                             { name: branchLocalInstance },
                             { current: branchLocalRaw.branches[branchLocalInstance].current },
+                            { options: null },
                             { tracking: trackingOn },
                             { has_remote: true },
                             { has_local: true }
@@ -122,6 +125,7 @@ export class GitService {
                             branchRemoteRaw.branches[existRemoteLocal],
                             { name: branchLocalInstance },
                             { current: branchLocalRaw.branches[branchLocalInstance].current },
+                            { options: null },
                             { tracking: trackingOn },
                             { has_remote: false },
                             { has_local: true }
@@ -139,9 +143,11 @@ export class GitService {
                 if (findFromOld) {
                     selfArr[index].id = findFromOld.id;
                     selfArr[index].last_update = findFromOld.last_update;
+                    selfArr[index].options = findFromOld.options;
                 } else {
                     selfArr[index].id = this.securityService.randomID;
                     selfArr[index].last_update = null;
+                    selfArr[index].options = null;
                 }
             });
         } else {
@@ -151,6 +157,7 @@ export class GitService {
                 if (findFromNew) {
                     findFromNew.id = selfArr[index].id;
                     findFromNew.last_update = selfArr[index].last_update;
+                    findFromNew.options = selfArr[index].options;
                 } else {
                     // do nothing, will be removed as both local and remote cannot be found
                     // This can be due to branch removed, renamed, etc.

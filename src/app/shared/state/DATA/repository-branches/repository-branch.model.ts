@@ -5,6 +5,7 @@ export interface RepositoryBranchSummary {
     current?: boolean;
     label?: string;
     // additional
+    options?: CommitOptions;
     tracking?: BranchTracking[];
     has_remote?: boolean;
     has_local?: boolean;
@@ -15,6 +16,11 @@ export interface BranchTracking {
     name: string;
     fetch: string;
     push: string;
+}
+
+export interface CommitOptions {
+    argument?: string;
+    value?: string;
 }
 
 export function createRepositoryBranch(params: Partial<RepositoryBranchSummary>) {

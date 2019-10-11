@@ -71,7 +71,7 @@
 
         <div class="commitment-btn-more">
             <button (click)="toggleOptionCommit()"
-                    [class.active-option]="customOptionCommit"
+                    [class.bg-info]="customOptionCommit"
                     class="rounded-0"
                     mat-icon-button>
                 <i class="fas fa-ellipsis-v"></i>
@@ -79,66 +79,23 @@
         </div>
 
         <div *ngIf="customOptionCommit" class="commitment-option-expanded">
-            <div [class.opacity-nonFocus]="optional.value !== 'default'"
-                 class="option">
-                <div class="added-checkbox acomi-checkbox-control">
-                    <input [value]="'default'" class="acomi-input-box"
-                           formControlName="optional" hidden
-                           id="preOption"
-                           name="optional"
-                           type="radio"/>
-                    <label class="cbx" for="preOption">
-                        <span>
-                            <svg height="10px" viewbox="0 0 12 10" width="12px">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                            </svg>
-                        </span>
-                    </label>
-                </div>
-                <div class="option-title">
-                    <div [class.text-muted]="optional.value !== 'default'">
-                        Using default option
-                    </div>
-                    <div class="option-info text-muted">
-                        -m -n Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, quisquam?
-                    </div>
-                </div>
-            </div>
-
-            <div [class.opacity-nonFocus]="optional.value !== 'custom'"
-                 class="option">
-                <div class="added-checkbox acomi-checkbox-control">
-                    <input [value]="'custom'"
-                           class="acomi-input-box" formControlName="optional"
-                           hidden id="preOption-custom"
-                           name="optional" type="radio"/>
-                    <label class="cbx" for="preOption-custom">
-                        <span>
-                            <svg height="10px" viewbox="0 0 12 10" width="12px">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                            </svg>
-                        </span>
-                    </label>
-                </div>
-                <label class="option-title">
-                    <input [(ngModel)]="customOptionCommitInput"
-                           [disabled]="optional.value !== 'custom'"
-                           [ngModelOptions]="{standalone: true}"
-                           [placeholder]="'-n --author \'\'Another Person <another@person.com>\'\''"
-                           class="form-control form-control-dark custom-commit"
-                           type="text">
-                </label>
-            </div>
-
             <div class="option">
                 <div class="option-title">
-                    -n --author \'\'Another Person < another@person.com>\'\''
+                    <button (click)="openCommitOptions()"
+                            class="bg-primary-black rounded-0"
+                            mat-icon-button>
+                        <i class="fas fa-edit"></i>
+                    </button>
                 </div>
 
-                <div class="option-btn">
-                    <button mat-flat-button (click)="openCommitOptions()">
-                        <i class="fas fa-cog"></i>
-                    </button>
+                <div class="option-preview">
+                    <div [class.text-muted]="(activeBranch?.options | gitCommitOptions) === 'none'">
+                        Using default option
+                    </div>
+                    <div [class.text-muted]="(activeBranch?.options | gitCommitOptions) === 'none'"
+                         class="option-info">
+                        {{activeBranch?.options | gitCommitOptions}}
+                    </div>
                 </div>
             </div>
         </div>
