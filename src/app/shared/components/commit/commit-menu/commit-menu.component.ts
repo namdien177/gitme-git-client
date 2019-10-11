@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -9,32 +9,26 @@ import { RepositoriesService, Repository } from '../../../state/DATA/repositorie
 import { MatDialog } from '@angular/material';
 import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
 import { RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
+import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
 
 @Component({
     selector: 'gitme-commit-menu',
     templateUrl: './commit-menu.component.html',
     styleUrls: ['./commit-menu.component.scss']
 })
-export class CommitMenuComponent implements OnInit, OnDestroy {
-
+export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     statusSummary: StatusSummary;
-
     @Input()
     activeBranch: RepositoryBranchSummary;
-
     @Input()
     isViewChangeTo: 'changes' | 'history' = 'changes';
     @Output()
     isViewChangeToChange: EventEmitter<'changes' | 'history'> = new EventEmitter<'changes' | 'history'>();
-
     formCommitment: FormGroup;
-
     checkboxAllFileStatus = false;
-
     customOptionCommit = false;
     customOptionCommitInput = '';
-
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -56,6 +50,10 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
 
     get files() {
         return this.formCommitment.get('files');
+    }
+
+    ngAfterViewInit(): void {
+
     }
 
     ngOnInit() {
@@ -137,17 +135,20 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
     }
 
     openCommitOptions() {
+        const defaultDataCommit = defaultCommitOptionDialog;
+        defaultDataCommit.data = this.activeBranch.options;
         const commitOptionResult = this.dialog.open(
             CommitOptionsComponent, {
-                width: '350px',
+                width: '550px',
                 height: '400px',
-                data: 'test',
+                data: defaultDataCommit,
                 panelClass: 'bg-primary-black-mat-dialog',
             }
         );
 
         commitOptionResult.afterClosed().subscribe(res => {
             console.log(res);
+            this.optional.setValue(res);
         });
     }
 

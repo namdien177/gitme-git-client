@@ -1,2 +1,46 @@
-<p>commit-options works!</p>
-<button (click)="chooseNo()">close</button>
+<h1 mat-dialog-title>
+    {{emittedDataFromView.title}}
+</h1>
+<form [formGroup]="formOptions" class="optionsList" mat-dialog-content>
+    <div class="innerContent">
+        <div class="title text-muted">
+            Argument
+        </div>
+        <div class="title text-muted">
+            Value
+        </div>
+    </div>
+
+    <ng-container *ngFor="let item of commitOption.controls; let i = index;"
+                  formArrayName="options">
+        <ng-container [formGroupName]="i">
+            <div class="innerContent">
+                <label>
+                    <input (focusout)="removeEmptyCommand()"
+                           (keyup)="typingCommand()"
+                           class="form-control form-control-dark form-control-float"
+                           formControlName="argument"
+                           type="text">
+                </label>
+                <label>
+                    <input (focusout)="removeEmptyCommand()"
+                           (keyup)="typingCommand()"
+                           class="form-control form-control-dark form-control-float"
+                           formControlName="value"
+                           type="text">
+                </label>
+            </div>
+        </ng-container>
+    </ng-container>
+</form>
+<div class="footDialog" mat-dialog-actions>
+    <button mat-button mat-dialog-close>
+        {{emittedDataFromView.decision.noText}}
+    </button>
+    <button (click)="submitNewOptions()"
+            class="bg-info"
+            color="primary"
+            mat-button>
+        {{emittedDataFromView.decision.yesText}}
+    </button>
+</div>
