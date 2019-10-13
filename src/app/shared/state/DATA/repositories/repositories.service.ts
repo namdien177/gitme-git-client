@@ -209,12 +209,20 @@ export class RepositoriesService {
         );
     }
 
+    /**
+     * TODO: checking author, timestamp and re-update the branches configs.
+     * @param repository
+     * @param title
+     * @param files
+     * @param option
+     */
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
-        const { name } = repository.credential;
+        const { name, id_credential } = repository.credential;
+        const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
         const author = !!name ? name : null;
-        if (!!option && !!!option['--author'] && author) {
+        if (!!option && !!!option['--author'] && author && authorDB) {
             option = Object.assign(option, {
-                '--author': author
+                '--author': `"${ author } <${ authorDB.username }>"`
             });
         }
         console.log(option);
