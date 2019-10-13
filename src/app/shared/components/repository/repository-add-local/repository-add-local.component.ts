@@ -169,7 +169,7 @@ export class RepositoryAddLocalComponent implements OnInit {
          * * Update working repository
          * * Fetching new repository => reassign main branch
          */
-        fromPromise(this.repositoryService.newRepository(
+        fromPromise(this.repositoryService.insertNewRepository(
             repositoryInstance, credentialsInstance, !this.isExistingAccount
         )).subscribe(
             addStatus => {

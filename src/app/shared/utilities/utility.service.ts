@@ -195,9 +195,8 @@ export class UtilityService {
         Object.keys(objOptions).forEach(argu => {
             stringFinal += argu + (argu.trim().indexOf('--') === 0 ? '=' : ' ');
             // appending value
-            stringFinal += objOptions[argu] + ' ';
+            stringFinal += (!!objOptions[argu] ? objOptions[argu].trim() : '') + ' ';
         });
-
-        return stringFinal;
+        return stringFinal.length > 0 ? stringFinal : 'none';
     }
 }

@@ -120,7 +120,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     }
 
     private watchingBranch() {
-        this.repositoryBranchesService.get()
+        this.repositoryBranchesService.select()
         .subscribe(
             listBranch => {
                 this.branches = listBranch;

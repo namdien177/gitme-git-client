@@ -11,6 +11,14 @@ import { CommitOptions } from '../../../../state/DATA/repository-branches';
 })
 export class CommitOptionsComponent implements OnInit {
 
+    // @debug
+    debuging = {
+        value: '"do hoang nam <do.hoangnam9x@gmail.com>"',
+        argument: '--author'
+    };
+
+    errorMessage = null;
+
     formOptions: FormGroup;
     private readonly initialData;
 
@@ -62,6 +70,13 @@ export class CommitOptionsComponent implements OnInit {
                 this.addNewOption();
             }
         }
+
+        const notContainDuplicated = this.checkDuplicatedArgument();
+        if (notContainDuplicated) {
+            this.errorMessage = null;
+        } else {
+            this.errorMessage = 'Some arguments are duplicated!';
+        }
     }
 
     removeEmptyCommand() {
@@ -91,6 +106,28 @@ export class CommitOptionsComponent implements OnInit {
     submitNewOptions() {
         const getFinalData = this.prepareData();
         this.dialogRef.close(getFinalData);
+    }
+
+    private checkDuplicatedArgument() {
+        const numberArgCurrent = this.commitOption.length;
+        let statusValid = true;
+        const storingArgument = [];
+        if (numberArgCurrent > 1) {
+            this.commitOption.controls.every((form: FormGroup, index) => {
+                if (!!form.value) {
+                    const strCompare = (<string>form.value['argument']).toLowerCase();
+                    if (strCompare.length > 0) {
+                        if (storingArgument.indexOf(strCompare) > -1) {
+                            statusValid = false;
+                            return false;
+                        }
+                        storingArgument.push(strCompare);
+                    }
+                }
+                return true;
+            });
+        }
+        return statusValid;
     }
 
     private addNewOption(data: CommitOptions = null) {

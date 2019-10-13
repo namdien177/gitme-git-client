@@ -2,15 +2,6 @@
     {{emittedDataFromView.title}}
 </h1>
 <form [formGroup]="formOptions" class="optionsList" mat-dialog-content>
-    <div class="innerContent">
-        <div class="title text-muted">
-            Argument
-        </div>
-        <div class="title text-muted">
-            Value
-        </div>
-    </div>
-
     <ng-container *ngFor="let item of commitOption.controls; let i = index;"
                   formArrayName="options">
         <ng-container [formGroupName]="i">
@@ -20,6 +11,7 @@
                            (keyup)="typingCommand()"
                            class="form-control form-control-dark form-control-float"
                            formControlName="argument"
+                           placeholder="Argument"
                            type="text">
                 </label>
                 <label>
@@ -27,6 +19,7 @@
                            (keyup)="typingCommand()"
                            class="form-control form-control-dark form-control-float"
                            formControlName="value"
+                           placeholder="Value"
                            type="text">
                 </label>
             </div>
@@ -34,13 +27,21 @@
     </ng-container>
 </form>
 <div class="footDialog" mat-dialog-actions>
-    <button mat-button mat-dialog-close>
-        {{emittedDataFromView.decision.noText}}
-    </button>
-    <button (click)="submitNewOptions()"
-            class="bg-info"
-            color="primary"
-            mat-button>
-        {{emittedDataFromView.decision.yesText}}
-    </button>
+    <div class="text-danger">
+        {{errorMessage}}
+    </div>
+
+    <div class="group-decide">
+        <button mat-button mat-dialog-close>
+            {{emittedDataFromView.decision.noText}}
+        </button>
+        <button (click)="submitNewOptions()"
+                [class.bg-info]="!(!formOptions.valid || !!errorMessage)"
+                [class.bg-primary-black-darker]="!formOptions.valid || !!errorMessage"
+                [disabled]="!formOptions.valid || !!errorMessage"
+                color="primary"
+                mat-button>
+            {{emittedDataFromView.decision.yesText}}
+        </button>
+    </div>
 </div>

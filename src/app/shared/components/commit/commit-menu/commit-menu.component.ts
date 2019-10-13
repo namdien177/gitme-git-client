@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { StatusSummary } from '../../../model/statusSummary.model';
-import { FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
+import { createInitialState, FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ArrayLengthShouldLargerThan } from '../../../validate/customFormValidate';
@@ -8,7 +8,7 @@ import { UtilityService } from '../../../utilities/utility.service';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
 import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
-import { RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
+import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
 
 @Component({
@@ -18,21 +18,23 @@ import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
 })
 export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
-    statusSummary: StatusSummary;
-    @Input()
-    activeBranch: RepositoryBranchSummary;
-    @Input()
     isViewChangeTo: 'changes' | 'history' = 'changes';
     @Output()
     isViewChangeToChange: EventEmitter<'changes' | 'history'> = new EventEmitter<'changes' | 'history'>();
+
+    repository: Repository = null;
+    statusSummary: StatusSummary = createInitialState();
+    activeBranch: RepositoryBranchSummary = null;
+
     formCommitment: FormGroup;
     checkboxAllFileStatus = false;
     customOptionCommit = false;
-    customOptionCommitInput = '';
+
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         private repositoryStatusService: RepositoryStatusService,
+        private repositoryBranchesService: RepositoryBranchesService,
         private repositoriesService: RepositoriesService,
         private utilitiesService: UtilityService,
         public dialog: MatDialog,
@@ -53,11 +55,13 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-
     }
 
     ngOnInit() {
         this.setupFormCommitment();
+        this.watchingRepository();
+        this.watchingBranch();
+        this.watchingSummary();
     }
 
     ngOnDestroy(): void {
@@ -118,15 +122,16 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         const listFilesCommit: FileStatusSummaryView[] = this.files.value;
         const paths: string[] = this.utilitiesService.extractFilePathFromGitStatus(listFilesCommit);
         const activeRepository: Repository = this.repositoriesService.getActive();
+        let optionCommits = null;
         if (this.customOptionCommit) {
             // having custom option when commit
+            optionCommits = this.optional.value;
         }
 
         console.log(this.title.value);
         console.log(this.files.value);
         console.log(this.optional.value);
-        return;
-        this.repositoriesService.commit(activeRepository, this.title.value, paths).subscribe(
+        this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits).subscribe(
             result => {
                 console.log(result);
                 this.formCommitment.reset();
@@ -147,9 +152,29 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         );
 
         commitOptionResult.afterClosed().subscribe(res => {
-            console.log(res);
-            this.optional.setValue(res);
+            let valPassed = null;
+            if (Array.isArray(res)) {
+                // save the array
+                valPassed = this.parseSingleOptionCmd(res);
+                this.activeBranch.options = res;
+            }
+            this.optional.setValue(valPassed);
         });
+    }
+
+    parseSingleOptionCmd(arrOptions: CommitOptions[]) {
+        const finalOption = {};
+        arrOptions.forEach(opt => {
+            if (!!opt.argument && opt.argument.length > 0) {
+                finalOption[opt.argument] = opt.value.length > 0 ? opt.value : null;
+            } else {
+                if (!!opt.value && opt.value.length > 0) {
+                    // make this as properties
+                    finalOption[opt.value] = null;
+                }
+            }
+        });
+        return finalOption;
     }
 
     private setupFormCommitment() {
@@ -158,5 +183,34 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             files: [[], [ArrayLengthShouldLargerThan(0)]],
             optional: [null, []]
         });
+    }
+
+    private watchingRepository() {
+        this.repositoriesService.selectActive(false).subscribe(repoActive => {
+            this.repository = repoActive;
+        });
+    }
+
+    private watchingSummary() {
+        this.repositoryStatusService.select().subscribe(status => {
+            this.statusSummary = status;
+        });
+    }
+
+    private watchingBranch() {
+        this.repositoryBranchesService.select()
+        .subscribe(
+            listBranch => {
+                this.activeBranch = listBranch.find(branch => {
+                    return branch.current;
+                });
+
+                if (this.activeBranch) {
+                    this.optional.setValue(this.activeBranch.options);
+                }
+
+                console.log(this.activeBranch);
+            }
+        );
     }
 }

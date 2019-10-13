@@ -44,7 +44,7 @@ export class RepositoryBranchesService {
         this.store.set(listBranch);
     }
 
-    get(): Observable<RepositoryBranchSummary[]> {
+    select(): Observable<RepositoryBranchSummary[]> {
         return this.query.selectAll();
     }
 

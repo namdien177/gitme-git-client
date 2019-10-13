@@ -36,12 +36,13 @@ export class RepositoriesService {
 
 
     /**
+     * STATUS: DONE
      * Create new repository and add to local file config
      * @param newRepository
      * @param credentials
      * @param isNewAccount
      */
-    async newRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
+    async insertNewRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
         const systemDefaultName = this.securityService.appUUID;
         if (isNewAccount) {
             // Save the new credential to file store;
@@ -60,7 +61,10 @@ export class RepositoriesService {
         return statusSave;
     }
 
-    // TODO: Load all repositories from config
+    /**
+     * STATUS: DONE
+     * Load all the repository configs in all local json file
+     */
     async load() {
         const machineID = this.securityService.appUUID;
         const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
@@ -97,19 +101,41 @@ export class RepositoriesService {
         this.set(repositories);
     }
 
+    /**
+     * STATUS: DONE
+     * Add a single repository information to state.
+     * @param arrData The repository to be added. It will be placed ahead and activated.
+     */
     add(arrData: Repository) {
         this.store.add(arrData, { prepend: true });
+        this.setActive(arrData);
     }
 
+    /**
+     * STATUS: DONE
+     * Add a collection of repositories to state.
+     * @param arr The collection of config from repositories to be added.
+     */
     set(arr: Repository[]) {
         this.store.set(arr);
     }
 
+    /**
+     * STATUS: DONE
+     * Define the activating repository to be working on. This also override the localStorage for future works.
+     * @param activeRepository
+     */
     setActive(activeRepository: Repository) {
         this.store.setActive(activeRepository.id);
         this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
     }
 
+    /**
+     * STATUS: DONE
+     * Retrieving the activating repository. The observable will always return a single repository
+     * @param initLoad If set to True (default), it will load from disk first.
+     * Should set this to false to save disk performance.
+     */
     selectActive(initLoad: boolean = true): Observable<Repository> {
         if (!initLoad) {
             return this.query.selectActive().pipe(
@@ -136,14 +162,27 @@ export class RepositoriesService {
         );
     }
 
-    getActive() {
+    /**
+     * Get the current active repository
+     */
+    getActive(): Repository {
         return this.query.getActive();
     }
 
+    /**
+     * Remove the active state.
+     */
     clearActive() {
         this.store.setActive(null);
     }
 
+    /**
+     * STATUS: NOT DONE
+     * TODO: need check
+     * Checkout other branch.
+     * @param repo
+     * @param branch
+     */
     checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
         this.setLoading();
         return fromPromise(this.gitService.switchBranch(repo, branch))

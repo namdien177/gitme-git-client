@@ -89,12 +89,12 @@
                 </div>
 
                 <div class="option-preview">
-                    <div [class.text-muted]="(activeBranch?.options | gitCommitOptions) === 'none'">
-                        Using default option
+                    <div [class.text-muted]="(optional.value | gitCommitOptions) === 'none'">
+                        Additional commands
                     </div>
-                    <div [class.text-muted]="(activeBranch?.options | gitCommitOptions) === 'none'"
+                    <div [class.text-muted]="(optional.value | gitCommitOptions) === 'none'"
                          class="option-info">
-                        {{activeBranch?.options | gitCommitOptions}}
+                        {{optional.value | gitCommitOptions}}
                     </div>
                 </div>
             </div>
