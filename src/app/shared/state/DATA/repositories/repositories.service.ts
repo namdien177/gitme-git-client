@@ -217,6 +217,9 @@ export class RepositoriesService {
                 '--author': author
             });
         }
+        console.log(option);
+        console.log(repository.credential);
+        console.log(author);
         return fromPromise(
             this.gitService.commit(repository, title, files, option)
         ).pipe(
