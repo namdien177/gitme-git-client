@@ -213,7 +213,7 @@ export class RepositoriesService {
         const { name } = repository.credential;
         const author = !!name ? name : null;
         if (!!option && !!!option['--author'] && author) {
-            Object.assign(option, {
+            option = Object.assign(option, {
                 '--author': author
             });
         }
