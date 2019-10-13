@@ -224,6 +224,10 @@ export class RepositoriesService {
             option = Object.assign(option, {
                 '--author': `"${ author } <${ authorDB.username }>"`
             });
+        } else if (!option && author && authorDB) {
+            option = {
+                '--author': `"${ author } <${ authorDB.username }>"`
+            };
         }
         console.log(option);
         console.log(repository.credential);
