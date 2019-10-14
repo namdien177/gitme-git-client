@@ -96,7 +96,7 @@
         }
     }
 
-    .commit-flies {
+    .content {
         grid-area: files-list;
     }
 }
@@ -201,7 +201,7 @@
         }
     }
 
-    &.open {
+    &.active {
         background-color: $primary-black;
     }
 }

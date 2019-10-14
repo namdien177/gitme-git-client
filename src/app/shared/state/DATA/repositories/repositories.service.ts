@@ -34,14 +34,14 @@ export class RepositoriesService {
     ) {
     }
 
-
     /**
+     * STATUS: DONE
      * Create new repository and add to local file config
      * @param newRepository
      * @param credentials
      * @param isNewAccount
      */
-    async newRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
+    async insertNewRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
         const systemDefaultName = this.securityService.appUUID;
         if (isNewAccount) {
             // Save the new credential to file store;
@@ -60,7 +60,10 @@ export class RepositoriesService {
         return statusSave;
     }
 
-    // TODO: Load all repositories from config
+    /**
+     * STATUS: DONE
+     * Load all the repository configs in all local json file
+     */
     async load() {
         const machineID = this.securityService.appUUID;
         const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
@@ -71,10 +74,10 @@ export class RepositoriesService {
 
         const repositoryFile = configFile.repository_config;
         const repositories: Repository[] = [];
-        for (const configName of repositoryFile) {
-            const repos = await this.dataService.getRepositoriesConfigData(configName);
-            if (!!repos && !!repos.repository && repos.repository.length > 0) {
-                repos.repository.forEach(repo => repositories.push(repo));
+        for (const idRepository of repositoryFile) {
+            const repos = await this.dataService.getRepositoriesConfigData(idRepository);
+            if (!!repos && !!repos.repository) {
+                repositories.push(repos.repository);
             }
         }
 
@@ -83,7 +86,7 @@ export class RepositoriesService {
                 repositories[0].id : null;
 
         if (repositories.length > 0) {
-            let findCached = null;
+            let findCached: Repository = null;
             if (!!previousWorking) {
                 findCached = repositories.find(repo => repo.id === previousWorking);
                 if (!findCached) {
@@ -97,21 +100,42 @@ export class RepositoriesService {
         this.set(repositories);
     }
 
+    /**
+     * STATUS: DONE
+     * Add a single repository information to state.
+     * @param arrData The repository to be added. It will be placed ahead and activated.
+     */
     add(arrData: Repository) {
         this.store.add(arrData, { prepend: true });
+        this.setActive(arrData);
     }
 
+    /**
+     * STATUS: DONE
+     * Add a collection of repositories to state.
+     * @param arr The collection of config from repositories to be added.
+     */
     set(arr: Repository[]) {
         this.store.set(arr);
     }
 
+    /**
+     * STATUS: DONE
+     * Define the activating repository to be working on. This also override the localStorage for future works.
+     * @param activeRepository
+     */
     setActive(activeRepository: Repository) {
         this.store.setActive(activeRepository.id);
         this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
     }
 
+    /**
+     * STATUS: DONE
+     * Retrieving the activating repository. The observable will always return a single repository
+     * @param initLoad If set to True (default), it will load from disk first.
+     * Should set this to false to save disk performance.
+     */
     selectActive(initLoad: boolean = true): Observable<Repository> {
-        this.setLoading();
         if (!initLoad) {
             return this.query.selectActive().pipe(
                 map(active => {
@@ -123,7 +147,9 @@ export class RepositoriesService {
                 })
             );
         }
-        return fromPromise(this.load()).pipe(
+        return fromPromise(
+            this.load()
+        ).pipe(
             switchMap(() => this.query.selectActive()),
             map(active => {
                 if (Array.isArray(active)) {
@@ -131,21 +157,33 @@ export class RepositoriesService {
                 } else {
                     return active;
                 }
-            }),
-            tap(() => {
-                this.finishLoading();
             })
         );
     }
 
-    getActive() {
+    /**
+     * STATUS: DONE
+     * Get the current active repository
+     */
+    getActive(): Repository {
         return this.query.getActive();
     }
 
+    /**
+     * STATUS: DONE
+     * Remove the active state.
+     */
     clearActive() {
         this.store.setActive(null);
     }
 
+    /**
+     * STATUS: NOT DONE
+     * TODO: need check
+     * Checkout other branch.
+     * @param repo
+     * @param branch
+     */
     checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
         this.setLoading();
         return fromPromise(this.gitService.switchBranch(repo, branch))
@@ -172,18 +210,18 @@ export class RepositoriesService {
         );
     }
 
+    /**
+     * TODO: checking author, timestamp and re-update the branches configs.
+     * @param repository
+     * @param title
+     * @param files
+     * @param option
+     */
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
-        const { name } = repository.credential;
-        const author = !!name ? name : null;
-        if (!!option && !!!option['--author'] && author) {
-            Object.assign(option, {
-                '--author': author
-            });
-        }
+        const { id_credential } = repository.credential;
+        const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
         return fromPromise(
-            this.gitService.commit(repository, title, files, option)
-        ).pipe(
-            tap(() => this.fetch({ ...repository }))
+            this.gitService.commit(repository, authorDB, title, files, option)
         );
     }
 
@@ -222,7 +260,13 @@ export class RepositoriesService {
         );
     }
 
-    fetch(repository: Repository, option?: { [git: string]: string }) {
+    /**
+     * Fetching data
+     * @param repository
+     * @param branch
+     * @param option
+     */
+    fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
         // get account
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
@@ -230,15 +274,14 @@ export class RepositoriesService {
         // update timestamp
         repository.timestamp = moment().valueOf();
         return fromPromise(
-            this.gitService.fetchInfo(repository, credential)
-            .then(
-                res => {
-                    if (typeof res !== 'boolean') {
-                        this.updateExistingRepositoryOnLocalDatabase(res.repository).then(result => console.log(result));
-                    }
-                    return res;
-                }
-            )
+            this.gitService.fetchInfo(repository, credential, branch)
+        ).pipe(
+            switchMap(res => {
+                return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
+            }),
+            tap(() => {
+                this.load();
+            })
         );
     }
 
@@ -275,7 +318,6 @@ export class RepositoriesService {
 
         const repositoryFileDirectory = configFile.repository_config;
         const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
-
         const statusUpdate: {
             status: boolean
             repository: Repository
@@ -284,7 +326,7 @@ export class RepositoriesService {
 
         for (const repository of repositories) {
             if (repository.id === repositoryUpdate.id) {
-                const status = await this.dataService.updateRepositoryData(repositoryUpdate);
+                const status = await this.dataService.updateRepositoryData(repositoryUpdate, true);
                 statusUpdate.push(
                     {
                         status: status,
@@ -300,11 +342,9 @@ export class RepositoriesService {
 
     async getAllRepositoryFromConfig(repositoryFileDirectory: string[]) {
         const repositories: Repository[] = [];
-
         for (const fileName of repositoryFileDirectory) {
             const repos = await this.dataService.getRepositoriesConfigData(fileName);
-
-            if (!!repos && !!repos.repository && repos.repository.length > 0) {
+            if (!!repos && !!repos.repository) {
                 repositories.push(repos.repository);
             }
         }

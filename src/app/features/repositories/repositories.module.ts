@@ -9,8 +9,10 @@ import { XTerminalModule } from '../../shared/layout/x-terminal/x-terminal.modul
 import { RepoChangesComponent } from './dashboard/repo-changes/repo-changes.component';
 import { RepoHistoryComponent } from './repo-history/repo-history.component';
 import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
-import { NavigationBarModule } from '../../shared/layout/navigation-bar/navigation-bar.module';
 import { HighlightModule } from 'ngx-highlightjs';
+import { ShareRepositoryComponentsModule } from '../../shared/components/repository/ShareRepositoryComponents.module';
+import { ShareBranchComponentsModule } from '../../shared/components/branch/ShareBranchComponents.module';
+import { ShareCommitComponentsModule } from '../../shared/components/commit/ShareCommitComponents.module';
 
 
 const declareComps = [
@@ -31,8 +33,10 @@ const declareComps = [
         XTerminalModule,
         CoreModule,
         RepositoriesRouting,
-        NavigationBarModule,
-        HighlightModule
+        ShareRepositoryComponentsModule,
+        ShareBranchComponentsModule,
+        ShareCommitComponentsModule,
+        HighlightModule,
     ]
 })
 export class RepositoriesModule {

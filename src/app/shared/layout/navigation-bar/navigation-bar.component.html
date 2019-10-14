@@ -1,5 +1,5 @@
 <div class="buttons-bar">
-    <div [class.open]="isRepositoryBoxOpen"
+    <div [class.active]="isRepositoryBoxOpen"
          class="function repo-selection">
         <div class="inner-title feature-right">
             <div (click)="toggleRepositoryBox()" class="main-function">
@@ -7,12 +7,7 @@
                     Current Repository
                 </div>
                 <div class="title">
-                    <ng-container *ngIf="loading.repository">
-                        Loading
-                    </ng-container>
-                    <ng-container *ngIf="!loading.repository">
-                        {{repository?.name}}
-                    </ng-container>
+                    {{repository?.name}}
                 </div>
             </div>
             <div class="right-feature">
@@ -20,13 +15,13 @@
             </div>
         </div>
 
-        <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"
-                                       class="list-repositories">
-        </gitme-navigation-repositories>
+<!--        <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"-->
+<!--                                       class="list-repositories">-->
+<!--        </gitme-navigation-repositories>-->
     </div>
 
     <div (isOutside)="clickOutSide($event, 'branches')"
-         [class.open]="isBranchBoxOpen"
+         [class.active]="isBranchBoxOpen"
          appIsClickOutside
          class="function repo-branches">
         <div (click)="toggleBranchBox()" class="inner-title raw">

@@ -3,6 +3,7 @@ import { Account } from '../state/DATA/account-list';
 import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
+import { CommitOptions } from '../state/DATA/repository-branches';
 
 
 @Injectable()
@@ -50,6 +51,10 @@ export class UtilityService {
         return +strUnit.substr(0, strUnit.length - 1);
     }
 
+    /**
+     * Get the string that parsed all unicode characters to safe characters to include in terminal git command
+     * @param dangerString
+     */
     gitStringSafe(dangerString: string) {
         const charLength = dangerString.length;
         let finalString = '';
@@ -67,6 +72,10 @@ export class UtilityService {
         return finalString;
     }
 
+    /**
+     * Retrieve the safe directory string to use in terminal
+     * @param rawPath
+     */
     directorySafePath(rawPath: string) {
         const fixedRawPath = this.slashFixer(rawPath);
         const strSplit = fixedRawPath.split('/').map(nonTrim => nonTrim.trim());
@@ -161,6 +170,7 @@ export class UtilityService {
         files.forEach(file => {
             if (file.path.includes('->')) {
                 const extracted = this.extractPathsFromRenamedCase(file);
+                console.log(extracted);
                 arrCompleted.push(extracted.deleted, extracted.added);
             } else {
                 const safePath = this.directorySafePath(file.path);
@@ -178,5 +188,15 @@ export class UtilityService {
             deleted: deleted.slice(0, deleted.length - 1),
             added: added.slice(0, added.length - 1)
         };
+    }
+
+    stringifyObjectOption(objOptions: CommitOptions) {
+        let stringFinal = '';
+        Object.keys(objOptions).forEach(argu => {
+            stringFinal += argu + (argu.trim().indexOf('--') === 0 ? '=' : ' ');
+            // appending value
+            stringFinal += (!!objOptions[argu] ? objOptions[argu].trim() : '') + ' ';
+        });
+        return stringFinal.length > 0 ? stringFinal : 'none';
     }
 }

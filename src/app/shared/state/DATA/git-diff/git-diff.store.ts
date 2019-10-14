@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store, StoreConfig } from '@datorama/akita';
-import { GitDiff } from '../../../model/GitDiff';
+import { GitDiff } from '../../../model/gitDiff.model';
 
 export interface GitDiffState {
     diff: GitDiff;

@@ -7,7 +7,6 @@ export interface Repository {
     credential?: RepositoryCredential;
     branches?: RepositoryBranchSummary[];
 
-    options?: CommitOptions[];
     tags?: CommitTags[];
 
     timestamp?: number;
@@ -25,12 +24,6 @@ export interface RepositoryRemotes {
 export interface RepositoryCredential {
     id_credential: string;
     name?: string;
-}
-
-export interface CommitOptions {
-    branch?: string;
-    argument?: string;
-    value?: string;
 }
 
 export interface CommitTags {

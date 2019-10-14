@@ -8,41 +8,48 @@ $primary-light: #263238;
 $primary-light-lighter: #4f5b62;
 
 $shadow-light: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+$shadow-light-leveled: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 
 $transparent-backdrop: rgba(0, 0, 0, 0.75);
 
 .bg-success {
-    background-color: #00c851;
+    background-color: #00c851 !important;
 }
 
 .bg-warning {
-    background-color: #ffbb33;
+    background-color: #ffbb33 !important;
 }
 
 .bg-danger {
-    background-color: tomato;
+    background-color: tomato !important;
 }
 
 .bg-info {
-    background-color: dodgerblue;
+    background-color: dodgerblue !important;
 }
 
 .bg-transparent {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 
 .bg-primary-black {
-    background: $primary-black;
+    background: $primary-black !important;
+}
+
+.bg-primary-black-mat-dialog {
+    .mat-dialog-container {
+        background-color: $primary-black !important;
+    }
 }
 
 .bg-primary-black-darker {
-    background: $primary-black-darker;
+    background: $primary-black-darker !important;
 }
 
 .bg-primary-black-foreground {
-    background: $primary-black-foreground;
+    background: $primary-black-foreground !important;
 }
 
 .bg-primary-black-lighter {
-    background: $primary-black-lighter;
+    background: $primary-black-lighter !important;
 }

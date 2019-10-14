@@ -15,11 +15,7 @@
     </div>
 
     <div class="list-branches">
-        <gitme-branch-item *ngFor="let branch of branches | async"
-                           class="branch"
-                           [branchSummary]="branch">
-        </gitme-branch-item>
-        <gitme-branch-item *ngFor="let branch of branches | async"
+        <gitme-branch-item *ngFor="let branch of branches"
                            class="branch"
                            [branchSummary]="branch">
         </gitme-branch-item>

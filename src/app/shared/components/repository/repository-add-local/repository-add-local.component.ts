@@ -12,6 +12,7 @@ import { DialogsInformation } from '../../../model/DialogsInformation';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { SecurityService } from '../../../../services/system/security.service';
 import { Account, AccountListService } from '../../../state/DATA/account-list';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'gitme-repository-add-local',
@@ -52,7 +53,8 @@ export class RepositoryAddLocalComponent implements OnInit {
         private gitPackService: GitService,
         private fileSystemService: FileSystemService,
         private cd: ChangeDetectorRef,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private router: Router
     ) {
         this.electron = electronNG.remote;
     }
@@ -167,11 +169,13 @@ export class RepositoryAddLocalComponent implements OnInit {
          * * Update working repository
          * * Fetching new repository => reassign main branch
          */
-        fromPromise(this.repositoryService.newRepository(
+        fromPromise(this.repositoryService.insertNewRepository(
             repositoryInstance, credentialsInstance, !this.isExistingAccount
         )).subscribe(
             addStatus => {
-                console.log(addStatus);
+                if (addStatus.status) {
+                    this.router.navigateByUrl('/');
+                }
                 this.cancelDialogAdding();
             }
         );

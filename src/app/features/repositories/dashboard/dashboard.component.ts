@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GitDiffService, GitDiffState } from '../../../shared/state/DATA/git-diff';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { Repository } from '../../../shared/state/DATA/repositories';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
-import { StatusSummary } from '../../../shared/model/StatusSummary';
+import { StatusSummary } from '../../../shared/model/statusSummary.model';
 
 @Component({
     selector: 'gitme-dashboard',

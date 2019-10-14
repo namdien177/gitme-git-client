@@ -1,0 +1,39 @@
+@import 'src/styles/theme';
+
+:host {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content auto max-content;
+    height: 100%;
+}
+
+.footDialog {
+    justify-content: space-between;
+}
+
+.optionsList {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -12px !important;
+    padding: 0 12px !important;
+
+    > * {
+        margin-bottom: 0.5rem;
+    }
+
+    .innerContent {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(auto-fill, max-content);
+        grid-gap: 0.5rem 1rem;
+
+        align-items: start;
+
+        .title {
+            padding: 0.5rem 0;
+            user-select: none;
+            font-size: 0.8rem;
+        }
+    }
+}

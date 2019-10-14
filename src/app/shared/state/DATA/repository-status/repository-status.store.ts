@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store, StoreConfig } from '@datorama/akita';
-import { StatusSummary } from '../../../model/StatusSummary';
+import { StatusSummary } from '../../../model/statusSummary.model';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
 
 export interface RepositoryStatusState extends StatusSummary {

@@ -3,7 +3,7 @@ import { GitDiffState, GitDiffStore } from './git-diff.store';
 import { GitDiffQuery } from './git-diff.query';
 import { CodeHighlightService } from '../../../../services/features/code-highlight.service';
 import { Observable } from 'rxjs';
-import { GitDiff } from '../../../model/GitDiff';
+import { GitDiff } from '../../../model/gitDiff.model';
 
 @Injectable({ providedIn: 'root' })
 export class GitDiffService {

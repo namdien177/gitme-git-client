@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createInitialState, FileStatusSummaryView, RepositoryStatusStore } from './repository-status.store';
-import { StatusSummary } from '../../../model/StatusSummary';
+import { StatusSummary } from '../../../model/statusSummary.model';
 import { RepositoryStatusQuery } from './repository-status.query';
 
 @Injectable({ providedIn: 'root' })

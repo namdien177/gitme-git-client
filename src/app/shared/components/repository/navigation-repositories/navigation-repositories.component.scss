@@ -1,12 +1,11 @@
-@import "src/styles/theme";
+@import "../../../../../styles/theme";
 
 :host {
-    position: fixed;
-    top: calc(32px + 80px);
+    position: absolute;
+    top: 100%;
     left: 0;
-    bottom: 0;
-    width: calc(100vw - 700px);
-    max-width: 350px;
+    height: calc(100vh - 112px);
+    width: 100%;
     background-color: $primary-black-darker;
     z-index: 10050;
     padding: 0;

@@ -18,7 +18,7 @@ export class RepositoryBranchesService {
     ) {
     }
 
-    async load(repository: Repository, credentials?: Account) {
+    async load(repository: Repository) {
         const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
         this.set(repoSum);
     }
@@ -44,15 +44,15 @@ export class RepositoryBranchesService {
         this.store.set(listBranch);
     }
 
-    get(): Observable<RepositoryBranchSummary[]> {
+    select(): Observable<RepositoryBranchSummary[]> {
         return this.query.selectAll();
     }
 
-    getSync(): RepositoryBranchSummary[] {
+    get(): RepositoryBranchSummary[] {
         return this.query.getAll();
     }
 
-    getActive() {
+    selectActive() {
         this.setLoading();
         return this.query.selectActive().pipe(
             tap(() => {
@@ -61,7 +61,7 @@ export class RepositoryBranchesService {
         );
     }
 
-    getActiveSync() {
+    getActive() {
         return this.query.getActive();
     }
 
