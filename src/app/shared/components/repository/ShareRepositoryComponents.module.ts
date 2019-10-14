@@ -5,6 +5,7 @@ import { NavigationRepositoriesComponent } from './navigation-repositories/navig
 import { RepositoryAddLocalComponent } from './repository-add-local/repository-add-local.component';
 import { RepositoryCloneComponent } from './repository-add-clone/repository-clone.component';
 import { RepositoryItemComponent } from './repository-item/repository-item.component';
+import { ShareCredentialsComponentsModule } from '../credential/ShareCredentialsComponents.module';
 
 const declareComps = [
     NavigationRepositoriesComponent,
@@ -22,6 +23,7 @@ const declareComps = [
     ],
     imports: [
         CommonModule,
+        ShareCredentialsComponentsModule,
         CoreModule
     ]
 })

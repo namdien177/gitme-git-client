@@ -219,21 +219,19 @@ export class RepositoriesService {
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
         const { name, id_credential } = repository.credential;
         const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
-        const author = !!name ? name : null;
-        if (!!option && !!!option['--author'] && author && authorDB) {
-            option = Object.assign(option, {
-                '--author': `"${ author } <${ authorDB.username }>"`
-            });
-        } else if (!option && author && authorDB) {
-            option = {
-                '--author': `"${ author } <${ authorDB.username }>"`
-            };
-        }
+        // if (!!option && !!option['--author'] && author && authorDB) {
+        //     option = Object.assign(option, {
+        //         '--author': `"${ author } <${ authorDB.username }>"`
+        //     });
+        // } else if (!option && author && authorDB) {
+        //     option = {
+        //         '--author': `"${ author } <${ authorDB.username }>"`
+        //     };
+        // }
         console.log(option);
         console.log(repository.credential);
-        console.log(author);
         return fromPromise(
-            this.gitService.commit(repository, title, files, option)
+            this.gitService.commit(repository, authorDB, title, files, option)
         ).pipe(
             tap(() => this.fetch({ ...repository }))
         );

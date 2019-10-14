@@ -334,10 +334,13 @@ export class GitService {
         });
     }
 
-    async commit(repository: Repository, message: string, fileList?: string[], option?: {
+    async commit(repository: Repository, account: Account, message: string, fileList?: string[], option?: {
         [properties: string]: string
     }) {
-        return this.gitInstance(repository.directory).commit(message, fileList, option);
+        const instanceGit = await this.gitInstance(repository.directory);
+        await instanceGit.addConfig('user.name', account.name_local);
+        await instanceGit.addConfig('user.email', account.username);
+        return instanceGit.commit(message, fileList, option);
     }
 
     async undoChange(repository: Repository, files: FileStatusSummaryView[]) {
