@@ -11,6 +11,7 @@ import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-option
 import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
 import { switchMap } from 'rxjs/operators';
+import { GitDiffService } from '../../../state/DATA/git-diff';
 
 @Component({
     selector: 'gitme-commit-menu',
@@ -38,6 +39,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         private repositoryBranchesService: RepositoryBranchesService,
         private repositoriesService: RepositoriesService,
         private utilitiesService: UtilityService,
+        private gitDiffService: GitDiffService,
         public dialog: MatDialog,
         private fb: FormBuilder
     ) {
@@ -134,6 +136,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             switchMap(result => {
                 this.formCommitment.reset();
                 console.log(this.repository);
+                this.gitDiffService.reset();
                 return this.repositoriesService.fetch(
                     { ...this.repository } as Repository,
                     this.activeBranch
