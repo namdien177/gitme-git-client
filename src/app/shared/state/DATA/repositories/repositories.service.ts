@@ -270,7 +270,6 @@ export class RepositoriesService {
         );
         // update timestamp
         repository.timestamp = moment().valueOf();
-        console.log(repository);
         return fromPromise(
             this.gitService.fetchInfo(repository, credential, branch)
             .then(
@@ -282,6 +281,11 @@ export class RepositoriesService {
                     return res;
                 }
             )
+        ).pipe(
+            switchMap(result => {
+                console.log(result);
+                return fromPromise(this.load());
+            })
         );
     }
 
@@ -318,7 +322,6 @@ export class RepositoriesService {
 
         const repositoryFileDirectory = configFile.repository_config;
         const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
-        console.log(repositories);
         const statusUpdate: {
             status: boolean
             repository: Repository
@@ -343,10 +346,8 @@ export class RepositoriesService {
 
     async getAllRepositoryFromConfig(repositoryFileDirectory: string[]) {
         const repositories: Repository[] = [];
-        console.log(repositoryFileDirectory);
         for (const fileName of repositoryFileDirectory) {
             const repos = await this.dataService.getRepositoriesConfigData(fileName);
-            console.log(repos);
             if (!!repos && !!repos.repository) {
                 repositories.push(repos.repository);
             }

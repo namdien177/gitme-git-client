@@ -128,9 +128,6 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             optionCommits = this.optional.value;
         }
 
-        console.log(this.title.value);
-        console.log(this.files.value);
-        console.log(this.optional.value);
         this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits).subscribe(
             result => {
                 console.log(result);
