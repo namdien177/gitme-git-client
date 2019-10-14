@@ -1,4 +1,6 @@
-<div [class.selected]="branchSummary?.current" class="card">
+<div [class.selected]="branchSummary?.current"
+     (click)="checkoutBranches()"
+     class="card">
     <div class="card-body row">
         <div class="remote-status">
             <i class="fas fa-code-branch"></i>
