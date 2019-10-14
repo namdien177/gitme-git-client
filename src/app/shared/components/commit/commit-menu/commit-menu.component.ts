@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material';
 import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
 import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
     selector: 'gitme-commit-menu',
@@ -128,10 +129,17 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             optionCommits = this.optional.value;
         }
 
-        this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits).subscribe(
-            result => {
+        this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits)
+        .pipe(
+            switchMap(result => {
                 console.log(result);
                 this.formCommitment.reset();
+                return this.repositoriesService.fetch(this.repository, this.activeBranch);
+            })
+        )
+        .subscribe(
+            fetchStatus => {
+                console.log(fetchStatus);
             }
         );
     }

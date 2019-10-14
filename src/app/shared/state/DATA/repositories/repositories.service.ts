@@ -220,11 +220,8 @@ export class RepositoriesService {
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
         const { id_credential } = repository.credential;
         const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
-        const activeBranch = this.repositoryBranchesService.getActive();
         return fromPromise(
             this.gitService.commit(repository, authorDB, title, files, option)
-        ).pipe(
-            tap(() => this.fetch({ ...repository }, activeBranch))
         );
     }
 
@@ -276,9 +273,9 @@ export class RepositoriesService {
             switchMap(res => {
                 return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
             }),
-            switchMap(result => {
+            tap(result => {
                 console.log(result);
-                return fromPromise(this.load());
+                this.load();
             })
         );
     }
