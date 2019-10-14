@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { FileWatchesStore } from './file-watches.store';
 import { chokidarNode, fsNode } from '../../../types/types.electron';
+import { FileWatchesQuery } from './file-watches.query';
 
 @Injectable({ providedIn: 'root' })
 export class FileWatchesService implements OnDestroy {
@@ -28,9 +29,14 @@ export class FileWatchesService implements OnDestroy {
     ];
 
     constructor(
-        private fileChangesStore: FileWatchesStore,
+        private store: FileWatchesStore,
+        private query: FileWatchesQuery,
     ) {
         this.chokidar = chokidarNode;
+    }
+
+    selectChanges() {
+        return this.query.select();
     }
 
     watch(watchingPath: string) {
@@ -49,7 +55,7 @@ export class FileWatchesService implements OnDestroy {
                 path: string,
                 stats?: typeof fsNode.Stats
             ) => {
-                this.fileChangesStore.update({
+                this.store.update({
                     isChange: true,
                     path: path,
                     type: eventName,
@@ -64,7 +70,7 @@ export class FileWatchesService implements OnDestroy {
         this.watcher = null;
 
         if (emit) {
-            this.fileChangesStore.update({
+            this.store.update({
                 isChange: null,
                 path: null,
                 type: null,

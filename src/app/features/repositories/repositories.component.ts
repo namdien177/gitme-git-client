@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { of, Subject } from 'rxjs';
+import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { switchMap } from 'rxjs/operators';
+import { debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
@@ -23,7 +23,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
 
     isRepositoryBoxOpen = false;
     isBranchBoxOpen = false;
-    isViewChangeTo = 'changes';
+    isViewChangeTo: 'changes' | 'history' = 'changes';
 
     private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -34,9 +34,11 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         private repositoryStatusService: RepositoryStatusService,
         private fileWatchesService: FileWatchesService,
     ) {
-        this.watchingUIState();     // Observing dropdown list of components
-        this.watchingRepository();  // Observing repository
-        this.watchingBranch();  // Observing repository
+        this.watchingUIState();         // Observing dropdown list of components
+        this.watchingRepository();      // Observing repository
+        this.watchingBranch();          // Observing repository
+        this.watchingFileChanges();     // Observing file changes by chokidar
+        this.loopRefreshBranchStatus(); // Loop to auto fetching
     }
 
     ngOnInit() {
@@ -47,7 +49,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     }
 
     toggleRepositoryBox() {
-        console.log('togg');
         this.repoMenuService.toggleRepositoryMenu(this.isRepositoryBoxOpen);
     }
 
@@ -72,6 +73,42 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
     }
 
+    commitMenuCategory(view: 'changes' | 'history') {
+        this.isViewChangeTo = view;
+
+        if (view === 'changes') {
+
+        } else {
+
+        }
+    }
+
+    /**
+     * Default looping 15s
+     * Fetching and retrieve status for every 15 second.
+     * @param loopDuration
+     */
+    private loopRefreshBranchStatus(loopDuration = 15000) {
+        interval(loopDuration)
+        .pipe(
+            takeUntil(this.componentDestroyed),
+            switchMap(() => {
+                if (!!this.repository && !!this.activeBranch) {
+                    return this.repositoriesService.fetch(
+                        { ...this.repository } as Repository,
+                        { ...this.activeBranch } as RepositoryBranchSummary
+                    );
+                }
+                return of(null);
+            }),
+            switchMap(() => this.observingBranchStatus())
+        ).subscribe((status) => {
+            this.statusSummary = status;
+            if (status) {
+                this.repositoryStatusService.set(status);
+            }
+        });
+    }
 
     private watchingUIState() {
         this.repoMenuService.select().subscribe(state => {
@@ -107,18 +144,8 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Return the current status of branch
+     * Observing branch status
      */
-    private observingBranchStatus() {
-        if (!!this.repository) {
-            return this.repositoriesService.getBranchStatus(
-                this.repository,
-                false
-            );
-        }
-        return of(null);
-    }
-
     private watchingBranch() {
         this.repositoryBranchesService.select()
         .subscribe(
@@ -129,5 +156,37 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
                 });
             }
         );
+    }
+
+    /**
+     * Start listening to changes by Chokidar for better performance and cross-platform support
+     */
+    private watchingFileChanges() {
+        this.fileWatchesService.selectChanges().pipe(
+            takeUntil(this.componentDestroyed),
+            takeWhile(() => this.isViewChangeTo === 'changes'),
+            debounceTime(200),
+            switchMap(() => this.observingBranchStatus())
+        ).subscribe(
+            (status: StatusSummary) => {
+                this.statusSummary = status;
+                if (status) {
+                    this.repositoryStatusService.set(status);
+                }
+            }
+        );
+    }
+
+    /**
+     * Return the current status of branch
+     */
+    private observingBranchStatus() {
+        if (!!this.repository) {
+            return this.repositoriesService.getBranchStatus(
+                this.repository,
+                false
+            );
+        }
+        return of(null);
     }
 }
