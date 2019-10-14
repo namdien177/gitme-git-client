@@ -318,7 +318,7 @@ export class RepositoriesService {
 
         const repositoryFileDirectory = configFile.repository_config;
         const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
-
+        console.log(repositories);
         const statusUpdate: {
             status: boolean
             repository: Repository
@@ -327,7 +327,7 @@ export class RepositoriesService {
 
         for (const repository of repositories) {
             if (repository.id === repositoryUpdate.id) {
-                const status = await this.dataService.updateRepositoryData(repositoryUpdate);
+                const status = await this.dataService.updateRepositoryData(repositoryUpdate, true);
                 statusUpdate.push(
                     {
                         status: status,
