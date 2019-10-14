@@ -275,6 +275,7 @@ export class RepositoriesService {
             this.gitService.fetchInfo(repository, credential, branch)
             .then(
                 res => {
+                    console.log(res);
                     if (typeof res !== 'boolean') {
                         this.updateExistingRepositoryOnLocalDatabase(res.repository).then(result => console.log(result));
                     }
