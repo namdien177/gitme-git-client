@@ -260,6 +260,12 @@ export class RepositoriesService {
         );
     }
 
+    /**
+     * Fetching data
+     * @param repository
+     * @param branch
+     * @param option
+     */
     fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
         // get account
         const credential: Account = this.accountListService.getOneSync(
@@ -273,8 +279,7 @@ export class RepositoriesService {
             switchMap(res => {
                 return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
             }),
-            tap(result => {
-                console.log(result);
+            tap(() => {
                 this.load();
             })
         );

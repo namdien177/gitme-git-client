@@ -132,7 +132,6 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits)
         .pipe(
             switchMap(result => {
-                console.log(result);
                 this.formCommitment.reset();
                 console.log(this.repository);
                 return this.repositoriesService.fetch(

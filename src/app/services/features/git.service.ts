@@ -232,59 +232,12 @@ export class GitService {
     async fetchInfo(repository: Repository, credentials: Account, branch: RepositoryBranchSummary) {
         // retrieve the directory for gitInstance to execute
         const { directory } = repository;
-
-        // // checking remotes
-        // let urlRemotes: string = null;
-        // let fetchURlLocal: string = null;
-        // if (!!remote) {
-        //     const findBranchDefault = remote.find(remoteFetch => remoteFetch.name === 'origin');
-        //     if (!!findBranchDefault) {
-        //         fetchURlLocal = findBranchDefault.fetch;
-        //     }
-        // }
-        // if (!!remote && !!fetchURlLocal) {
-        //     if (credentials) {
-        //         urlRemotes = this.utilities.addCredentialsToRemote(fetchURlLocal, credentials);
-        //     } else {
-        //         urlRemotes = fetchURlLocal;
-        //     }
-        // } else {
-        //     // retrieve from gitInstance
-        //     const listRemotes = await this.gitInstance(directory).getRemotes(true);
-        //     let fallbackURLRemotes = '';
-        //     const arrNewRemotes: RepositoryRemotes[] = [];
-        //
-        //     listRemotes.forEach(remoteInfo => {
-        //         if (!!!customRemote && remoteInfo.name === 'origin') {
-        //             urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
-        //             fallbackURLRemotes = urlRemotes;
-        //         } else if (remoteInfo.name === customRemote) {
-        //             urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
-        //         }
-        //
-        //         arrNewRemotes.push({
-        //             id: this.securityService.randomID,
-        //             name: remoteInfo.name,
-        //             fetch: remoteInfo.refs.fetch,
-        //             push: remoteInfo.refs.push
-        //         });
-        //     });
-        //
-        //     if (!urlRemotes && !fallbackURLRemotes) {
-        //         return false;
-        //     }
-        //
-        //     if (!urlRemotes) {
-        //         urlRemotes = fallbackURLRemotes;
-        //     }
-        //
-        //     repository.remote = arrNewRemotes;
-        // }
         let urlRemote = branch.tracking.fetch;
         if (!!credentials) {
             urlRemote = this.utilities.addCredentialsToRemote(urlRemote, credentials);
         }
         const data = await this.gitInstance(directory).fetch(urlRemote);
+        console.log(data);
         return {
             fetchData: data,
             repository
