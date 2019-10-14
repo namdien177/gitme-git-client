@@ -34,7 +34,6 @@ export class RepositoriesService {
     ) {
     }
 
-
     /**
      * STATUS: DONE
      * Create new repository and add to local file config
@@ -163,6 +162,7 @@ export class RepositoriesService {
     }
 
     /**
+     * STATUS: DONE
      * Get the current active repository
      */
     getActive(): Repository {
@@ -170,6 +170,7 @@ export class RepositoriesService {
     }
 
     /**
+     * STATUS: DONE
      * Remove the active state.
      */
     clearActive() {
@@ -217,23 +218,13 @@ export class RepositoriesService {
      * @param option
      */
     commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
-        const { name, id_credential } = repository.credential;
+        const { id_credential } = repository.credential;
         const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
-        // if (!!option && !!option['--author'] && author && authorDB) {
-        //     option = Object.assign(option, {
-        //         '--author': `"${ author } <${ authorDB.username }>"`
-        //     });
-        // } else if (!option && author && authorDB) {
-        //     option = {
-        //         '--author': `"${ author } <${ authorDB.username }>"`
-        //     };
-        // }
-        console.log(option);
-        console.log(repository.credential);
+        const activeBranch = this.repositoryBranchesService.getActive();
         return fromPromise(
             this.gitService.commit(repository, authorDB, title, files, option)
         ).pipe(
-            tap(() => this.fetch({ ...repository }))
+            tap(() => this.fetch({ ...repository }, activeBranch))
         );
     }
 
@@ -272,15 +263,16 @@ export class RepositoriesService {
         );
     }
 
-    fetch(repository: Repository, option?: { [git: string]: string }) {
+    fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
         // get account
         const credential: Account = this.accountListService.getOneSync(
             repository.credential.id_credential
         );
         // update timestamp
         repository.timestamp = moment().valueOf();
+        console.log(repository);
         return fromPromise(
-            this.gitService.fetchInfo(repository, credential)
+            this.gitService.fetchInfo(repository, credential, branch)
             .then(
                 res => {
                     if (typeof res !== 'boolean') {

@@ -13,7 +13,6 @@ import { FileStatusSummaryView, RepositoryStatusService } from '../../state/DATA
 import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
 import { ApplicationStateService } from '../../state/UI/Application-State';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { LoadingIndicatorService } from '../../state/system/Loading-Indicator';
 
 @Component({
     selector: 'gitme-navigation-bar',
@@ -140,7 +139,7 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         if (this.statusSummary.ahead < 1) {
             return;
         }
-        const branches = this.repositoryBranchesService.getSync();
+        const branches = this.repositoryBranchesService.get();
         this.repositoriesService.push(this.repository, branches).subscribe(
             result => {
             }
@@ -261,12 +260,14 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
         .pipe(
             auditTime(200)
         )
-        .subscribe(status => {});
+        .subscribe(status => {
+        });
 
         this.repositoriesQuery.selectLoading()
         .pipe(
             auditTime(200)
         )
-        .subscribe(status => {});
+        .subscribe(status => {
+        });
     }
 }

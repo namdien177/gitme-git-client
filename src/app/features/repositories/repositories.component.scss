@@ -16,10 +16,12 @@
         grid-template-areas: 'branches  push  settings' 'router router router';
         grid-template-columns: 350px auto 80px;
         grid-template-rows: 60px auto;
+        z-index: 1;
     }
 
     .left-panel {
         grid-area: commit;
+        z-index: 2;
     }
 }
 

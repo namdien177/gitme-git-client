@@ -48,11 +48,11 @@ export class RepositoryBranchesService {
         return this.query.selectAll();
     }
 
-    getSync(): RepositoryBranchSummary[] {
+    get(): RepositoryBranchSummary[] {
         return this.query.getAll();
     }
 
-    getActive() {
+    selectActive() {
         this.setLoading();
         return this.query.selectActive().pipe(
             tap(() => {
@@ -61,7 +61,7 @@ export class RepositoryBranchesService {
         );
     }
 
-    getActiveSync() {
+    getActive() {
         return this.query.getActive();
     }
 

@@ -18,12 +18,38 @@ export class GitService {
     ) {
     }
 
+    private static repositoryBranchBuilder(
+        oldBranchInstance,
+        name,
+        isCurrent,
+        option,
+        trackingOn,
+        isRemote,
+        isLocal
+    ): RepositoryBranchSummary {
+        return Object.assign(
+            {},
+            oldBranchInstance,
+            { name: name },
+            { current: isCurrent },
+            { options: option },
+            { tracking: trackingOn },
+            { has_remote: isRemote },
+            { has_local: isLocal }
+        );
+    }
+
+    /**
+     * Retrieve instance of the git repository.
+     * @param dir Raw directory, then will be converted to a safer string later.
+     */
     gitInstance(dir?: string) {
         dir = this.utilities.directorySafePath(dir);
         return git(dir);
     }
 
     /**
+     * STATUS: DONE
      * Get the name of the repository by looping out from array of paths
      * @param arrayPath
      */
@@ -44,12 +70,12 @@ export class GitService {
     }
 
     /**
-     * Get all branches of the repository.
-     * @param directory
-     * @param oldBranches
+     * STATUS: DONE
+     * Get all branches of the repository via directory.
+     * @param directory     Working directory
+     * @param oldBranches   Retrieve from repository configs
      */
     async getBranchInfo(directory: string, oldBranches: RepositoryBranchSummary[] = []): Promise<RepositoryBranchSummary[]> {
-        // const branchAll = await this.gitInstance(directory).branch(['-a']);
         const branchRemoteRaw = await this.gitInstance(directory).branch(['-r']);
         const branchLocalRaw = await this.gitInstance(directory).branch([]);
         const branchTracking = await this.getBranchTracking(directory);
@@ -68,30 +94,20 @@ export class GitService {
                 const extractedNameRemote = slidedSlash.slice(1).join('/');   // remove origin/
                 const existInstanceLocal = branchLocalRaw.all.find(nameLocalBranch => nameLocalBranch === extractedNameRemote);
                 if (!!existInstanceLocal && existInstanceLocal.length > 0) {
-                    const branchItem: RepositoryBranchSummary =
-                        Object.assign(
-                            {},
-                            branchRemoteRaw.branches[branchRemoteInstance],
-                            { name: existInstanceLocal },
-                            { current: branchLocalRaw.branches[existInstanceLocal].current },
-                            { options: null },
-                            { tracking: trackingOn },
-                            { has_remote: true },
-                            { has_local: true }
-                        );
+                    const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+                        branchRemoteRaw.branches[branchRemoteInstance],
+                        existInstanceLocal,
+                        branchLocalRaw.branches[existInstanceLocal].current,
+                        null, trackingOn, true, true
+                    );
                     branchesOutPut.push(branchItem);
                 } else {
-                    const branchItem: RepositoryBranchSummary =
-                        Object.assign(
-                            {},
-                            branchRemoteRaw.branches[branchRemoteInstance],
-                            { name: branchRemoteInstance },
-                            { current: branchRemoteRaw.branches[branchRemoteInstance].current },
-                            { options: null },
-                            { tracking: trackingOn },
-                            { has_remote: true },
-                            { has_local: false }
-                        );
+                    const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+                        branchRemoteRaw.branches[branchRemoteInstance],
+                        branchRemoteInstance,
+                        branchRemoteRaw.branches[branchRemoteInstance].current,
+                        null, trackingOn, true, false
+                    );
                     branchesOutPut.push(branchItem);
                 }
             });
@@ -106,30 +122,20 @@ export class GitService {
                     return branchLocalInstance === extractedNameRemote;
                 });
                 if (!!existRemoteLocal && existRemoteLocal.length > 0) {
-                    const branchItem: RepositoryBranchSummary =
-                        Object.assign(
-                            {},
-                            branchRemoteRaw.branches[existRemoteLocal],
-                            { name: branchLocalInstance },
-                            { current: branchLocalRaw.branches[branchLocalInstance].current },
-                            { options: null },
-                            { tracking: trackingOn },
-                            { has_remote: true },
-                            { has_local: true }
-                        );
+                    const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+                        branchRemoteRaw.branches[existRemoteLocal],
+                        branchLocalInstance,
+                        branchLocalRaw.branches[branchLocalInstance].current,
+                        null, trackingOn, true, true
+                    );
                     branchesOutPut.push(branchItem);
                 } else {
-                    const branchItem: RepositoryBranchSummary =
-                        Object.assign(
-                            {},
-                            branchRemoteRaw.branches[existRemoteLocal],
-                            { name: branchLocalInstance },
-                            { current: branchLocalRaw.branches[branchLocalInstance].current },
-                            { options: null },
-                            { tracking: trackingOn },
-                            { has_remote: false },
-                            { has_local: true }
-                        );
+                    const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+                        branchRemoteRaw.branches[existRemoteLocal],
+                        branchLocalInstance,
+                        branchLocalRaw.branches[branchLocalInstance].current,
+                        null, trackingOn, false, true
+                    );
                     branchesOutPut.push(branchItem);
                 }
             });
@@ -223,59 +229,62 @@ export class GitService {
         };
     }
 
-    async fetchInfo(repository: Repository, credentials?: Account, customRemote: string = null) {
+    async fetchInfo(repository: Repository, credentials: Account, branch: RepositoryBranchSummary) {
         // retrieve the directory for gitInstance to execute
-        const { directory, remote } = repository;
+        const { directory } = repository;
 
-        // checking remotes
-        let urlRemotes: string = null;
-        let fetchURlLocal: string = null;
-        if (!!remote) {
-            const findBranchDefault = remote.find(remoteFetch => remoteFetch.name === 'origin');
-            if (!!findBranchDefault) {
-                fetchURlLocal = findBranchDefault.fetch;
-            }
+        // // checking remotes
+        // let urlRemotes: string = null;
+        // let fetchURlLocal: string = null;
+        // if (!!remote) {
+        //     const findBranchDefault = remote.find(remoteFetch => remoteFetch.name === 'origin');
+        //     if (!!findBranchDefault) {
+        //         fetchURlLocal = findBranchDefault.fetch;
+        //     }
+        // }
+        // if (!!remote && !!fetchURlLocal) {
+        //     if (credentials) {
+        //         urlRemotes = this.utilities.addCredentialsToRemote(fetchURlLocal, credentials);
+        //     } else {
+        //         urlRemotes = fetchURlLocal;
+        //     }
+        // } else {
+        //     // retrieve from gitInstance
+        //     const listRemotes = await this.gitInstance(directory).getRemotes(true);
+        //     let fallbackURLRemotes = '';
+        //     const arrNewRemotes: RepositoryRemotes[] = [];
+        //
+        //     listRemotes.forEach(remoteInfo => {
+        //         if (!!!customRemote && remoteInfo.name === 'origin') {
+        //             urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
+        //             fallbackURLRemotes = urlRemotes;
+        //         } else if (remoteInfo.name === customRemote) {
+        //             urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
+        //         }
+        //
+        //         arrNewRemotes.push({
+        //             id: this.securityService.randomID,
+        //             name: remoteInfo.name,
+        //             fetch: remoteInfo.refs.fetch,
+        //             push: remoteInfo.refs.push
+        //         });
+        //     });
+        //
+        //     if (!urlRemotes && !fallbackURLRemotes) {
+        //         return false;
+        //     }
+        //
+        //     if (!urlRemotes) {
+        //         urlRemotes = fallbackURLRemotes;
+        //     }
+        //
+        //     repository.remote = arrNewRemotes;
+        // }
+        let urlRemote = branch.tracking.fetch;
+        if (!!credentials) {
+            urlRemote = this.utilities.addCredentialsToRemote(urlRemote, credentials);
         }
-        if (!!remote && !!fetchURlLocal) {
-            if (credentials) {
-                urlRemotes = this.utilities.addCredentialsToRemote(fetchURlLocal, credentials);
-            } else {
-                urlRemotes = fetchURlLocal;
-            }
-        } else {
-            // retrieve from gitInstance
-            const listRemotes = await this.gitInstance(directory).getRemotes(true);
-            let fallbackURLRemotes = '';
-            const arrNewRemotes: RepositoryRemotes[] = [];
-
-            listRemotes.forEach(remoteInfo => {
-                if (!!!customRemote && remoteInfo.name === 'origin') {
-                    urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
-                    fallbackURLRemotes = urlRemotes;
-                } else if (remoteInfo.name === customRemote) {
-                    urlRemotes = this.getURLRemoteFromListGitRemotes(remoteInfo, credentials);
-                }
-
-                arrNewRemotes.push({
-                    id: this.securityService.randomID,
-                    name: remoteInfo.name,
-                    fetch: remoteInfo.refs.fetch,
-                    push: remoteInfo.refs.push
-                });
-            });
-
-            if (!urlRemotes && !fallbackURLRemotes) {
-                return false;
-            }
-
-            if (!urlRemotes) {
-                urlRemotes = fallbackURLRemotes;
-            }
-
-            repository.remote = arrNewRemotes;
-        }
-        // const urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
-        const data = await this.gitInstance(directory).fetch(urlRemotes);
+        const data = await this.gitInstance(directory).fetch(urlRemote);
         return {
             fetchData: data,
             repository
@@ -334,6 +343,15 @@ export class GitService {
         });
     }
 
+    /**
+     * STATUS: DONE
+     * Commit changes
+     * @param repository    Current active repository
+     * @param account       Credentials from repository config (or any source)
+     * @param message       Message title when commit
+     * @param fileList      List directory of changed files, relative to repo directory
+     * @param option        additional option.
+     */
     async commit(repository: Repository, account: Account, message: string, fileList?: string[], option?: {
         [properties: string]: string
     }) {
@@ -427,6 +445,10 @@ export class GitService {
         });
     }
 
+    /**
+     * Splitting raw string of remotes to branchTracking object array.
+     * @param arrayStringRemote
+     */
     private retrieveBranchTrackingArray(arrayStringRemote: string[]) {
         const branchTracking: BranchTracking[] = [];
 
@@ -467,5 +489,4 @@ export class GitService {
             return remoteInfo.refs.fetch;
         }
     }
-
 }

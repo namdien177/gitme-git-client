@@ -6,7 +6,7 @@ export interface RepositoryBranchSummary {
     label?: string;
     // additional
     options?: CommitOptions[];
-    tracking?: BranchTracking[];
+    tracking?: BranchTracking;
     has_remote?: boolean;
     has_local?: boolean;
     last_update?: number;
