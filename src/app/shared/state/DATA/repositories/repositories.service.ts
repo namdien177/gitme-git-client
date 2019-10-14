@@ -343,11 +343,11 @@ export class RepositoriesService {
 
     async getAllRepositoryFromConfig(repositoryFileDirectory: string[]) {
         const repositories: Repository[] = [];
-
+        console.log(repositoryFileDirectory);
         for (const fileName of repositoryFileDirectory) {
             const repos = await this.dataService.getRepositoriesConfigData(fileName);
-
-            if (!!repos && !!repos.repository && repos.repository.length > 0) {
+            console.log(repos);
+            if (!!repos && !!repos.repository) {
                 repositories.push(repos.repository);
             }
         }
