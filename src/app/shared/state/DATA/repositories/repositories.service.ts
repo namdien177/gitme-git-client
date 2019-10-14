@@ -272,16 +272,10 @@ export class RepositoriesService {
         repository.timestamp = moment().valueOf();
         return fromPromise(
             this.gitService.fetchInfo(repository, credential, branch)
-            .then(
-                res => {
-                    console.log(res);
-                    if (typeof res !== 'boolean') {
-                        this.updateExistingRepositoryOnLocalDatabase(res.repository).then(result => console.log(result));
-                    }
-                    return res;
-                }
-            )
         ).pipe(
+            switchMap(res => {
+                return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
+            }),
             switchMap(result => {
                 console.log(result);
                 return fromPromise(this.load());
