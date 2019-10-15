@@ -183,8 +183,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private observingBranchStatus() {
         if (!!this.repository) {
             return this.repositoriesService.getBranchStatus(
-                this.repository,
-                false
+                this.repository
             );
         }
         return of(null);

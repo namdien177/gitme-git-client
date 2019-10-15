@@ -195,7 +195,7 @@ export class RepositoriesService {
         );
     }
 
-    getBranchStatus(repository: Repository, setLoading = true) {
+    getBranchStatus(repository: Repository, setLoading = false) {
         if (setLoading) {
             this.setLoading();
         }

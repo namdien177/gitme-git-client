@@ -20,12 +20,12 @@ export class GitService {
 
     private static repositoryBranchBuilder(
         oldBranchInstance,
-        name,
-        isCurrent,
+        name: string,
+        isCurrent: string | boolean,
         option,
-        trackingOn,
-        isRemote,
-        isLocal
+        trackingOn: BranchTracking,
+        isRemote: boolean,
+        isLocal: boolean
     ): RepositoryBranchSummary {
         return Object.assign(
             {},

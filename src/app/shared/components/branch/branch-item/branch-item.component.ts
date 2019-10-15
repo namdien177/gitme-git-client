@@ -22,12 +22,12 @@ export class BranchItemComponent implements OnInit {
     ) {
         this.repositoriesService.selectActive(false)
         .subscribe(repo => {
-            this.repository = repo;
+            this.repository = { ...repo } as Repository;
         });
 
         this.repositoryStatusService.select()
         .subscribe(status => {
-            this.status = status;
+            this.status = { ...status } as StatusSummary;
         });
     }
 
@@ -35,20 +35,15 @@ export class BranchItemComponent implements OnInit {
     }
 
     checkoutBranches() {
-        if (this.repository && this.branchSummary) {
-            if (this.status.files.length > 0) {
-                // there is file changes
-                // stop the checkout
-            } else {
-                this.repositoriesService.checkoutBranch(
-                    this.repository,
-                    this.branchSummary
-                ).subscribe(
-                    status => {
-                        console.log(status);
-                    }
-                );
-            }
+        if (this.repository && this.branchSummary && this.status.files.length === 0) {
+            this.repositoriesService.checkoutBranch(
+                this.repository,
+                this.branchSummary
+            ).subscribe(
+                status => {
+                    console.log(status);
+                }
+            );
         }
     }
 }

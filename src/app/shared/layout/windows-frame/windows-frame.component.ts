@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../services/system/electron.service';
+import { AppConfig } from '../../model/App-Config';
+import { DataService } from '../../../services/features/data.service';
+import { SecurityService } from '../../../services/system/security.service';
 
 @Component({
     selector: 'gitme-windows-frame',
@@ -8,9 +11,22 @@ import { ElectronService } from '../../../services/system/electron.service';
 })
 export class WindowsFrameComponent implements OnInit {
 
+    appConfig: AppConfig = null;
+    idApp: string = null;
+
     constructor(
-        private electronServices: ElectronService
+        private electronServices: ElectronService,
+        private securityService: SecurityService,
+        private dataService: DataService
     ) {
+        this.idApp = this.securityService.appUUID;
+        this.dataService.getConfigAppData(this.idApp).then(
+            config => {
+                if (!!config) {
+                    this.appConfig = config;
+                }
+            }
+        );
     }
 
     ngOnInit() {
