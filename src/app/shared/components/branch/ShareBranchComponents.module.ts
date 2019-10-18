@@ -13,7 +13,7 @@ const declareComps = [
 
 @NgModule({
     declarations: [
-        ...declareComps
+        ...declareComps,
     ],
     exports: [
         ...declareComps
