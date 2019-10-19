@@ -6,6 +6,7 @@ import { OnlyInfoComponent } from '../components/UI/dialogs/only-info/only-info.
 import { CommitOptionsComponent } from '../components/commit/_dialogs/commit-options/commit-options.component';
 import { MaterialModule } from './material.module';
 import { BranchOptionsComponent } from '../components/branch/_dialogs/branch-options/branch-options.component';
+import { BranchNewOptionComponent } from '../components/branch/_dialogs/branch-new/branch-new-option/branch-new-option.component';
 
 
 const dialogComps = [
@@ -13,7 +14,8 @@ const dialogComps = [
     YesNoDecisionComponent,
     OnlyInfoComponent,
     CommitOptionsComponent,
-    BranchOptionsComponent
+    BranchOptionsComponent,
+    BranchNewOptionComponent,
 ];
 
 @NgModule({
