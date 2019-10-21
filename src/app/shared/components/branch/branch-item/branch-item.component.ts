@@ -41,7 +41,7 @@ export class BranchItemComponent implements OnInit {
     checkoutBranches() {
         if (!this.branchSummary.current) {
             if (this.repository && this.branchSummary && this.status.files.length === 0) {
-                this.repositoriesService.checkoutBranch(
+                this.repositoryBranchService.checkoutBranch(
                     this.repository,
                     this.branchSummary
                 ).subscribe(

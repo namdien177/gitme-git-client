@@ -177,24 +177,6 @@ export class RepositoriesService {
         this.store.setActive(null);
     }
 
-    /**
-     * STATUS: NOT DONE
-     * TODO: need check
-     * Checkout other branch.
-     * @param repo
-     * @param branch
-     */
-    checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
-        this.setLoading();
-        return fromPromise(this.gitService.switchBranch(repo, branch))
-        .pipe(
-            map(status => {
-                this.finishLoading();
-                return status;
-            })
-        );
-    }
-
     getBranchStatus(repository: Repository, setLoading = false) {
         if (setLoading) {
             this.setLoading();
