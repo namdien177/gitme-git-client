@@ -1,5 +1,6 @@
 <div class="repo-files-commit">
     <div (click)="viewDiffFile(file, i)"
+         (contextmenu)="openContextDialog(file)"
          *ngFor="let file of statusSummary?.files; let i = index; trackBy: trackByPath"
          [class.active]="file.active"
          class="files">
