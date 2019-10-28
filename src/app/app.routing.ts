@@ -11,12 +11,12 @@ const routes: Routes = [
     },
     {
         path: 'application',
-        canActivate: [NotExistRepositoryConfigGuard],
+        canActivateChild: [NotExistRepositoryConfigGuard],
         loadChildren: () => import('./features/application/application.module').then(m => m.ApplicationModule)
     },
     {
         path: '**',
-        redirectTo: '/application'
+        redirectTo: '/dashboard'
     }
 ];
 

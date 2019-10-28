@@ -132,7 +132,8 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
 
     openContextDialog(file: FileStatusSummaryView) {
         const dataTransfer = {
-            file
+            file,
+            repository: this.repository
         };
         const contextOpen = this.matBottomSheet.open(SingleComponent, {
             panelClass: ['bg-primary-black', 'p-2-option'],

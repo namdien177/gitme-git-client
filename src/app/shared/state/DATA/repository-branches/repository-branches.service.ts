@@ -66,6 +66,10 @@ export class RepositoryBranchesService {
         );
     }
 
+    revertFiles(repository: Repository, fileDirectories: string[]) {
+
+    }
+
     set(listBranch: RepositoryBranchSummary[]) {
         listBranch.sort(
             (branchA, branchB) => {

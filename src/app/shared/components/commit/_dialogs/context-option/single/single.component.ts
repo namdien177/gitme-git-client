@@ -1,6 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
 import { FileStatusSummaryView } from '../../../../../state/DATA/repository-status';
+import { RepositoryBranchesService } from '../../../../../state/DATA/repository-branches';
+import { Repository } from '../../../../../state/DATA/repositories';
 
 @Component({
     selector: 'gitme-single',
@@ -10,13 +12,22 @@ import { FileStatusSummaryView } from '../../../../../state/DATA/repository-stat
 export class SingleComponent implements OnInit {
 
     extension = '';
+    private readonly file;
+    private readonly repository;
 
     constructor(
         private _bottomSheetRef: MatBottomSheetRef<SingleComponent>,
+        private branchServices: RepositoryBranchesService,
         @Inject(MAT_BOTTOM_SHEET_DATA) public data: {
-            file: FileStatusSummaryView
-        }
+            file: FileStatusSummaryView,
+            repository: Repository
+        },
     ) {
+        this.file = data.file;
+        this.repository = data.repository;
+        if (!this.file || !this.repository) {
+            this.dismissed();
+        }
     }
 
     ngOnInit() {
@@ -26,5 +37,9 @@ export class SingleComponent implements OnInit {
 
     dismissed() {
         this._bottomSheetRef.dismiss();
+    }
+
+    revertChanges() {
+
     }
 }
