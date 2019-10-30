@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { FileSystemService } from '../../services/system/fileSystem.service';
 @Injectable({
     providedIn: 'root'
 })
-export class NotExistRepositoryConfigGuard implements CanActivate {
+export class NotExistRepositoryConfigGuard implements CanActivateChild {
     constructor(
         private dataService: DataService,
         private securityService: SecurityService,
@@ -20,7 +20,7 @@ export class NotExistRepositoryConfigGuard implements CanActivate {
 
     }
 
-    canActivate(
+    canActivateChild(
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
         return fromPromise(

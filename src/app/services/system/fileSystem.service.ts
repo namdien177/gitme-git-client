@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { electronNG, fsNode, pathNode, utilNode } from '../../shared/types/types.electron';
+import { electronNode, fsNode, pathNode, utilNode } from '../../shared/types/types.electron';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { DefineCommon } from '../../common/define.common';
 
@@ -9,21 +9,31 @@ export class FileSystemService {
     private readonly fsNODE: typeof fsNode;
     private readonly pathNODE: typeof pathNode;
     private readonly utilNODE: typeof utilNode;
-    private readonly appELECTRON: typeof electronNG.remote.app;
+    private readonly shellNode: typeof electronNode.shell;
+    private readonly clipboardNODE: typeof electronNode.clipboard;
+
+    private readonly appELECTRON: typeof electronNode.remote.app;
 
     private readonly ROOT;
 
     constructor(
         private utilitiesService: UtilityService
     ) {
+        this.appELECTRON = electronNode.remote.app;
         this.fsNODE = fsNode;
-        this.appELECTRON = electronNG.remote.app;
+        this.pathNODE = pathNode;
         this.utilNODE = utilNode;
+        this.shellNode = electronNode.shell;
+        this.clipboardNODE = electronNode.clipboard;
         this.ROOT = DefineCommon.ROOT;
     }
 
     get fs() {
         return this.fsNODE;
+    }
+
+    get clipboard() {
+        return this.clipboardNODE;
     }
 
     get path() {
@@ -248,6 +258,31 @@ export class FileSystemService {
             }
             return list.concat([name]);
         }, []);
+    }
+
+    /**
+     * Open the folder of a file
+     * @param directory array path to the file
+     */
+    openFolderOf(...directory) {
+        let finalDirectory = '';
+        directory.forEach(dir => {
+            finalDirectory = this.path.join(finalDirectory, dir);
+        });
+
+        return this.shellNode.showItemInFolder(finalDirectory);
+    }
+
+    copyPath(relativeTo: boolean, ...directory: string[]) {
+        let finalDirectory = '';
+        if (relativeTo) {
+            finalDirectory = directory.join('/');
+        } else {
+            directory.forEach(dir => {
+                finalDirectory = this.path.join(finalDirectory, dir);
+            });
+        }
+        this.clipboardNODE.writeText(finalDirectory);
     }
 
     async removeFile(directory: string) {

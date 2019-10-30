@@ -17,7 +17,6 @@ export class ClickOutSideDirective {
 
     @HostListener('document:click', ['$event'])
     onMouseEnter(event: MouseEvent) {
-        console.log(event);
         let toArrWhitelist = [];
         if (Array.isArray(this.whiteListClass)) {
             toArrWhitelist = this.whiteListClass;

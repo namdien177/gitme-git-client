@@ -25,7 +25,7 @@ export type xTermTypeOf = typeof XTerm;
 /**
  * electron instance in angular compile runtime
  */
-export const electronNG: typeof electron = window.require('electron');
+export const electronNode: typeof electron = window.require('electron');
 export type electronNGTypeOf = typeof electron;
 /**
  * NodeJS packages

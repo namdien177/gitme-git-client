@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { cryptoNode, electronNG, uuidNode } from '../../shared/types/types.electron';
+import { cryptoNode, electronNode, uuidNode } from '../../shared/types/types.electron';
 import * as crypto from 'crypto';
 import { LocalStorageService } from './localStorage.service';
 import { DefineCommon } from '../../common/define.common';
@@ -9,7 +9,7 @@ export class SecurityService {
 
     private cryptoNode: typeof crypto;
 
-    private instanceElectron: typeof electronNG.remote;
+    private instanceElectron: typeof electronNode.remote;
     private readonly secretUUID: string;
     private readonly IV_LENGTH = 16; // For AES, this is always 16
 
@@ -17,7 +17,7 @@ export class SecurityService {
         private localStorageService: LocalStorageService
     ) {
         this.secretUUID = localStorageService.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME);
-        this.instanceElectron = electronNG.remote;
+        this.instanceElectron = electronNode.remote;
         this.cryptoNode = cryptoNode;
     }
 

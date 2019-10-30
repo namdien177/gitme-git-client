@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ElectronService } from '../../../services/system/electron.service';
-import { electronNG, electronNGTypeOf } from '../../../shared/types/types.electron';
+import { electronNode, electronNGTypeOf } from '../../../shared/types/types.electron';
 
 @Component({
     selector: 'gitme-welcome-screen',
@@ -17,7 +17,7 @@ export class WelcomeScreenComponent implements OnInit {
         private cd: ChangeDetectorRef,
         private electronService: ElectronService
     ) {
-        this.electron = electronNG;
+        this.electron = electronNode;
     }
 
     ngOnInit() {

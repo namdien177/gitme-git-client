@@ -7,6 +7,7 @@ import { CommitOptionsComponent } from '../components/commit/_dialogs/commit-opt
 import { MaterialModule } from './material.module';
 import { BranchOptionsComponent } from '../components/branch/_dialogs/branch-options/branch-options.component';
 import { BranchNewOptionComponent } from '../components/branch/_dialogs/branch-new/branch-new-option/branch-new-option.component';
+import { SingleComponent as CommitOptionsSingleComponent } from '../components/commit/_dialogs/context-option/single/single.component';
 
 
 const dialogComps = [
@@ -14,6 +15,7 @@ const dialogComps = [
     YesNoDecisionComponent,
     OnlyInfoComponent,
     CommitOptionsComponent,
+    CommitOptionsSingleComponent,
     BranchOptionsComponent,
     BranchNewOptionComponent,
 ];

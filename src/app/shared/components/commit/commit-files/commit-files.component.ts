@@ -10,6 +10,8 @@ import {
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap, tap } from 'rxjs/operators';
 import { GitDiffService } from '../../../state/DATA/git-diff';
+import { MatBottomSheet } from '@angular/material';
+import { SingleComponent } from '../_dialogs/context-option/single/single.component';
 
 @Component({
     selector: 'gitme-commit-files',
@@ -39,7 +41,8 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
         private repositoriesService: RepositoriesService,
         private repositoriesQuery: RepositoriesQuery,
         private repositoryStatusService: RepositoryStatusService,
-        private gitDiffService: GitDiffService
+        private gitDiffService: GitDiffService,
+        private matBottomSheet: MatBottomSheet
     ) {
         this.repositoriesService.selectActive(false).pipe(
             switchMap(repository => {
@@ -124,6 +127,21 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
             this.fileActivated.emit(fileSummary);
             this._fileActivated = fileSummary;
             this.repositoryStatusService.setActive(index);
+        });
+    }
+
+    openContextDialog(file: FileStatusSummaryView) {
+        const dataTransfer = {
+            file,
+            repository: this.repository
+        };
+        const contextOpen = this.matBottomSheet.open(SingleComponent, {
+            panelClass: ['bg-primary-black', 'p-2-option'],
+            data: dataTransfer,
+        });
+
+        contextOpen.afterDismissed().subscribe(data => {
+            console.log(data);
         });
     }
 }
