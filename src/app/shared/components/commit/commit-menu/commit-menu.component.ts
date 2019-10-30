@@ -131,11 +131,15 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
             optionCommits = this.optional.value;
         }
 
-        this.repositoriesService.commit(activeRepository, this.title.value, paths, optionCommits)
+        this.repositoriesService.commit(
+            activeRepository,
+            this.title.value,
+            paths,
+            optionCommits
+        )
         .pipe(
             switchMap(result => {
                 this.formCommitment.reset();
-                console.log(this.repository);
                 this.gitDiffService.reset();
                 return this.repositoriesService.fetch(
                     { ...this.repository } as Repository,
@@ -197,13 +201,15 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private watchingRepository() {
-        this.repositoriesService.selectActive(false).subscribe(repoActive => {
+        this.repositoriesService.selectActive(false)
+        .subscribe(repoActive => {
             this.repository = repoActive;
         });
     }
 
     private watchingSummary() {
-        this.repositoryStatusService.select().subscribe(status => {
+        this.repositoryStatusService.select()
+        .subscribe(status => {
             this.statusSummary = status;
         });
     }
@@ -219,8 +225,6 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (this.activeBranch) {
                     this.optional.setValue(this.activeBranch.options);
                 }
-
-                console.log(this.activeBranch);
             }
         );
     }

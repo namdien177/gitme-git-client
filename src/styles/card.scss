@@ -7,16 +7,17 @@
     user-select: none;
     padding: 0.25rem;
     border-radius: 4px;
+    transition: background-color 0.2s;
 
     &:hover {
-        background-color: $primary-light;
+        background-color: $primary-black;
     }
 
     .card-body {
         padding: 0.75rem;
         margin: 0;
         font-size: 0.8rem;
-        line-height: 1rem;
+        line-height: 1.2;
         color: white;
     }
 }

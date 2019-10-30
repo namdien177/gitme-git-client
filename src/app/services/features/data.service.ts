@@ -180,7 +180,6 @@ export class DataService {
                 return false;
             }
         }
-        console.log(repository);
         return await this.fileSystemService.updateFileContext<AppRepositories>(
             repository.id,
             { repository },

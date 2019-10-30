@@ -1,0 +1,12 @@
+@import "src/styles/theme";
+
+.card {
+
+    &:hover {
+        background-color: $primary-black-darker;
+    }
+
+    .card-body {
+        font-size: 1rem;
+    }
+}
