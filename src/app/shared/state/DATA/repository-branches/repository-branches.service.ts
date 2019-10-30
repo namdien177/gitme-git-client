@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { FileStatusSummaryView } from '../repository-status';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
@@ -46,6 +47,16 @@ export class RepositoryBranchesService {
     }
 
     /**
+     * STATUS: DONE
+     * @param repository
+     * @param files
+     */
+    async revertFiles(repository: Repository, files: FileStatusSummaryView[]) {
+        const dirList = files.map(file => file.path);
+        return this.gitService.revert(repository, dirList);
+    }
+
+    /**
      *
      * @param repository
      * @param branchName
@@ -64,10 +75,6 @@ export class RepositoryBranchesService {
             this.gitService.gitInstance(repository.directory)
             .checkoutLocalBranch(branchName)
         );
-    }
-
-    revertFiles(repository: Repository, fileDirectories: string[]) {
-
     }
 
     set(listBranch: RepositoryBranchSummary[]) {

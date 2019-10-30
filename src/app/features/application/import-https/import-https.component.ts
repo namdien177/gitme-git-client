@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { electronNG, osNode } from '../../../shared/types/types.electron';
+import { electronNode, osNode } from '../../../shared/types/types.electron';
 import { UtilityService } from '../../../shared/utilities/utility.service';
 import { RepositoriesMenuService } from '../../../shared/state/UI/repositories-menu';
 import { GitService } from '../../../services/features/git.service';
@@ -27,7 +27,7 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
         message: null
     };
 
-    private readonly electron: typeof electronNG.remote;
+    private readonly electron: typeof electronNode.remote;
     private formFieldBuilder = {
         repo_https: ['', [Validators.required, Validators.minLength(6)]],
         repo_dir: [osNode.homedir(), [Validators.required, Validators.minLength(1)]],
@@ -45,7 +45,7 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
         private cd: ChangeDetectorRef,
         private router: Router
     ) {
-        this.electron = electronNG.remote;
+        this.electron = electronNode.remote;
     }
 
     get repo_https() {

@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogsInformation } from '../../../shared/model/DialogsInformation';
 import { Account, AccountListService } from '../../../shared/state/DATA/account-list';
-import { electronNG, osNode } from '../../../shared/types/types.electron';
+import { electronNode, osNode } from '../../../shared/types/types.electron';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { UtilityService } from '../../../shared/utilities/utility.service';
 import { GitService } from '../../../services/features/git.service';
@@ -35,7 +35,7 @@ export class ImportLocalComponent implements OnInit {
      */
     credentials: Account = null;
 
-    private readonly electron: typeof electronNG.remote;
+    private readonly electron: typeof electronNode.remote;
     private formFieldBuilder = {
         repo_dir: [osNode.homedir(), Validators.required],
         repo_dir_display: [osNode.homedir(), Validators.required],
@@ -54,7 +54,7 @@ export class ImportLocalComponent implements OnInit {
         private securityService: SecurityService,
         private router: Router
     ) {
-        this.electron = electronNG.remote;
+        this.electron = electronNode.remote;
     }
 
     get repo_name() {

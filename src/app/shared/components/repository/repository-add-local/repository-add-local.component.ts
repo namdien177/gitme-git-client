@@ -4,7 +4,7 @@ import { UtilityService } from '../../../utilities/utility.service';
 import { RepositoriesMenuService } from '../../../state/UI/repositories-menu';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
-import { electronNG, osNode } from '../../../types/types.electron';
+import { electronNode, osNode } from '../../../types/types.electron';
 import { switchMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { of } from 'rxjs';
@@ -36,7 +36,7 @@ export class RepositoryAddLocalComponent implements OnInit {
      */
     credentials: Account = null;
 
-    private readonly electron: typeof electronNG.remote;
+    private readonly electron: typeof electronNode.remote;
     private formFieldBuilder = {
         repo_dir: [osNode.homedir(), Validators.required],
         repo_dir_display: [osNode.homedir(), Validators.required],
@@ -56,7 +56,7 @@ export class RepositoryAddLocalComponent implements OnInit {
         private securityService: SecurityService,
         private router: Router
     ) {
-        this.electron = electronNG.remote;
+        this.electron = electronNode.remote;
     }
 
     get repo_name() {

@@ -17,6 +17,7 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
+import { UtilityService } from '../../../utilities/utility.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -30,7 +31,8 @@ export class RepositoriesService {
         private localStorageService: LocalStorageService,
         private accountListService: AccountListService,
         private repositoryBranchesService: RepositoryBranchesService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private utilitiesService: UtilityService
     ) {
     }
 
@@ -55,6 +57,14 @@ export class RepositoriesService {
 
         if (statusSave.status) {
             await this.load();
+
+            // adding config to the system
+            const config = {
+                'user.email': credentials.username,
+                'user.name': credentials.name_local
+            };
+            await this.addConfig(newRepository, config);
+            // this.gitService.gitInstance(newRepository.directory)
         }
 
         return statusSave;
@@ -177,6 +187,11 @@ export class RepositoriesService {
         this.store.setActive(null);
     }
 
+    /**
+     * STATUS: DONE
+     * @param repository
+     * @param setLoading
+     */
     getBranchStatus(repository: Repository, setLoading = false) {
         if (setLoading) {
             this.setLoading();
@@ -190,6 +205,15 @@ export class RepositoriesService {
                 return status;
             })
         );
+    }
+
+    async addConfig(repository: Repository, configObject: { [configName: string]: string }) {
+        const gitConfig = this.gitService.gitInstance(repository.directory);
+        Object.keys(configObject).forEach(configName => {
+            gitConfig.addConfig(configName, configObject[configName]);
+        });
+
+        return gitConfig;
     }
 
     /**

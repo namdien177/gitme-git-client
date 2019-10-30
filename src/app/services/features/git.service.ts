@@ -314,15 +314,18 @@ export class GitService {
         return instanceGit.commit(message, fileList, option);
     }
 
-    async undoChange(repository: Repository, files: FileStatusSummaryView[]) {
+    async revert(repository: Repository, files: string[]) {
         if (files.length === 0) {
             // reset hard
             return this.gitInstance(repository.directory).reset('hard');
         } else {
-            const dirList = files.map(file => file.working_dir);
             return this.gitInstance(repository.directory)
-            .checkout(dirList).then(() => null);
+            .checkout(['--', ...files]).then(() => null);
         }
+    }
+
+    async revertToCommit(repository: Repository, commitID: string) {
+
     }
 
     async getDiffOfFile(repository: Repository, filePath: string) {

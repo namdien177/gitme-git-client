@@ -6,7 +6,7 @@ import { machineIdSync } from 'node-machine-id';
 import * as childProcess from 'child_process';
 import * as os from 'os';
 import { LocalStorageService } from './localStorage.service';
-import { electronNG, fsNode } from '../../shared/types/types.electron';
+import { electronNode, fsNode } from '../../shared/types/types.electron';
 import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
@@ -38,10 +38,10 @@ export class ElectronService implements OnDestroy {
     ) {
         // Conditional imports
         if (ElectronService.isElectron()) {
-            this.ipcRenderer = electronNG.ipcRenderer;
-            this.webFrame = electronNG.webFrame;
-            this.remote = electronNG.remote;
-            this.window = electronNG.remote.getCurrentWindow();
+            this.ipcRenderer = electronNode.ipcRenderer;
+            this.webFrame = electronNode.webFrame;
+            this.remote = electronNode.remote;
+            this.window = electronNode.remote.getCurrentWindow();
             this.childProcess = window.require('child_process');
 
             this.fs = fsNode;

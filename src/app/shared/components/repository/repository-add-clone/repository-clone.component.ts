@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { electronNG, osNode } from '../../../types/types.electron';
+import { electronNode, osNode } from '../../../types/types.electron';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UtilityService } from '../../../utilities/utility.service';
 import { RepositoriesMenuService } from '../../../state/UI/repositories-menu';
@@ -18,7 +18,7 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
     illuminateValue_dir: string = osNode.homedir();
     isExistingAccount = true;
 
-    private readonly electron: typeof electronNG.remote;
+    private readonly electron: typeof electronNode.remote;
     private formFieldBuilder = {
         repo_https: [''],
         repo_dir: [osNode.homedir()],
@@ -38,7 +38,7 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
         private fileSystemService: FileSystemService,
         private cd: ChangeDetectorRef
     ) {
-        this.electron = electronNG.remote;
+        this.electron = electronNode.remote;
     }
 
     get repo_https() {
