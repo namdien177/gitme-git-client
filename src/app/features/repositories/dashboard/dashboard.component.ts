@@ -55,7 +55,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe(
             diffStatus => {
                 this.diffStatus = diffStatus;
-
                 if (!!diffStatus && diffStatus.directory) {
                     const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
                     this.info = {

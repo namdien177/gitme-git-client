@@ -21,6 +21,10 @@ export async function Grammar(langType: string): Promise<GrammarInterface> {
                 await import('prismjs/components/prism-' + langType);
                 grammar = prism.languages[langType];
                 break;
+            case 'gitignore':
+                await import('prismjs/components/prism-' + 'git');
+                grammar = prism.languages['git'];
+                break;
         }
     }
 

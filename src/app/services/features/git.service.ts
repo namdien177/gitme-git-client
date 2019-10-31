@@ -7,14 +7,15 @@ import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositor
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
-import { FileStatusSummaryView } from '../../shared/state/DATA/repository-status';
+import { FileSystemService } from '../system/fileSystem.service';
 
 @Injectable()
 export class GitService {
 
     constructor(
         private utilities: UtilityService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private fileSystem: FileSystemService
     ) {
     }
 
@@ -366,6 +367,17 @@ export class GitService {
             console.log(err);
             return false;
         });
+    }
+
+    async isFileIgnored(repository: Repository, filePath: string) {
+        return this.gitInstance(repository.directory)
+        .checkIgnore([filePath]);
+    }
+
+    async addToIgnore(repository: Repository, relativeFilePath: string) {
+        // Check if file is already in ignore
+        const statusIgnore = await this.isFileIgnored(repository, relativeFilePath);
+        console.log(statusIgnore);
     }
 
     isRemoteAvailable(repository: Repository) {

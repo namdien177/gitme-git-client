@@ -20,6 +20,7 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
         this.gitDiffService.getDiff().subscribe(
             diffStatus => {
                 if (!!diffStatus && !!diffStatus.diff) {
+                    console.log(diffStatus);
                     this.outputHTML = diffStatus.diff;
                 } else {
                     this.outputHTML = null;
