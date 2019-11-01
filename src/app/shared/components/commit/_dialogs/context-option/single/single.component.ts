@@ -4,6 +4,7 @@ import { FileStatusSummaryView } from '../../../../../state/DATA/repository-stat
 import { RepositoryBranchesService } from '../../../../../state/DATA/repository-branches';
 import { Repository } from '../../../../../state/DATA/repositories';
 import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
+import { pathNode } from '../../../../../types/types.electron';
 
 @Component({
     selector: 'gitme-single',
@@ -70,6 +71,10 @@ export class SingleComponent implements OnInit {
                 console.log(status);
             }
         );
+        const testPath = pathNode.join(this.repository.directory, '.gitignore');
+        this.fileSystemService.quickAppendStringTo(testPath, this.file.path).then(res => {
+            console.log(res);
+        });
     }
 }
 

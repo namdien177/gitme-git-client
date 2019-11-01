@@ -152,6 +152,7 @@ export class UtilityService {
     }
 
     extractFrontPath(directory: string) {
+        directory = this.slashFixer(directory);
         const dir = directory.split('/');
         let frontPath = '';
         dir.forEach((path, index) => {

@@ -137,16 +137,17 @@ export class FileSystemService {
      * @param fileName the file name without extension
      * @param directoryPath directory with front and back included slash
      * @param extension support default .json, .txt is also supported.
+     * @param root
      */
     getFileContext<dataType>(
         fileName: string,
         directoryPath: string,
-        extension: '.txt' | '.json' = '.json'
+        extension: '.txt' | '.json' | '' = '.json',
+        root = this.ROOT
     ): Promise<{ status: boolean, message: string, value: dataType | any }> {
-        const rootStoreDir = this.ROOT;
+        const rootStoreDir = root;
         const fileFullName = fileName + extension;
         const finalDir = rootStoreDir + directoryPath + fileFullName;
-
         if (!this.isFileExist(finalDir)) {
             return this.promiseReturn(null, 'File not exist', false);
         }
@@ -192,7 +193,7 @@ export class FileSystemService {
         fileName: string,
         data: dataType | string | object,
         directoryPath: string = '/',
-        extension: '.json' | '.txt' = '.json'
+        extension: '.json' | '.txt' | '' = '.json'
     ) {
         const rootStoreDir = this.ROOT;
         const fileFullName = fileName + extension;
@@ -210,6 +211,17 @@ export class FileSystemService {
         }, err => {
             return this.promiseReturn(err, 'Read failed - Dir: ' + finalDir, false);
         });
+    }
+
+    async quickAppendStringTo(fileDirectory: string, ofContent: string) {
+        const frontEndPath = this.utilitiesService.extractFrontPath(fileDirectory);
+        if (frontEndPath.front[frontEndPath.front.length - 1] !== '/') {
+            frontEndPath.front = frontEndPath.front + '/';
+        }
+        const valueFile = await this.getFileContext(frontEndPath.end, '/', '', frontEndPath.front);
+
+        const newVal = valueFile.value + '\n' + ofContent;
+        console.log(newVal);
     }
 
     saveFileData(
@@ -295,13 +307,13 @@ export class FileSystemService {
         return this.isFileExist(directory);
     }
 
-    private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
+    private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json' | ''): { valid: boolean, data: string } {
         let writeData = '';
         if (extension === '.txt') {
             if (typeof data !== 'string') {
                 writeData = JSON.stringify(data);
             }
-        } else {
+        } else if (extension === '.json') {
             if (typeof data !== 'object' || (typeof data === 'object' && Array.isArray(data))) {
                 return {
                     valid: false,
@@ -309,6 +321,8 @@ export class FileSystemService {
                 };
             }
             writeData = JSON.stringify(data);
+        } else {
+            writeData = data.toString();
         }
         return {
             valid: true,
