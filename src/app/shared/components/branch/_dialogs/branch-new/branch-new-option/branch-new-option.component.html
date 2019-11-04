@@ -1,1 +1,69 @@
-<p>branch-new-option works!</p>
+<form action="" class="form-container">
+    <div class="form-content">
+        <div class="form-group">
+            <label for="branchName">
+                New branch name
+            </label>
+            <input class="form-control form-control-float form-control-dark"
+                   id="branchName"
+                   type="text">
+            <small>New branch will be: </small>
+        </div>
+
+        <div class="form-radio-branches">
+            <div class="card">
+                <div class="card-body branch-name">
+                    <div class="branch-checkbox acomi-checkbox-control">
+                        <input class="acomi-input-box"
+                               hidden
+                               id="fromDefault"
+                               type="checkbox"/>
+                        <label class="cbx" for="fromDefault">
+                            <span>
+                                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                </svg>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="branch-choice">
+                        From master
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body branch-name additional">
+                    <div class="branch-checkbox acomi-checkbox-control">
+                        <input class="acomi-input-box"
+                               hidden
+                               id="fromCurrent"
+                               type="checkbox"/>
+                        <label class="cbx" for="fromCurrent">
+                            <span>
+                                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                </svg>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="branch-choice">
+                        From current branch
+                    </div>
+                    <small class="branch-subName text-muted">
+                        {{branch.name}}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button color="warn"
+                mat-flat-button>
+            {{emittedDataFromView.decision.noText}}
+        </button>
+        <button color="primary"
+                mat-raised-button>
+            {{emittedDataFromView.decision.yesText}}
+        </button>
+    </div>
+</form>
