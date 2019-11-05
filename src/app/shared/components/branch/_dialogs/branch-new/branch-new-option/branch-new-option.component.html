@@ -23,7 +23,7 @@
         </div>
         <span>Checkout from</span>
         <div class="form-radio-branches">
-            <label class="card" for="fromDefault">
+            <label *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) !== 2" class="card" for="fromDefault">
                 <div class="card-body branch-name">
                     <div class="branch-checkbox acomi-checkbox-control">
                         <input [value]="0"
@@ -45,6 +45,16 @@
                     </div>
                 </div>
             </label>
+
+            <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 2">
+                <h4 class="m-0 mb-1 text-muted weight-lighter">Branch master was not found</h4>
+                <small class="text-muted">Current branch will be selected</small>
+            </div>
+
+            <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 0">
+                <h4 class="m-0 mb-1 text-muted weight-lighter">Already on branch default</h4>
+                <small class="text-muted">Current branch will be selected</small>
+            </div>
 
             <label class="card" for="fromCurrent">
                 <div class="card-body branch-name additional">
