@@ -6,6 +6,7 @@ import { BranchNewOptionComponent } from '../_dialogs/branch-new/branch-new-opti
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
+import { GitService } from '../../../../services/features/git.service';
 
 @Component({
     selector: 'gitme-repo-branches',
@@ -20,11 +21,12 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
     @Input()
     branches: RepositoryBranchSummary[] = [];
     @Output()
-    branchesChange: EventEmitter<RepositoryBranchSummary[]> = new EventEmitter<RepositoryBranchSummary[]>();
+    branchesChange: EventEmitter<RepositoryBranchSummary[]> = new EventEmitter();
 
     constructor(
         private repositoryBranchesService: RepositoryBranchesService,
         private repositoriesService: RepositoriesService,
+        private git: GitService,
         private matDialog: MatDialog
     ) {
         this.repository = this.repositoriesService.getActive();
@@ -36,6 +38,10 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
+        this.git.gitInstance(this.repository.directory)
+            .listRemote(['--heads']).then(res => {
+            console.log(res);
+        });
     }
 
     openOptionNewBranch() {
@@ -54,7 +60,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
         const dialogOpenInitial = this.matDialog.open(
             BranchNewOptionComponent, {
                 width: '380px',
-                height: '350px',
+                height: 'auto',
                 data: data,
                 panelClass: 'bg-primary-black-mat-dialog',
             }
@@ -63,8 +69,8 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
         dialogOpenInitial.afterClosed().pipe(
             switchMap(newBranch => {
                 if (newBranch) {
-
                 }
+                console.log(newBranch);
 
                 return of(null);
             })

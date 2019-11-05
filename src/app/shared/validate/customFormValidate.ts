@@ -28,3 +28,15 @@ export function isTypeAccount(account: object): ValidatorFn {
         return null;
     };
 }
+
+export function shouldNotExistInArray(array: string[], sourceName: string = 'array') {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+        const value = control.value;
+
+        const isMatch = array.some(toCheck => {
+            return value === toCheck;
+        });
+
+        return !isMatch ? null : { match: `${ value } is existed in the ${ sourceName }` };
+    };
+}

@@ -1,50 +1,67 @@
-<form action="" class="form-container">
+<form [formGroup]="formBuilder"
+      class="form-container">
     <div class="form-content">
         <div class="form-group">
             <label for="branchName">
                 New branch name
             </label>
             <input class="form-control form-control-float form-control-dark"
+                   formControlName="branchName"
                    id="branchName"
+                   placeholder="feature/abc"
                    type="text">
-            <small>New branch will be: </small>
+            <ng-container *ngIf="branchName.dirty">
+                <small *ngIf="branchName.errors?.match"
+                       class="text-danger">
+                    This branch is already existed
+                </small>
+                <small *ngIf="branchName.errors?.length"
+                       class="text-danger">
+                    Branch name must have at lease 1 character!
+                </small>
+            </ng-container>
         </div>
-
+        <span>Checkout from</span>
         <div class="form-radio-branches">
-            <div class="card">
+            <label class="card" for="fromDefault">
                 <div class="card-body branch-name">
                     <div class="branch-checkbox acomi-checkbox-control">
-                        <input class="acomi-input-box"
+                        <input [value]="0"
+                               class="acomi-input-box"
+                               formControlName="fromBranch"
                                hidden
                                id="fromDefault"
-                               type="checkbox"/>
-                        <label class="cbx" for="fromDefault">
+                               type="radio"/>
+                        <div class="cbx">
                             <span>
                                 <svg height="10px" viewbox="0 0 12 10" width="12px">
                                     <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                                 </svg>
                             </span>
-                        </label>
+                        </div>
                     </div>
                     <div class="branch-choice">
                         From master
                     </div>
                 </div>
-            </div>
-            <div class="card">
+            </label>
+
+            <label class="card" for="fromCurrent">
                 <div class="card-body branch-name additional">
                     <div class="branch-checkbox acomi-checkbox-control">
-                        <input class="acomi-input-box"
+                        <input [value]="1"
+                               class="acomi-input-box"
+                               formControlName="fromBranch"
                                hidden
                                id="fromCurrent"
-                               type="checkbox"/>
-                        <label class="cbx" for="fromCurrent">
+                               type="radio"/>
+                        <div class="cbx">
                             <span>
                                 <svg height="10px" viewbox="0 0 12 10" width="12px">
                                     <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                                 </svg>
                             </span>
-                        </label>
+                        </div>
                     </div>
                     <div class="branch-choice">
                         From current branch
@@ -53,15 +70,18 @@
                         {{branch.name}}
                     </small>
                 </div>
-            </div>
+            </label>
         </div>
     </div>
     <div class="form-actions">
-        <button color="warn"
+        <button (click)="cancel()"
+                color="warn"
                 mat-flat-button>
             {{emittedDataFromView.decision.noText}}
         </button>
-        <button color="primary"
+        <button (click)="checkoutFrom()"
+                [disabled]="formBuilder.invalid"
+                color="primary"
                 mat-raised-button>
             {{emittedDataFromView.decision.yesText}}
         </button>
