@@ -43,9 +43,8 @@ export class SingleComponent implements OnInit {
 
     revertChanges() {
         const singleFileArr: FileStatusSummaryView[] = [this.file];
-        this.branchServices.revertFiles(this.repository, singleFileArr).then(
+        this.branchServices.revertFiles(this.repository, singleFileArr).subscribe(
             result => {
-                console.log(result);
                 this.dismissed('REVERT');
             }
         );
@@ -63,6 +62,15 @@ export class SingleComponent implements OnInit {
             this.fileSystemService.copyPath(relative, this.repository.directory, this.file.path);
         }
     }
+
+    ignoreThisFile() {
+        this.branchServices.ignoreFile(this.repository, this.file)
+        .subscribe(
+            status => {
+                this.dismissed('IGNORED');
+            }
+        );
+    }
 }
 
-export type ACTION_ON_FILE = 'OPEN_FOLDER' | 'REVERT' | 'CANCEL';
+export type ACTION_ON_FILE = 'OPEN_FOLDER' | 'REVERT' | 'CANCEL' | 'IGNORED';

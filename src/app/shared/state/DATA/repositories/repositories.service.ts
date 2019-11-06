@@ -18,6 +18,7 @@ import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
 import { UtilityService } from '../../../utilities/utility.service';
+import { pathNode } from '../../../types/types.electron';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -362,9 +363,7 @@ export class RepositoriesService {
         return await this.dataService.getConfigAppData(this.securityService.appUUID);
     }
 
-    getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
-        return this.gitService.getDiffOfFile(repository, fileStatusSummary.path).then(res => {
-            return res;
-        });
+    async getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
+        return await this.gitService.getDiffOfFile(repository, fileStatusSummary.path);
     }
 }

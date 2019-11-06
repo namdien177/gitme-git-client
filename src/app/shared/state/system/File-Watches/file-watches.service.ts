@@ -10,22 +10,22 @@ export class FileWatchesService implements OnDestroy {
     private watcher: typeof chokidarNode.FSWatcher.prototype = null;
 
     private ignoreDefault = [
-        '**/node_modules',
-        '**/.git',
-        '**/vendor',
-        '**/.idea',
-        '**/.project',
-        '**/.classpath',
-        '**/.c9',
-        '**/*.launch',
-        '**/.settings',
-        '**/dist',
-        '**/tmp',
-        '**/out-tsc',
-        '**/app-builds',
-        '**/release',
-        '**/main.js',
-        '**/src/**/*.js',
+        '/node_modules',
+        '/.git',
+        '/vendor',
+        '/.idea',
+        '/.project',
+        '/.classpath',
+        '/.c9',
+        '/*.launch',
+        '/.settings',
+        '/dist',
+        '/tmp',
+        '/out-tsc',
+        '/app-builds',
+        '/release',
+        '/main.js',
+        '/src/**/*.js',
     ];
 
     constructor(
@@ -41,6 +41,7 @@ export class FileWatchesService implements OnDestroy {
 
     watch(watchingPath: string) {
         this.unwatch();
+        console.log(watchingPath);
         this.watcher = this.chokidar.watch(watchingPath, {
             cwd: watchingPath,
             ignored: this.ignoreDefault,

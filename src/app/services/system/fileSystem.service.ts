@@ -69,9 +69,9 @@ export class FileSystemService {
      * @param directoryPath raw absolute path
      */
     isFileExist(directoryPath: string) {
-        let safePath = this.utilitiesService.directorySafePath(directoryPath);
-        safePath = safePath.slice(0, safePath.length - 1);
+        const safePath = this.utilitiesService.directorySafePath(directoryPath);
         const existingFile = this.fs.existsSync(safePath);
+        console.log(existingFile);
         if (existingFile) {
             return this.fs.lstatSync(safePath).isFile();
         }
@@ -98,7 +98,7 @@ export class FileSystemService {
         fileName: string,
         data: object | string,
         directoryPath: string = '/',
-        extension: '.json' | '.txt' = '.json',
+        extension: '.json' | '.txt' | '' = '.json',
         useRoot = true
     ): Promise<{ status: boolean, message: string, value: any }> {
         const rootStoreDir = useRoot ? this.ROOT : '';
@@ -137,16 +137,17 @@ export class FileSystemService {
      * @param fileName the file name without extension
      * @param directoryPath directory with front and back included slash
      * @param extension support default .json, .txt is also supported.
+     * @param root
      */
     getFileContext<dataType>(
         fileName: string,
         directoryPath: string,
-        extension: '.txt' | '.json' = '.json'
+        extension: '.txt' | '.json' | '' = '.json',
+        root = this.ROOT
     ): Promise<{ status: boolean, message: string, value: dataType | any }> {
-        const rootStoreDir = this.ROOT;
+        const rootStoreDir = root;
         const fileFullName = fileName + extension;
         const finalDir = rootStoreDir + directoryPath + fileFullName;
-
         if (!this.isFileExist(finalDir)) {
             return this.promiseReturn(null, 'File not exist', false);
         }
@@ -187,14 +188,15 @@ export class FileSystemService {
      * @param data will be stringify when write to file if extension is .txt
      * @param directoryPath extra path to append. Must include slash to front and end
      * @param extension currently only accepting .txt or .json file. Much prefer `.json`.
+     * @param rootStoreDir
      */
     updateFileContext<dataType>(
         fileName: string,
         data: dataType | string | object,
         directoryPath: string = '/',
-        extension: '.json' | '.txt' = '.json'
+        extension: '.json' | '.txt' | '' = '.json',
+        rootStoreDir = this.ROOT
     ) {
-        const rootStoreDir = this.ROOT;
         const fileFullName = fileName + extension;
         const finalDir = rootStoreDir + directoryPath + fileFullName;
         if (!this.isDirectoryExist(rootStoreDir + directoryPath) || !this.isFileExist(finalDir)) {
@@ -210,6 +212,43 @@ export class FileSystemService {
         }, err => {
             return this.promiseReturn(err, 'Read failed - Dir: ' + finalDir, false);
         });
+    }
+
+    async quickAppendStringTo(fileDirectory: string, extension: '' | '.json' | '.txt' = '', ofContent: string) {
+        const frontEndPath = this.utilitiesService.extractFrontPath(fileDirectory);
+        if (frontEndPath.front[frontEndPath.front.length - 1] !== '/') {
+            frontEndPath.front = frontEndPath.front + '/';
+        }
+        const valueFile = await this.getFileContext(frontEndPath.end, '', extension, frontEndPath.front);
+
+        const newVal = valueFile.value + '\n' + ofContent;
+        const writeValue = await this.updateFileContext(frontEndPath.end, newVal, '', extension, frontEndPath.front);
+        return writeValue.status;
+    }
+
+    /**
+     * Check if file was over size
+     * @param fileDirectory full directory
+     * @param fileSizeCap   in bytes. Default is 150kb
+     * @return 0 for smaller, 1 for bigger (or equal), 2 for file not existed
+     */
+    isFileOversize(fileDirectory: string, fileSizeCap: number = 150 * 1024): { code: 0 | 1 | 2, fileSize: number, fileCap: number } {
+        const safePath = this.utilitiesService.directorySafePath(fileDirectory);
+        if (!this.isFileExist(fileDirectory)) {
+            return {
+                code: 2,
+                fileSize: 0,
+                fileCap: fileSizeCap
+            };
+        }
+
+        const stats = this.fs.statSync(safePath);
+        const sizeInByte = stats.size;
+        return {
+            code: sizeInByte >= fileSizeCap ? 1 : 0,
+            fileSize: sizeInByte,
+            fileCap: fileSizeCap
+        };
     }
 
     saveFileData(
@@ -295,13 +334,13 @@ export class FileSystemService {
         return this.isFileExist(directory);
     }
 
-    private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json'): { valid: boolean, data: string } {
+    private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json' | ''): { valid: boolean, data: string } {
         let writeData = '';
         if (extension === '.txt') {
             if (typeof data !== 'string') {
                 writeData = JSON.stringify(data);
             }
-        } else {
+        } else if (extension === '.json') {
             if (typeof data !== 'object' || (typeof data === 'object' && Array.isArray(data))) {
                 return {
                     valid: false,
@@ -309,6 +348,8 @@ export class FileSystemService {
                 };
             }
             writeData = JSON.stringify(data);
+        } else {
+            writeData = data.toString();
         }
         return {
             valid: true,

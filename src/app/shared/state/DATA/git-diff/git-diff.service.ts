@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GitDiffState, GitDiffStore } from './git-diff.store';
+import { createInitialState, GitDiffState, GitDiffStore } from './git-diff.store';
 import { GitDiffQuery } from './git-diff.query';
 import { CodeHighlightService } from '../../../../services/features/code-highlight.service';
 import { Observable } from 'rxjs';
@@ -24,12 +24,22 @@ export class GitDiffService {
         let diffState: GitDiff = null;
         if (!!diff && diff.length > 0) {
             diffState = await this.codeHighLightService.getDiffHTML(diff);
+        } else {
+            diffState = createInitialState().diff;
+            status = 'new';
         }
         this.store.setLoading(false);
         this.store.update({
             diff: diffState,
             directory: fileDirectory,
             status
+        });
+    }
+
+    setOversizeFile() {
+        this.store.reset();
+        this.store.update({
+            overflow: true
         });
     }
 

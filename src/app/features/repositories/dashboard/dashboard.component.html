@@ -1,4 +1,4 @@
-<ng-container *ngIf="!!info.dir">
+<ng-container *ngIf="!!info.dir || !!info.name">
     <div class="file-information">
         <div class="icon">
             <div (click)="openDirectory()" class="circle">
@@ -8,7 +8,7 @@
 
         <div class="info">
             <div class="directory-status text-muted">
-                <div class="directory">{{info.dir}}</div>
+                <div class="directory">/{{info.dir}}</div>
             </div>
             <div class="name">
                 {{info.name}}
@@ -32,7 +32,7 @@
     </div>
 </ng-container>
 
-<ng-container *ngIf="!info.dir">
+<ng-container *ngIf="!info.dir && !info.name">
     <div class="wait-file-option">
         <h2>Overview</h2>
         <small class="text-muted">

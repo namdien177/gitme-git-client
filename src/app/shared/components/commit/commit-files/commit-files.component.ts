@@ -12,6 +12,8 @@ import { switchMap, tap } from 'rxjs/operators';
 import { GitDiffService } from '../../../state/DATA/git-diff';
 import { MatBottomSheet } from '@angular/material';
 import { SingleComponent } from '../_dialogs/context-option/single/single.component';
+import { pathNode } from '../../../types/types.electron';
+import { FileSystemService } from '../../../../services/system/fileSystem.service';
 
 @Component({
     selector: 'gitme-commit-files',
@@ -41,6 +43,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
         private repositoriesService: RepositoriesService,
         private repositoriesQuery: RepositoriesQuery,
         private repositoryStatusService: RepositoryStatusService,
+        private fileService: FileSystemService,
         private gitDiffService: GitDiffService,
         private matBottomSheet: MatBottomSheet
     ) {
@@ -105,6 +108,12 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
         if (!!this._fileActivated && fileSummary.path === this._fileActivated.path) {
             return;
         }
+
+        const path = pathNode.join(this.repository.directory, fileSummary.path);
+        if (this.fileService.isFileOversize(path, 29 * 1024).code === 1) {
+            return this.gitDiffService.setOversizeFile();
+        }
+
         fromPromise(this.repositoriesService.getDiffOfFile(this.repository, fileSummary))
         .pipe(
             tap(diff => {

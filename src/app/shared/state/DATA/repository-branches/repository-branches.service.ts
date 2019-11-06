@@ -51,9 +51,14 @@ export class RepositoryBranchesService {
      * @param repository
      * @param files
      */
-    async revertFiles(repository: Repository, files: FileStatusSummaryView[]) {
+    revertFiles(repository: Repository, files: FileStatusSummaryView[]) {
         const dirList = files.map(file => file.path);
-        return this.gitService.revert(repository, dirList);
+        return fromPromise(this.gitService.revert(repository, dirList));
+    }
+
+    ignoreFile(repository: Repository, file: FileStatusSummaryView) {
+        const dir = file.path;
+        return fromPromise(this.gitService.addToIgnore(repository, dir));
     }
 
     /**
