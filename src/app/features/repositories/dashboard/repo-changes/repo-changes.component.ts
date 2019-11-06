@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GitDiffService } from '../../../../shared/state/DATA/git-diff';
 import { GitDiff } from '../../../../shared/model/gitDiff.model';
 
@@ -13,6 +13,7 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
 
     constructor(
         private gitDiffService: GitDiffService,
+        private cd: ChangeDetectorRef
     ) {
     }
 
@@ -20,6 +21,7 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
         this.gitDiffService.getDiff().subscribe(
             diffStatus => {
                 if (!!diffStatus && !!diffStatus.diff) {
+                    console.log(diffStatus);
                     this.outputHTML = diffStatus.diff;
                 } else {
                     this.outputHTML = null;

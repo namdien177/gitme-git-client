@@ -7,14 +7,16 @@ import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositor
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
-import { FileStatusSummaryView } from '../../shared/state/DATA/repository-status';
+import { FileSystemService } from '../system/fileSystem.service';
+import { pathNode } from '../../shared/types/types.electron';
 
 @Injectable()
 export class GitService {
 
     constructor(
         private utilities: UtilityService,
-        private securityService: SecurityService
+        private securityService: SecurityService,
+        private fileSystem: FileSystemService
     ) {
     }
 
@@ -366,6 +368,37 @@ export class GitService {
             console.log(err);
             return false;
         });
+    }
+
+    async isFileIgnored(repository: Repository, ...filePath: string[]) {
+        return this.gitInstance(repository.directory)
+        .checkIgnore([...filePath]);
+    }
+
+    async addToIgnore(repository: Repository, ...relativeFilePath: string[]) {
+        // Check if file is already in ignore
+        const statusIgnore = await this.isFileIgnored(repository, ...relativeFilePath);
+        const addIgnore = [];
+        if (statusIgnore.length > 0) {
+            const filterNotIgnored = relativeFilePath.filter(path => {
+                return !statusIgnore.some(already => already === path);
+            });
+            addIgnore.push(...filterNotIgnored);
+        } else {
+            addIgnore.push(...relativeFilePath);
+        }
+
+        // Check if file ignore is already exist
+        const rootIgnore = pathNode.join(repository.directory, '.gitignore');
+        const concatPath = '\n' + relativeFilePath.join('\n');
+        if (this.fileSystem.isFileExist(rootIgnore)) {
+            // File already exist => write to file
+            return await this.fileSystem.quickAppendStringTo(rootIgnore, '', concatPath);
+        } else {
+            // Create file .gitignore
+            const createStatus = await this.fileSystem.createFile('.gitignore', concatPath, repository.directory, '', false);
+            return createStatus.status;
+        }
     }
 
     isRemoteAvailable(repository: Repository) {
