@@ -10,13 +10,15 @@ export interface GitDiffState {
         original: string;
         toCompare: string
     };
+    overflow: boolean;
 }
 
 export function createInitialState(): GitDiffState {
     return {
         diff: null,
         directory: null,
-        status: 'new'
+        status: null,
+        overflow: false
     };
 }
 

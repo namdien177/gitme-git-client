@@ -4,7 +4,6 @@ import { FileStatusSummaryView } from '../../../../../state/DATA/repository-stat
 import { RepositoryBranchesService } from '../../../../../state/DATA/repository-branches';
 import { Repository } from '../../../../../state/DATA/repositories';
 import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
-import { pathNode } from '../../../../../types/types.electron';
 
 @Component({
     selector: 'gitme-single',
@@ -46,7 +45,6 @@ export class SingleComponent implements OnInit {
         const singleFileArr: FileStatusSummaryView[] = [this.file];
         this.branchServices.revertFiles(this.repository, singleFileArr).subscribe(
             result => {
-                console.log(result);
                 this.dismissed('REVERT');
             }
         );
@@ -66,16 +64,13 @@ export class SingleComponent implements OnInit {
     }
 
     ignoreThisFile() {
-        this.branchServices.ignoreFile(this.repository, this.file).subscribe(
+        this.branchServices.ignoreFile(this.repository, this.file)
+        .subscribe(
             status => {
-                console.log(status);
+                this.dismissed('IGNORED');
             }
         );
-        const testPath = pathNode.join(this.repository.directory, '.gitignore');
-        this.fileSystemService.quickAppendStringTo(testPath, this.file.path).then(res => {
-            console.log(res);
-        });
     }
 }
 
-export type ACTION_ON_FILE = 'OPEN_FOLDER' | 'REVERT' | 'CANCEL';
+export type ACTION_ON_FILE = 'OPEN_FOLDER' | 'REVERT' | 'CANCEL' | 'IGNORED';

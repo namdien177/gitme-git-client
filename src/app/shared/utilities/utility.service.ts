@@ -78,25 +78,7 @@ export class UtilityService {
      */
     directorySafePath(rawPath: string) {
         const fixedRawPath = this.slashFixer(rawPath);
-        const strSplit = fixedRawPath.split('/').map(nonTrim => nonTrim.trim());
-        let finalDir = '';
-        strSplit.forEach(arrDir => {
-            if (arrDir.includes(' ')) {
-                if (arrDir.indexOf('\'') === -1) {
-                    finalDir += '\'' + arrDir + '\'';
-                } else {
-                    if (arrDir.indexOf('\'') === 0) {
-                        finalDir += '\'' + arrDir;
-                    } else if (arrDir.charAt(arrDir.length - 1) !== '\'') {
-                        finalDir += arrDir + '\'';
-                    }
-                }
-            } else {
-                finalDir += arrDir;
-            }
-            finalDir += '/';
-        });
-        return finalDir;
+        return decodeURIComponent(fixedRawPath);
     }
 
     repositoryNameFromHTTPS(rawHTTP: string) {
@@ -175,7 +157,7 @@ export class UtilityService {
                 arrCompleted.push(extracted.deleted, extracted.added);
             } else {
                 const safePath = this.directorySafePath(file.path);
-                arrCompleted.push(safePath.slice(0, safePath.length - 1));
+                arrCompleted.push(safePath);
             }
         });
         return arrCompleted;
@@ -186,8 +168,8 @@ export class UtilityService {
         const deleted = this.directorySafePath(splitPaths[0].trim());
         const added = this.directorySafePath(splitPaths[1].trim());
         return {
-            deleted: deleted.slice(0, deleted.length - 1),
-            added: added.slice(0, added.length - 1)
+            deleted: deleted,
+            added: added
         };
     }
 
