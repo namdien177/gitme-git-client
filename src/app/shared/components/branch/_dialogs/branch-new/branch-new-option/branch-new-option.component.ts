@@ -7,6 +7,8 @@ import { FileStatusSummaryView, RepositoryStatusService } from '../../../../../s
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../../state/DATA/repository-branches';
 import { shouldNotExistInArray } from '../../../../../validate/customFormValidate';
 import { SecurityService } from '../../../../../../services/system/security.service';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { isValidNameGitBranch } from '../../../../../utilities/utilityHelper';
 
 @Component({
   selector: 'gitme-branch-new-option',
@@ -73,19 +75,19 @@ export class BranchNewOptionComponent implements OnInit {
     });
 
     // Listen to input branch to parse to safe name
-    // this.branchNameInput.valueChanges.pipe(
-    //     // debounceTime(100),
-    //     distinctUntilChanged()
-    // ).subscribe(value => {
-    //     const safeValue = isValidNameGitBranch(value);
-    //     if (safeValue.status) {
-    //         this.branchName.setValue(value);
-    //         this.parseNameBranch = null;
-    //     } else {
-    //         this.branchName.setValue(safeValue.name);
-    //         this.parseNameBranch = safeValue.msg;
-    //     }
-    // });
+    this.branchNameInput.valueChanges.pipe(
+        // debounceTime(100),
+        distinctUntilChanged()
+    ).subscribe(value => {
+        const safeValue = isValidNameGitBranch(value);
+        if (safeValue.status) {
+            this.branchName.setValue(value);
+            this.parseNameBranch = null;
+        } else {
+            this.branchName.setValue(safeValue.name);
+            this.parseNameBranch = safeValue.msg;
+        }
+    });
   }
 
   cancel() {

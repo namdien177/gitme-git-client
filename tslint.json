@@ -14,7 +14,7 @@
     "component-selector": [
       true,
       "element",
-      "app",
+      "gitme",
       "kebab-case"
     ],
     "curly": true,
