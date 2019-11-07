@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -14,7 +13,6 @@
       "node_modules/@types"
     ],
     "lib": [
-      "es2018",
       "es2017",
       "es2016",
       "es2015",

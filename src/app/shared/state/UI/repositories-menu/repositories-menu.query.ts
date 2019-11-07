@@ -5,8 +5,8 @@ import { RepositoriesMenuState, RepositoriesMenuStore } from './repositories-men
 @Injectable({ providedIn: 'root' })
 export class RepositoriesMenuQuery extends Query<RepositoriesMenuState> {
 
-    constructor(protected store: RepositoriesMenuStore) {
-        super(store);
-    }
+  constructor(protected store: RepositoriesMenuStore) {
+    super(store);
+  }
 
 }

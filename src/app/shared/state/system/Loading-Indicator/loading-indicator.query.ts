@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Query } from '@datorama/akita';
-import { LoadingIndicatorStore, LoadingIndicatorState } from './loading-indicator.store';
+import { LoadingIndicatorState, LoadingIndicatorStore } from './loading-indicator.store';
 
 @Injectable({ providedIn: 'root' })
 export class LoadingIndicatorQuery extends Query<LoadingIndicatorState> {

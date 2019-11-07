@@ -21,67 +21,47 @@ import { AppConfig } from '../environments/environment';
 import { LocalStorageService } from './services/system/localStorage.service';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
-import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-
-import xml from 'highlight.js/lib/languages/xml';
-import scss from 'highlight.js/lib/languages/scss';
-import typescript from 'highlight.js/lib/languages/typescript';
-import javascript from 'highlight.js/lib/languages/javascript';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogsModule } from './shared/modules/dialogs.module';
 
-export function hljsLanguages() {
-    return [
-        { name: 'typescript', func: typescript },
-        { name: 'javascript', func: javascript },
-        { name: 'scss', func: scss },
-        { name: 'xml', func: xml }
-    ];
-}
-
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
-    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 const declareComps = [
-    AppComponent,
-    WindowsFrameComponent,
-    WebviewDirective
+  AppComponent,
+  WindowsFrameComponent,
+  WebviewDirective,
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps,
-    ],
-    imports: [
-        BrowserModule,
-        CoreModule,
-        HttpClientModule,
-        AppRouting,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: (HttpLoaderFactory),
-                deps: [HttpClient]
-            }
-        }),
-        AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
-        AkitaNgRouterStoreModule.forRoot(),
-        BrowserAnimationsModule,
-        // Dialogs
-        DialogsModule,
-    ],
-    providers: [
-        ElectronService,
-        LocalStorageService,
-        {
-            provide: HIGHLIGHT_OPTIONS,
-            useValue: {
-                languages: hljsLanguages,
-            }
-        }],
-    bootstrap: [AppComponent]
+  declarations: [
+    ...declareComps,
+  ],
+  imports: [
+    BrowserModule,
+    CoreModule,
+    HttpClientModule,
+    AppRouting,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (HttpLoaderFactory),
+        deps: [HttpClient],
+      },
+    }),
+    AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
+    AkitaNgRouterStoreModule.forRoot(),
+    BrowserAnimationsModule,
+    // Dialogs
+    DialogsModule,
+  ],
+  providers: [
+    ElectronService,
+    LocalStorageService,
+  ],
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }

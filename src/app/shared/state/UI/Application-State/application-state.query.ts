@@ -5,8 +5,8 @@ import { ApplicationStateState, ApplicationStateStore } from './application-stat
 @Injectable({ providedIn: 'root' })
 export class ApplicationStateQuery extends Query<ApplicationStateState> {
 
-    constructor(protected store: ApplicationStateStore) {
-        super(store);
-    }
+  constructor(protected store: ApplicationStateStore) {
+    super(store);
+  }
 
 }

@@ -1,48 +1,48 @@
 <div class="repo-files-commit">
-    <div (click)="viewDiffFile(file, i)"
-         (contextmenu)="openContextDialog(file)"
-         *ngFor="let file of statusSummary?.files; let i = index; trackBy: trackByPath"
-         [class.active]="file.active"
-         class="files">
-        <div class="added acomi-checkbox-control">
-            <input (click)="toggleCheckFile(i)"
-                   [checked]="file.checked"
-                   [id]="'file_check_'+i"
-                   class="acomi-input-box"
-                   hidden
-                   type="checkbox"/>
-            <label [htmlFor]="'file_check_'+i" class="cbx">
+  <div (click)="viewDiffFile(file, i)"
+       (contextmenu)="openContextDialog(file)"
+       *ngFor="let file of statusSummary?.files; let i = index; trackBy: trackByPath"
+       [class.active]="file.active"
+       class="files">
+    <div class="added acomi-checkbox-control">
+      <input (click)="toggleCheckFile(i)"
+             [checked]="file.checked"
+             [id]="'file_check_'+i"
+             class="acomi-input-box"
+             hidden
+             type="checkbox"/>
+      <label [htmlFor]="'file_check_'+i" class="cbx">
                 <span>
                     <svg height="10px" viewbox="0 0 12 10" width="12px">
                         <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                     </svg>
                 </span>
-            </label>
-        </div>
-        <div [title]="file.path" class="directory">
-            <div class="directory-path text-muted">
-                {{utilities.extractFrontPath(file.path).front}}
-            </div>
-            <div class="file-name">
-                {{utilities.extractFrontPath(file.path).end}}
-            </div>
-            <div class="type-action">
-                <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.created)">
+      </label>
+    </div>
+    <div [title]="file.path" class="directory">
+      <div class="directory-path text-muted">
+        {{utilities.extractFrontPath(file.path).front}}
+      </div>
+      <div class="file-name">
+        {{utilities.extractFrontPath(file.path).end}}
+      </div>
+      <div class="type-action">
+        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.created)">
                     <span class="created text-success">
                         <i class="far fa-plus-square"></i>
                     </span>
-                </ng-container>
-                <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.deleted)">
+        </ng-container>
+        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.deleted)">
                     <span class="deleted text-danger">
                         <i class="far fa-minus-square"></i>
                     </span>
-                </ng-container>
-                <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.modified)">
+        </ng-container>
+        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.modified)">
                     <span class="modified text-warning">
                         <i class="fas fa-pen-square"></i>
                     </span>
-                </ng-container>
-            </div>
-        </div>
+        </ng-container>
+      </div>
     </div>
+  </div>
 </div>

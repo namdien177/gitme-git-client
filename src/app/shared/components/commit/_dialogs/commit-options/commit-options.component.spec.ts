@@ -8,7 +8,7 @@ describe('CommitOptionsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommitOptionsComponent ]
+      declarations: [CommitOptionsComponent]
     })
     .compileComponents();
   }));

@@ -5,38 +5,38 @@ import { DataService } from '../../../services/features/data.service';
 import { SecurityService } from '../../../services/system/security.service';
 
 @Component({
-    selector: 'gitme-windows-frame',
-    templateUrl: './windows-frame.component.html',
-    styleUrls: ['./windows-frame.component.scss']
+  selector: 'gitme-windows-frame',
+  templateUrl: './windows-frame.component.html',
+  styleUrls: ['./windows-frame.component.scss']
 })
 export class WindowsFrameComponent implements OnInit {
 
-    appConfig: AppConfig = null;
-    idApp: string = null;
+  appConfig: AppConfig = null;
+  idApp: string = null;
 
-    constructor(
-        private electronServices: ElectronService,
-        private securityService: SecurityService,
-        private dataService: DataService
-    ) {
-        this.idApp = this.securityService.appUUID;
-        this.dataService.getConfigAppData(this.idApp).then(
-            config => {
-                if (!!config) {
-                    this.appConfig = config;
-                }
-            }
-        );
-    }
+  constructor(
+    private electronServices: ElectronService,
+    private securityService: SecurityService,
+    private dataService: DataService
+  ) {
+    this.idApp = this.securityService.appUUID;
+    this.dataService.getConfigAppData(this.idApp).then(
+      config => {
+        if (!!config) {
+          this.appConfig = config;
+        }
+      }
+    );
+  }
 
-    ngOnInit() {
-    }
+  ngOnInit() {
+  }
 
-    minimizeWindows() {
-        this.electronServices.minimizeApplication();
-    }
+  minimizeWindows() {
+    this.electronServices.minimizeApplication();
+  }
 
-    closeWindows() {
-        this.electronServices.closeApplication();
-    }
+  closeWindows() {
+    this.electronServices.closeApplication();
+  }
 }

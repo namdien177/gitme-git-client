@@ -6,22 +6,22 @@ import { CommonModule } from '@angular/common';
 import { CoreModule } from '../../modules/core.module';
 
 const declareComps = [
-    ListBranchesComponent,
-    BranchItemComponent,
-    BranchAddComponent,
+  ListBranchesComponent,
+  BranchItemComponent,
+  BranchAddComponent,
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps,
-    ],
-    exports: [
-        ...declareComps
-    ],
-    imports: [
-        CommonModule,
-        CoreModule
-    ]
+  declarations: [
+    ...declareComps,
+  ],
+  exports: [
+    ...declareComps
+  ],
+  imports: [
+    CommonModule,
+    CoreModule
+  ]
 })
 export class ShareBranchComponentsModule {
 }

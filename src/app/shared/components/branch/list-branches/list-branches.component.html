@@ -1,24 +1,24 @@
 <div class="container-fluid">
-    <label class="search-branches">
-        <input class="form-control form-control-dark form-control-float"
-               placeholder="Find branch"
-               type="text">
-    </label>
+  <label class="search-branches">
+    <input class="form-control form-control-dark form-control-float"
+           placeholder="Find branch"
+           type="text">
+  </label>
 
-    <div class="branch-action">
-        <button class="btn-block"
-                mat-flat-button
-                (click)="openOptionNewBranch()"
-                type="button">
-            <i class="fas fa-plus"></i>
-            New Branch
-        </button>
-    </div>
+  <div class="branch-action">
+    <button (click)="openOptionNewBranch()"
+            class="btn-block"
+            mat-flat-button
+            type="button">
+      <i class="fas fa-plus"></i>
+      New Branch
+    </button>
+  </div>
 
-    <div class="list-branches">
-        <gitme-branch-item *ngFor="let branch of branches"
-                           class="branch"
-                           [branchSummary]="branch">
-        </gitme-branch-item>
-    </div>
+  <div class="list-branches">
+    <gitme-branch-item *ngFor="let branch of branches"
+                       [branchSummary]="branch"
+                       class="branch">
+    </gitme-branch-item>
+  </div>
 </div>

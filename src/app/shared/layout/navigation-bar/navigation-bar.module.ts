@@ -5,21 +5,21 @@ import { NavigationBarComponent } from './navigation-bar.component';
 import { NavigationBranchModule } from '../../components/branch/list-branches/navigation-branch.module';
 
 const declareComps = [
-    NavigationBarComponent,
+  NavigationBarComponent,
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps,
-    ],
-    exports: [
-        ...declareComps
-    ],
-    imports: [
-        CommonModule,
-        CoreModule,
-        NavigationBranchModule
-    ],
+  declarations: [
+    ...declareComps,
+  ],
+  exports: [
+    ...declareComps
+  ],
+  imports: [
+    CommonModule,
+    CoreModule,
+    NavigationBranchModule
+  ],
 })
 export class NavigationBarModule {
 }

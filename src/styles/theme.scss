@@ -13,43 +13,43 @@ $shadow-light-leveled: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.
 $transparent-backdrop: rgba(0, 0, 0, 0.75);
 
 .bg-success {
-    background-color: #00c851 !important;
+  background-color: #00c851 !important;
 }
 
 .bg-warning {
-    background-color: #ffbb33 !important;
+  background-color: #ffbb33 !important;
 }
 
 .bg-danger {
-    background-color: tomato !important;
+  background-color: tomato !important;
 }
 
 .bg-info {
-    background-color: dodgerblue !important;
+  background-color: dodgerblue !important;
 }
 
 .bg-transparent {
-    background-color: transparent !important;
+  background-color: transparent !important;
 }
 
 .bg-primary-black {
-    background: $primary-black !important;
+  background: $primary-black !important;
 }
 
 .bg-primary-black-mat-dialog {
-    .mat-dialog-container {
-        background-color: $primary-black !important;
-    }
+  .mat-dialog-container {
+    background-color: $primary-black !important;
+  }
 }
 
 .bg-primary-black-darker {
-    background: $primary-black-darker !important;
+  background: $primary-black-darker !important;
 }
 
 .bg-primary-black-foreground {
-    background: $primary-black-foreground !important;
+  background: $primary-black-foreground !important;
 }
 
 .bg-primary-black-lighter {
-    background: $primary-black-lighter !important;
+  background: $primary-black-lighter !important;
 }

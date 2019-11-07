@@ -6,16 +6,16 @@ export interface RepositoriesState extends EntityState<Repository>, ActiveState 
 }
 
 const initialState = {
-    active: null
+  active: null
 };
 
 @Injectable({ providedIn: 'root' })
 @StoreConfig({ name: 'repositories', resettable: true })
 export class RepositoriesStore extends EntityStore<RepositoriesState> {
 
-    constructor() {
-        super(initialState);
-    }
+  constructor() {
+    super(initialState);
+  }
 
 }
 

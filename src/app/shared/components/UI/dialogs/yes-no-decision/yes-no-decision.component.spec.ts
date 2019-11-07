@@ -8,7 +8,7 @@ describe('YesNoDecisionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ YesNoDecisionComponent ]
+      declarations: [YesNoDecisionComponent]
     })
     .compileComponents();
   }));

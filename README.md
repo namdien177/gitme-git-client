@@ -9,11 +9,10 @@ Version-Control Client Application with Angular 8 and Electron (Typescript + SAS
 
 Currently runs with:
 
-- Angular v8.0.2
-- Electron v5.0.2
-- Electron Builder v20.41.0
-- node-pty@0.9.0-beta20
-- xterm 3.14.5
+- Angular v8.3.6
+- Electron v7.0.0
+- Electron Builder v21.2.0
+- node-pty@0.9.0-beta22
 
 The application was based on the from [*maximegris* 's bootstrap application](https://github.com/maximegris/angular-electron)
 

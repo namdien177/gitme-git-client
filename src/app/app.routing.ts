@@ -4,25 +4,25 @@ import { ExistRepositoryConfigGuard } from './shared/guard/exist-repository-conf
 import { NotExistRepositoryConfigGuard } from './shared/guard/not-exist-repository-config.guard';
 
 const routes: Routes = [
-    {
-        path: '',
-        canActivateChild: [ExistRepositoryConfigGuard],
-        loadChildren: () => import('./features/repositories/repositories.module').then(m => m.RepositoriesModule)
-    },
-    {
-        path: 'application',
-        canActivateChild: [NotExistRepositoryConfigGuard],
-        loadChildren: () => import('./features/application/application.module').then(m => m.ApplicationModule)
-    },
-    {
-        path: '**',
-        redirectTo: '/dashboard'
-    }
+  {
+    path: '',
+    canActivateChild: [ExistRepositoryConfigGuard],
+    loadChildren: () => import('./features/repositories/repositories.module').then(m => m.RepositoriesModule)
+  },
+  {
+    path: 'application',
+    canActivateChild: [NotExistRepositoryConfigGuard],
+    loadChildren: () => import('./features/application/application.module').then(m => m.ApplicationModule)
+  },
+  {
+    path: '**',
+    redirectTo: '/dashboard'
+  }
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes, { useHash: true })],
-    exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
+  exports: [RouterModule]
 })
 export class AppRouting {
 }
