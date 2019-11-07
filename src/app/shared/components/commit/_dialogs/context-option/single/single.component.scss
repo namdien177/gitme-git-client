@@ -2,11 +2,11 @@
 
 .card {
 
-    &:hover {
-        background-color: $primary-black-darker;
-    }
+  &:hover {
+    background-color: $primary-black-darker;
+  }
 
-    .card-body {
-        font-size: 1rem;
-    }
+  .card-body {
+    font-size: 1rem;
+  }
 }

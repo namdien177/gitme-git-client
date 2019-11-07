@@ -6,37 +6,37 @@ import { AccountListQuery } from './account-list.query';
 @Injectable({ providedIn: 'root' })
 export class AccountListService {
 
-    constructor(
-        protected store: AccountListStore,
-        protected query: AccountListQuery
-    ) {
-    }
+  constructor(
+    protected store: AccountListStore,
+    protected query: AccountListQuery
+  ) {
+  }
 
-    set(arrData: Account[]) {
-        this.store.set(arrData);
-    }
+  set(arrData: Account[]) {
+    this.store.set(arrData);
+  }
 
-    add(arrData: Account) {
-        this.store.add(arrData, { prepend: true });
-    }
+  add(arrData: Account) {
+    this.store.add(arrData, { prepend: true });
+  }
 
-    getAsync() {
-        return this.query.selectAll();
-    }
+  getAsync() {
+    return this.query.selectAll();
+  }
 
-    getSync() {
-        return this.query.getAll();
-    }
+  getSync() {
+    return this.query.getAll();
+  }
 
-    getOneSync(idAccount: string) {
-        return this.query.getEntity(idAccount);
-    }
+  getOneSync(idAccount: string) {
+    return this.query.getEntity(idAccount);
+  }
 
-    getOneAsync(idAccount: string) {
-        return this.query.selectEntity(idAccount);
-    }
+  getOneAsync(idAccount: string) {
+    return this.query.selectEntity(idAccount);
+  }
 
-    reset() {
-        this.store.reset();
-    }
+  reset() {
+    this.store.reset();
+  }
 }

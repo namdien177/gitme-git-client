@@ -8,7 +8,7 @@ describe('OnlyInfoComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OnlyInfoComponent ]
+      declarations: [OnlyInfoComponent]
     })
     .compileComponents();
   }));

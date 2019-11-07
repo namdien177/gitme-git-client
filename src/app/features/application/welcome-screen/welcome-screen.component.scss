@@ -1,74 +1,74 @@
 @import "src/styles/theme";
 
 :host {
-    display: grid;
-    grid-template-columns: 1fr 500px 1fr;
-    grid-template-rows: 1fr max-content 1fr;
-    height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 500px 1fr;
+  grid-template-rows: 1fr max-content 1fr;
+  height: 100%;
 
-    .inner-content {
-        grid-column: 2;
-        grid-row: 2;
-    }
+  .inner-content {
+    grid-column: 2;
+    grid-row: 2;
+  }
 }
 
 .inner-content {
 
-    .title {
-        display: grid;
-        grid-template-columns: max-content auto;
-        grid-gap: 0.5rem;
-        letter-spacing: 2px;
+  .title {
+    display: grid;
+    grid-template-columns: max-content auto;
+    grid-gap: 0.5rem;
+    letter-spacing: 2px;
 
-        .wt {
-            padding-right: 0.5rem;
-            border-right: 2px solid $primary-black-lighter;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-end;
+    .wt {
+      padding-right: 0.5rem;
+      border-right: 2px solid $primary-black-lighter;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
 
-            h1 {
-                width: max-content;
-                text-align: right;
+      h1 {
+        width: max-content;
+        text-align: right;
 
-                &.w {
-                    margin-bottom: 0.25rem;
-                }
-
-                &.t {
-                    margin-top: 0.25rem;
-                }
-            }
+        &.w {
+          margin-bottom: 0.25rem;
         }
 
-        > * {
-            align-self: center;
+        &.t {
+          margin-top: 0.25rem;
         }
+      }
     }
 
-    .btn-choices-box {
-        display: flex;
-        flex-direction: column;
-        padding: 0 3rem;
-
-        > * {
-            margin-bottom: 0.5rem;
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-            font-size: 0.9rem;
-            line-height: 1.2rem;
-        }
+    > * {
+      align-self: center;
     }
+  }
 
-    .about-us {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
+  .btn-choices-box {
+    display: flex;
+    flex-direction: column;
+    padding: 0 3rem;
 
-        .github {
-            font-size: 14px;
-            line-height: 16px;
-        }
+    > * {
+      margin-bottom: 0.5rem;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.2rem;
     }
+  }
+
+  .about-us {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .github {
+      font-size: 14px;
+      line-height: 16px;
+    }
+  }
 }

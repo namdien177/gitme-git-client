@@ -2,19 +2,19 @@
      (contextmenu)="onRightClick()"
      [class.selected]="branchSummary?.current"
      class="card">
-    <div class="card-body row">
-        <div class="remote-status">
-            <i class="fas fa-code-branch"></i>
-        </div>
-        <div class="name">
-            {{branchSummary?.name | branchNameShorten}}
-        </div>
-        <div class="status">
-            a minute ago
-        </div>
+  <div class="card-body row">
+    <div class="remote-status">
+      <i class="fas fa-code-branch"></i>
     </div>
+    <div class="name">
+      {{branchSummary?.name | branchNameShorten}}
+    </div>
+    <div class="status">
+      a minute ago
+    </div>
+  </div>
 </div>
 
 <div class="merge-btn btn-raw" title="Merge from branch...">
-    <i class="fas fa-project-diagram"></i>
+  <i class="fas fa-project-diagram"></i>
 </div>

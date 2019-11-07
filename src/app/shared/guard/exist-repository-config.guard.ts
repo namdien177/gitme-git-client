@@ -7,33 +7,33 @@ import { SecurityService } from '../../services/system/security.service';
 import { switchMap } from 'rxjs/operators';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class ExistRepositoryConfigGuard implements CanActivateChild {
 
-    constructor(
-        private dataService: DataService,
-        private securityService: SecurityService,
-        private router: Router
-    ) {
+  constructor(
+    private dataService: DataService,
+    private securityService: SecurityService,
+    private router: Router
+  ) {
 
-    }
+  }
 
-    canActivateChild(
-        next: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        return fromPromise(
-            this.dataService.getConfigAppData(this.securityService.appUUID)
-        ).pipe(
-            switchMap(appRepo => {
-                if (appRepo && appRepo.repository_config.length > 0) {
-                    return of(true);
-                }
+  canActivateChild(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return fromPromise(
+      this.dataService.getConfigAppData(this.securityService.appUUID)
+    ).pipe(
+      switchMap(appRepo => {
+        if (appRepo && appRepo.repository_config.length > 0) {
+          return of(true);
+        }
 
-                this.router.navigate(['/application']);
-                return of(false);
-            })
-        );
-    }
+        this.router.navigate(['/application']);
+        return of(false);
+      })
+    );
+  }
 
 }

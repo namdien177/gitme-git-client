@@ -10,18 +10,18 @@ import { ApplicationComponent } from './application.component';
 import { ShareCredentialsComponentsModule } from '../../shared/components/credential/ShareCredentialsComponents.module';
 
 const declareComps = [
-    WelcomeScreenComponent, ImportLocalComponent, CreateLocalComponent, ImportHttpsComponent,
-    ApplicationComponent
+  WelcomeScreenComponent, ImportLocalComponent, CreateLocalComponent, ImportHttpsComponent,
+  ApplicationComponent
 ];
 
 @NgModule({
-    declarations: [...declareComps],
-    imports: [
-        CommonModule,
-        CoreModule,
-        ShareCredentialsComponentsModule,
-        ApplicationRouting
-    ]
+  declarations: [...declareComps],
+  imports: [
+    CommonModule,
+    CoreModule,
+    ShareCredentialsComponentsModule,
+    ApplicationRouting
+  ]
 })
 export class ApplicationModule {
 }

@@ -5,21 +5,21 @@ import { CredentialInputComponent } from './credential-input/credential-input.co
 import { CredentialListComponent } from './credential-list/credential-list.component';
 
 const declareComps = [
-    CredentialInputComponent,
-    CredentialListComponent,
+  CredentialInputComponent,
+  CredentialListComponent,
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps
-    ],
-    exports: [
-        ...declareComps
-    ],
-    imports: [
-        CommonModule,
-        CoreModule
-    ]
+  declarations: [
+    ...declareComps
+  ],
+  exports: [
+    ...declareComps
+  ],
+  imports: [
+    CommonModule,
+    CoreModule
+  ]
 })
 export class ShareCredentialsComponentsModule {
 

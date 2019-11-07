@@ -1,61 +1,61 @@
 @import "../../../../../styles/theme";
 
 :host {
-    position: fixed;
-    top: 112px;
-    left: 0;
-    width: 100%;
+  position: fixed;
+  top: 112px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $primary-black;
+
+  .container-fluid {
+    display: grid;
+    grid-template-areas: 'search' 'action' 'list';
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content max-content auto;
+    grid-gap: 1rem;
     height: 100%;
-    background-color: $primary-black;
+    width: 100%;
+    padding: 0;
 
-    .container-fluid {
-        display: grid;
-        grid-template-areas: 'search' 'action' 'list';
-        grid-template-columns: 1fr;
-        grid-template-rows: max-content max-content auto;
-        grid-gap: 1rem;
-        height: 100%;
-        width: 100%;
-        padding: 0;
+    .branch-action {
+      grid-area: action;
+      padding: 0 0.5rem;
 
-        .branch-action {
-            grid-area: action;
-            padding: 0 0.5rem;
+      button {
+        background: $primary-black-darker;
+      }
 
-            button {
-                background: $primary-black-darker;
-            }
-
-            i {
-                margin-right: 0.25rem;
-            }
-        }
-
-        .search-branches {
-            grid-area: search;
-            display: flex;
-            flex-direction: column;
-            margin: 0;
-            padding: 0.5rem 0.5rem 0 0.5rem;
-
-            input {
-                font-size: 1rem;
-                line-height: 1.8rem;
-                transition: font-size 0.25s;
-            }
-        }
-
-        .list-branches {
-            grid-area: list;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-
-            .branch {
-                margin-bottom: 0.25rem;
-            }
-        }
+      i {
+        margin-right: 0.25rem;
+      }
     }
+
+    .search-branches {
+      grid-area: search;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0.5rem 0.5rem 0 0.5rem;
+
+      input {
+        font-size: 1rem;
+        line-height: 1.8rem;
+        transition: font-size 0.25s;
+      }
+    }
+
+    .list-branches {
+      grid-area: list;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+
+      .branch {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
 }

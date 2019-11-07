@@ -5,21 +5,21 @@ import { CommitFilesComponent } from './commit-files/commit-files.component';
 import { CommitMenuComponent } from './commit-menu/commit-menu.component';
 
 const declareComps = [
-    CommitFilesComponent,
-    CommitMenuComponent
+  CommitFilesComponent,
+  CommitMenuComponent
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps,
-    ],
-    exports: [
-        ...declareComps,
-    ],
-    imports: [
-        CommonModule,
-        CoreModule
-    ]
+  declarations: [
+    ...declareComps,
+  ],
+  exports: [
+    ...declareComps,
+  ],
+  imports: [
+    CommonModule,
+    CoreModule
+  ]
 })
 export class ShareCommitComponentsModule {
 

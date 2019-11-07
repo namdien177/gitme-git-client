@@ -8,24 +8,24 @@ import { RepositoryItemComponent } from './repository-item/repository-item.compo
 import { ShareCredentialsComponentsModule } from '../credential/ShareCredentialsComponents.module';
 
 const declareComps = [
-    NavigationRepositoriesComponent,
-    RepositoryAddLocalComponent,
-    RepositoryCloneComponent,
-    RepositoryItemComponent,
+  NavigationRepositoriesComponent,
+  RepositoryAddLocalComponent,
+  RepositoryCloneComponent,
+  RepositoryItemComponent,
 ];
 
 @NgModule({
-    declarations: [
-        ...declareComps
-    ],
-    exports: [
-        ...declareComps
-    ],
-    imports: [
-        CommonModule,
-        ShareCredentialsComponentsModule,
-        CoreModule
-    ]
+  declarations: [
+    ...declareComps
+  ],
+  exports: [
+    ...declareComps
+  ],
+  imports: [
+    CommonModule,
+    ShareCredentialsComponentsModule,
+    CoreModule
+  ]
 })
 export class ShareRepositoryComponentsModule {
 

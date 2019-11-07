@@ -1,27 +1,38 @@
-export interface GitDiff {
-    addedLines: number;
-    blocks: GitDiffBlocks[];
-    checksumAfter: string;
-    checksumBefore: string;
-    deletedLines: 1;
-    isCombined: boolean;
-    isGitDiff: boolean;
-    language: string;
-    mode: string;
-    newName: string;
-    oldName: string;
+export interface GitDiffResult {
+  addedLines: number;
+  deletedLines: number;
+  isCombined: boolean;
+  isGitDiff: boolean;
+  oldName: string;
+  newName: string;
+  language: string;
+  blocks: Block[];
+  oldMode?: string;
+  newMode?: string;
+  deletedFileMode?: string;
+  newFileMode?: string;
+  isDeleted?: boolean;
+  isNew?: boolean;
+  isCopy?: boolean;
+  isRename?: boolean;
+  unchangedPercentage?: number;
+  changedPercentage?: number;
+  checksumBefore?: string;
+  checksumAfter?: string;
+  mode?: string;
 }
 
-export interface GitDiffBlocks {
-    header: string;
-    lines: DiffBlockLines[];
-    newStartLine: string;
-    oldStartLine: string;
+export interface Block {
+  oldStartLine: number;
+  oldStartLine2?: number;
+  newStartLine: number;
+  header: string;
+  lines: Line[];
 }
 
-export interface DiffBlockLines {
-    content: string;
-    newNumber: number;
-    oldNumber: number;
-    type: 'd2h-del' | 'd2h-cntx' | 'd2h-ins';
+export interface Line {
+  content: string;
+  type: string;
+  oldNumber: number;
+  newNumber: number;
 }

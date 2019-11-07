@@ -9,9 +9,9 @@ export interface RepositoryBranchesState extends EntityState<RepositoryBranchSum
 @StoreConfig({ name: 'repository-branches' })
 export class RepositoryBranchesStore extends EntityStore<RepositoryBranchesState, RepositoryBranchSummary> {
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
 }
 

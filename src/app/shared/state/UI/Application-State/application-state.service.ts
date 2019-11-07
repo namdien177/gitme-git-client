@@ -5,25 +5,25 @@ import { ApplicationStateQuery } from './application-state.query';
 @Injectable({ providedIn: 'root' })
 export class ApplicationStateService {
 
-    constructor(
-        private applicationStateStore: ApplicationStateStore,
-        private applicationStateQuery: ApplicationStateQuery
-    ) {
-    }
+  constructor(
+    private applicationStateStore: ApplicationStateStore,
+    private applicationStateQuery: ApplicationStateQuery
+  ) {
+  }
 
-    setBlur() {
-        this.applicationStateStore.update({ isLosingFocus: true });
-    }
+  setBlur() {
+    this.applicationStateStore.update({ isLosingFocus: true });
+  }
 
-    setFocus() {
-        this.applicationStateStore.update({ isLosingFocus: false });
-    }
+  setFocus() {
+    this.applicationStateStore.update({ isLosingFocus: false });
+  }
 
-    observeApplicationState() {
-        return this.applicationStateQuery.select();
-    }
+  observeApplicationState() {
+    return this.applicationStateQuery.select();
+  }
 
-    getApplicationState() {
-        return this.applicationStateQuery.getValue();
-    }
+  getApplicationState() {
+    return this.applicationStateQuery.getValue();
+  }
 }

@@ -4,23 +4,22 @@ import { RepositoryBranchSummary } from '../../../../state/DATA/repository-branc
 import { StatusSummary } from '../../../../model/statusSummary.model';
 
 @Component({
-    selector: 'gitme-branch-options',
-    templateUrl: './branch-options.component.html',
-    styleUrls: ['./branch-options.component.scss']
+  selector: 'gitme-branch-options',
+  templateUrl: './branch-options.component.html',
+  styleUrls: ['./branch-options.component.scss']
 })
 export class BranchOptionsComponent implements OnInit {
 
-    constructor(
-        private _bottomSheetRef: MatBottomSheetRef<BranchOptionsComponent>,
-        @Inject(MAT_BOTTOM_SHEET_DATA) public data: {
-            branch: RepositoryBranchSummary
-            status: StatusSummary
-        }
-    ) {
-        console.log(data);
+  constructor(
+    private _bottomSheetRef: MatBottomSheetRef<BranchOptionsComponent>,
+    @Inject(MAT_BOTTOM_SHEET_DATA) public data: {
+      branch: RepositoryBranchSummary
+      status: StatusSummary
     }
+  ) {
+  }
 
-    ngOnInit() {
-    }
+  ngOnInit() {
+  }
 
 }

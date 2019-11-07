@@ -1,153 +1,153 @@
 @import "src/styles/theme";
 
 .form-control {
-    border: 0;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    position: relative;
-    background: transparent;
+  border: 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  position: relative;
+  background: transparent;
 
-    & ~ .focus-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.05);
-        opacity: 0;
-        transition: 0.5s;
-        z-index: -1;
-    }
+  & ~ .focus-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    transition: 0.5s;
+    z-index: -1;
+  }
 
-    &:focus ~ .focus-bg {
-        transition: 0.5s;
-        opacity: 1;
-    }
+  &:focus ~ .focus-bg {
+    transition: 0.5s;
+    opacity: 1;
+  }
 }
 
 .form-control-dark {
-    outline: none !important;
-    background-color: $primary-black-foreground !important;
-    border-color: $primary-black-lighter !important;
-    color: white !important;
-    box-shadow: none !important;
+  outline: none !important;
+  background-color: $primary-black-foreground !important;
+  border-color: $primary-black-lighter !important;
+  color: white !important;
+  box-shadow: none !important;
 
-    &.hover:hover {
-        border-color: whitesmoke !important;
-    }
+  &.hover:hover {
+    border-color: whitesmoke !important;
+  }
 
-    &.focus:focus {
-        border-color: white !important;
-    }
+  &.focus:focus {
+    border-color: white !important;
+  }
 }
 
 .acomi-checkbox-control {
-    display: grid;
-    place-content: center;
+  display: grid;
+  place-content: center;
 
-    .acomi-input-box {
-        &:checked + .cbx span:first-child {
-            background: #506EEC;
-            border-color: #506EEC;
+  .acomi-input-box {
+    &:checked + .cbx span:first-child {
+      background: #506EEC;
+      border-color: #506EEC;
 
-            svg {
-                stroke-dashoffset: 0;
-            }
+      svg {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+
+  .cbx {
+    margin: auto;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      transform: translate3d(0, 0, 0);
+
+      &:first-child {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        border-radius: 3px;
+        transform: scale(1);
+        vertical-align: middle;
+        border: 1px solid #9098A9;
+        transition: all 0.2s ease;
+
+        svg {
+          position: absolute;
+          top: 3px;
+          left: 2px;
+          fill: none;
+          stroke: #FFFFFF;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 16px;
+          stroke-dashoffset: 16px;
+          transition: all 0.3s ease;
+          transition-delay: 0.1s;
+          transform: translate3d(0, 0, 0);
         }
+
+        &:before {
+          content: "";
+          width: 100%;
+          height: 100%;
+          background: #506EEC;
+          display: block;
+          transform: scale(0);
+          opacity: 1;
+          border-radius: 50%;
+        }
+      }
+
+      &:last-child {
+        padding-left: 8px;
+      }
     }
 
-    .cbx {
-        margin: auto;
-        -webkit-user-select: none;
-        user-select: none;
-        cursor: pointer;
-
-        span {
-            display: inline-block;
-            vertical-align: middle;
-            transform: translate3d(0, 0, 0);
-
-            &:first-child {
-                position: relative;
-                width: 18px;
-                height: 18px;
-                border-radius: 3px;
-                transform: scale(1);
-                vertical-align: middle;
-                border: 1px solid #9098A9;
-                transition: all 0.2s ease;
-
-                svg {
-                    position: absolute;
-                    top: 3px;
-                    left: 2px;
-                    fill: none;
-                    stroke: #FFFFFF;
-                    stroke-width: 2;
-                    stroke-linecap: round;
-                    stroke-linejoin: round;
-                    stroke-dasharray: 16px;
-                    stroke-dashoffset: 16px;
-                    transition: all 0.3s ease;
-                    transition-delay: 0.1s;
-                    transform: translate3d(0, 0, 0);
-                }
-
-                &:before {
-                    content: "";
-                    width: 100%;
-                    height: 100%;
-                    background: #506EEC;
-                    display: block;
-                    transform: scale(0);
-                    opacity: 1;
-                    border-radius: 50%;
-                }
-            }
-
-            &:last-child {
-                padding-left: 8px;
-            }
-        }
-
-        &:hover span:first-child {
-            border-color: #506EEC;
-        }
+    &:hover span:first-child {
+      border-color: #506EEC;
     }
+  }
 }
 
 
 .form-control-float {
-    display: block;
-    margin: 0;
-    padding: 0.5rem 1rem;
-    color: inherit;
-    width: 100%;
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: 1.3;
-    border: none;
-    border-radius: 0.4rem;
-    transition: box-shadow 0.2s;
+  display: block;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  color: inherit;
+  width: 100%;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: 1.3;
+  border: none;
+  border-radius: 0.4rem;
+  transition: box-shadow 0.2s;
 
-    &::-webkit-input-placeholder {
-        color: #B0BEC5;
-    }
+  &::-webkit-input-placeholder {
+    color: #B0BEC5;
+  }
 
-    &:-ms-input-placeholder {
-        color: #B0BEC5;
-    }
+  &:-ms-input-placeholder {
+    color: #B0BEC5;
+  }
 
-    &::-ms-input-placeholder {
-        color: #B0BEC5;
-    }
+  &::-ms-input-placeholder {
+    color: #B0BEC5;
+  }
 
-    &::placeholder {
-        color: #B0BEC5;
-    }
+  &::placeholder {
+    color: #B0BEC5;
+  }
 
-    &:focus {
-        outline: none;
-        box-shadow: 0.2rem 0.8rem 1.6rem $primary-black-lighter;
-    }
+  &:focus {
+    outline: none;
+    box-shadow: 0.2rem 0.8rem 1.6rem $primary-black-lighter;
+  }
 }

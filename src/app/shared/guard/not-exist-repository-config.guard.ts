@@ -8,32 +8,32 @@ import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class NotExistRepositoryConfigGuard implements CanActivateChild {
-    constructor(
-        private dataService: DataService,
-        private securityService: SecurityService,
-        private fileService: FileSystemService,
-        private router: Router
-    ) {
+  constructor(
+    private dataService: DataService,
+    private securityService: SecurityService,
+    private fileService: FileSystemService,
+    private router: Router
+  ) {
 
-    }
+  }
 
-    canActivateChild(
-        next: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-        return fromPromise(
-            this.dataService.getConfigAppData(this.securityService.appUUID)
-        ).pipe(
-            switchMap(appConfig => {
-                if (appConfig && appConfig.repository_config.length > 0) {
-                    this.router.navigate(['/']);
-                    return of(false);
-                }
+  canActivateChild(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return fromPromise(
+      this.dataService.getConfigAppData(this.securityService.appUUID)
+    ).pipe(
+      switchMap(appConfig => {
+        if (appConfig && appConfig.repository_config.length > 0) {
+          this.router.navigate(['/']);
+          return of(false);
+        }
 
-                return of(true);
-            })
-        );
-    }
+        return of(true);
+      })
+    );
+  }
 }

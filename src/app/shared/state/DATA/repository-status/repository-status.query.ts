@@ -5,8 +5,8 @@ import { RepositoryStatusState, RepositoryStatusStore } from './repository-statu
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusQuery extends Query<RepositoryStatusState> {
 
-    constructor(protected store: RepositoryStatusStore) {
-        super(store);
-    }
+  constructor(protected store: RepositoryStatusStore) {
+    super(store);
+  }
 
 }

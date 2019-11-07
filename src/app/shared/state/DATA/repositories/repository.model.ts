@@ -1,32 +1,32 @@
 import { RepositoryBranchSummary } from '../repository-branches';
 
 export interface Repository {
-    id: string;
-    name: string;
-    directory: string;
-    credential?: RepositoryCredential;
-    branches?: RepositoryBranchSummary[];
+  id: string;
+  name: string;
+  directory: string;
+  credential?: RepositoryCredential;
+  branches?: RepositoryBranchSummary[];
 
-    tags?: CommitTags[];
+  tags?: CommitTags[];
 
-    timestamp?: number;
+  timestamp?: number;
 
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface RepositoryRemotes {
-    id: string;
-    name: string;
-    fetch: string;
-    push?: string;
+  id: string;
+  name: string;
+  fetch: string;
+  push?: string;
 }
 
 export interface RepositoryCredential {
-    id_credential: string;
-    name?: string;
+  id_credential: string;
+  name?: string;
 }
 
 export interface CommitTags {
-    name: string;
-    tracking: string;
+  name: string;
+  tracking: string;
 }

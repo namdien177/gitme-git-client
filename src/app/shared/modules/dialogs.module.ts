@@ -11,27 +11,27 @@ import { SingleComponent as CommitOptionsSingleComponent } from '../components/c
 
 
 const dialogComps = [
-    // General comp
-    YesNoDecisionComponent,
-    OnlyInfoComponent,
-    CommitOptionsComponent,
-    CommitOptionsSingleComponent,
-    BranchOptionsComponent,
-    BranchNewOptionComponent,
+  // General comp
+  YesNoDecisionComponent,
+  OnlyInfoComponent,
+  CommitOptionsComponent,
+  CommitOptionsSingleComponent,
+  BranchOptionsComponent,
+  BranchNewOptionComponent,
 ];
 
 @NgModule({
-    declarations: [
-        ...dialogComps
-    ],
-    imports: [
-        CommonModule,
-        MaterialModule,
-        CoreModule
-    ],
-    entryComponents: [
-        ...dialogComps
-    ]
+  declarations: [
+    ...dialogComps
+  ],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    CoreModule
+  ],
+  entryComponents: [
+    ...dialogComps
+  ]
 })
 export class DialogsModule {
 }
