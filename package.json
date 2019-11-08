@@ -1,11 +1,11 @@
 {
-  "name": "gitme-git-client",
+  "name": "angular-electron",
   "version": "6.3.1",
   "description": "Angular 8 with Electron (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/angular-electron",
+  "homepage": "https://github.com/namdien177/gitme-git-client",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Do Hoang Nam",
+    "email": "do.hoangnam9x@gmail.com"
   },
   "keywords": [
     "angular",
