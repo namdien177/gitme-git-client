@@ -56,9 +56,14 @@ export class RepositoryBranchesService {
     return fromPromise(this.gitService.revert(repository, dirList));
   }
 
-  ignoreFile(repository: Repository, file: FileStatusSummaryView) {
-    const dir = file.path;
-    return fromPromise(this.gitService.addToIgnore(repository, dir));
+  ignoreFiles(repository: Repository, ...files: FileStatusSummaryView[]) {
+    const dir = files.map(file => file.path);
+    return fromPromise(this.gitService.addFilesToIgnore(repository, ...dir));
+  }
+
+  ignoreExtension(repository: Repository, ...files: FileStatusSummaryView[]) {
+    const dir = files.map(file => file.path);
+    return fromPromise(this.gitService.addExtensionToIgnore(repository, ...dir));
   }
 
   /**
