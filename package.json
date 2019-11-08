@@ -1,5 +1,5 @@
 {
-  "name": "angular-electron",
+  "name": "gitme-git-client",
   "version": "6.3.1",
   "description": "Angular 8 with Electron (Typescript + SASS + Hot Reload)",
   "homepage": "https://github.com/namdien177/gitme-git-client",
@@ -104,7 +104,8 @@
     "node-pty": "0.9.0-beta22",
     "prismjs": "1.17.1",
     "simple-git": "^1.126.0",
-    "uniqid": "^5.0.3"
+    "uniqid": "^5.0.3",
+    "ngx-highlightjs": "^3.0.3"
   },
   "engines": {
     "node": ">=10.9.0"

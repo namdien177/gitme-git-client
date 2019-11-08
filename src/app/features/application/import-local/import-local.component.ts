@@ -83,7 +83,7 @@ export class ImportLocalComponent implements OnInit {
   }
 
   chooseDirectory() {
-    const dir = this.electron.dialog.showOpenDialogSync(this.electron.getCurrentWindow(), {
+    const dir = this.electron.dialog.showOpenDialog(this.electron.getCurrentWindow(), {
       title: 'Choose directory',
       properties: ['openDirectory'],
       defaultPath: osNode.homedir()
@@ -159,7 +159,7 @@ export class ImportLocalComponent implements OnInit {
      * Confirm this will:
      * * Saving credentials and repository into local file database
      * * Update working repository
-     * * Fetching new repository => reassign main branch
+     * * Fetching new repository => reassign main branch.
      */
     fromPromise(this.repositoryService.insertNewRepository(
       repositoryInstance, credentialsInstance, !this.isExistingAccount
