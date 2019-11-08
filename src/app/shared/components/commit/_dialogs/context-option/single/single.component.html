@@ -16,13 +16,13 @@
   </div>
 </div>
 
-<div (click)="ignoreThisFile()" class="card mb-1">
+<div (click)="ignoreThisFile()" *ngIf="ignoreStatus" class="card mb-1">
   <div class="card-body">
     Ignore this file
   </div>
 </div>
 
-<div class="card mb-1">
+<div (click)="ignoreThisExtension()" *ngIf="ignoreStatus" class="card mb-1">
   <div class="card-body">
     Ignore all file with this extension
     <br>
