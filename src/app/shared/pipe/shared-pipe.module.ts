@@ -7,23 +7,23 @@ import { RecentTimeDirective } from './recentTime.pipe';
 import { GitCommitOptionsPipe } from './git-commit-options.pipe';
 
 const reExporting = [
-    SafeHtmlPipe,
-    GitDiffPipe,
-    BranchMinimizedPipe,
-    RecentTimeDirective,
-    GitCommitOptionsPipe,
+  SafeHtmlPipe,
+  GitDiffPipe,
+  BranchMinimizedPipe,
+  RecentTimeDirective,
+  GitCommitOptionsPipe,
 ];
 
 @NgModule({
-    declarations: [
-        ...reExporting
-    ],
-    imports: [
-        CommonModule
-    ],
-    exports: [
-        ...reExporting
-    ]
+  declarations: [
+    ...reExporting
+  ],
+  imports: [
+    CommonModule
+  ],
+  exports: [
+    ...reExporting
+  ]
 })
 export class SharedPipeModule {
 }

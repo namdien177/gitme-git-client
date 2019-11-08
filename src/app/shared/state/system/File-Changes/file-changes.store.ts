@@ -9,9 +9,9 @@ export interface FileChangesState extends EntityState<FileChange> {
 @StoreConfig({ name: 'file-changes' })
 export class FileChangesStore extends EntityStore<FileChangesState> {
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
 }
 

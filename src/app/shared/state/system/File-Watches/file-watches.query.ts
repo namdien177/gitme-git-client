@@ -5,8 +5,8 @@ import { FileWatchesState, FileWatchesStore } from './file-watches.store';
 @Injectable({ providedIn: 'root' })
 export class FileWatchesQuery extends Query<FileWatchesState> {
 
-    constructor(protected store: FileWatchesStore) {
-        super(store);
-    }
+  constructor(protected store: FileWatchesStore) {
+    super(store);
+  }
 
 }

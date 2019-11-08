@@ -5,8 +5,8 @@ import { RepositoryBranchesState, RepositoryBranchesStore } from './repository-b
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesQuery extends QueryEntity<RepositoryBranchesState> {
 
-    constructor(protected store: RepositoryBranchesStore) {
-        super(store);
-    }
+  constructor(protected store: RepositoryBranchesStore) {
+    super(store);
+  }
 
 }

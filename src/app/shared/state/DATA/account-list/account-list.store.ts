@@ -9,9 +9,9 @@ export interface AccountListState extends EntityState<Account> {
 @StoreConfig({ name: 'account-list', resettable: true })
 export class AccountListStore extends EntityStore<AccountListState, Account> {
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
 }
 

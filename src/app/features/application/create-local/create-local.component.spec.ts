@@ -8,7 +8,7 @@ describe('CreateLocalComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateLocalComponent ]
+      declarations: [CreateLocalComponent]
     })
     .compileComponents();
   }));

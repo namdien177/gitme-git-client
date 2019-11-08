@@ -1,0 +1,148 @@
+<div class="buttons-bar">
+  <div [class.active]="isRepositoryBoxOpen"
+       class="function repo-selection">
+    <div class="inner-title feature-right">
+      <div (click)="toggleRepositoryBox()" class="main-function">
+        <div class="title-secondary text-muted">
+          Current Repository
+        </div>
+        <div class="title">
+          {{repository?.name}}
+        </div>
+      </div>
+      <div class="right-feature">
+        <em class="fas fa-cog"></em>
+      </div>
+    </div>
+
+    <!--        <gitme-navigation-repositories *ngIf="isRepositoryBoxOpen"-->
+    <!--                                       class="list-repositories">-->
+    <!--        </gitme-navigation-repositories>-->
+  </div>
+
+  <div (isOutside)="clickOutSide($event, 'branches')"
+       [class.active]="isBranchBoxOpen"
+       appIsClickOutside
+       class="function repo-branches">
+    <div (click)="toggleBranchBox()" class="inner-title raw">
+      <div class="title-secondary text-muted">
+        Current Branch
+      </div>
+      <div class="title feature-right">
+            <span class="text-nowrap">
+                <ng-container *ngIf="loading.branch">
+                    Loading
+                </ng-container>
+                <ng-container *ngIf="!loading.branch">
+                    {{activeBranch?.name}}
+                </ng-container>
+            </span>
+        <div class="status">
+          <div *ngIf="statusSummary?.behind > 0"
+               class="badge badge-pill badge-secondary bg-info pull-request">
+            <em class="fas fa-angle-down"></em>
+            {{statusSummary?.behind}}
+          </div>
+          <div *ngIf="statusSummary?.ahead > 0"
+               class="badge badge-pill badge-secondary bg-success push-request">
+            <em class="fas fa-angle-up"></em>
+            {{statusSummary?.ahead}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <gitme-repo-branches *ngIf="isBranchBoxOpen"
+                         class="list-branches"></gitme-repo-branches>
+  </div>
+</div>
+
+<form [formGroup]="formCommitment" class="files-commit">
+  <div class="function branch-actions">
+    <div (click)="pushCommit()" class="inner-title raw">
+      <div class="title-secondary text-muted">
+        git fetch origin
+      </div>
+      <div class="title feature-right">
+                <span class="text-nowrap">
+                  Fetch remote data
+                </span>
+        <div class="status">
+          <div *ngIf="statusSummary?.behind > 0"
+               class="badge badge-pill badge-secondary bg-info pull-request">
+            <em class="fas fa-angle-down"></em>
+            {{statusSummary?.behind}}
+          </div>
+          <div *ngIf="statusSummary?.ahead > 0"
+               class="badge badge-pill badge-secondary bg-success push-request">
+            <em class="fas fa-angle-up"></em>
+            {{statusSummary?.ahead}}
+          </div>
+          <div *ngIf="statusSummary?.files.length > 0"
+               [title]="statusSummary?.files.length + ' file(s) changed'"
+               class="badge badge-pill badge-secondary bg-warning changes">
+            <em class="fas fa-file-invoice"></em>
+            {{statusSummary?.files.length}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="branch-commit">
+    <button (click)="commitFile()"
+            [disabled]="formCommitment.invalid || loading.commit || loading.repository || loading.branch"
+            class="w-100 rounded-0"
+            color="primary"
+            mat-flat-button>
+      <gitme-small-load *ngIf="loading.commit"></gitme-small-load>
+      <span>Commit</span>
+    </button>
+  </div>
+
+  <label class="commit-title">
+    <input class="form-control form-control-dark"
+           formControlName="title"
+           placeholder="Commit title (Required)"
+           type="text">
+    <span class="focus-bg"></span>
+  </label>
+
+  <div (click)="toggleCheckboxAllFile()"
+       *ngIf="statusSummary?.files?.length > 0"
+       class="files-checkAll">
+    <div class="added-checkbox acomi-checkbox-control">
+      <input [checked]="checkboxAllFileStatus"
+             class="acomi-input-box"
+             hidden
+             id="checkboxAllFile"
+             type="checkbox"/>
+      <label class="cbx" for="checkboxAllFile">
+                <span>
+                    <svg height="10px" viewbox="0 0 12 10" width="12px">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                    </svg>
+                </span>
+      </label>
+    </div>
+    <span class="added-title">
+            Select All ({{statusSummary?.files?.length}}
+      file{{statusSummary?.files?.length > 1 ? 's' : ''}})
+        </span>
+  </div>
+
+  <div class="commit-flies">
+    <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
+                        (isAllFileChecked)="eventEmitCheckBoxFile($event)"
+                        *ngIf="statusSummary?.files?.length > 0">
+    </gitme-commit-files>
+    <p *ngIf="statusSummary?.files?.length == 0"
+       class="text-muted text-center nonSelectable">
+      No change file to be committed
+    </p>
+  </div>
+</form>
+
+<div class="content-router">
+  <ng-content></ng-content>
+</div>

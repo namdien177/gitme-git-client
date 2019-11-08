@@ -1,95 +1,95 @@
 @import "src/styles/theme";
 
 :host {
-    width: inherit;
-    height: inherit;
+  width: inherit;
+  height: inherit;
 }
 
 .gm--file-changes {
-    box-shadow: $shadow-light;
-    background: $primary-black-darker;
-    width: inherit;
-    height: inherit;
+  box-shadow: $shadow-light;
+  background: $primary-black-darker;
+  width: inherit;
+  height: inherit;
+  display: grid;
+  grid-template-areas: 'btn' 'content' 'commitment';
+  grid-template-rows: max-content auto max-content;
+  grid-gap: 0.25rem;
+  padding-bottom: 1rem;
+
+
+  .gm--file-btn {
+    grid-area: btn;
+    padding: 0.25rem;
     display: grid;
-    grid-template-areas: 'btn' 'content' 'commitment';
-    grid-template-rows: max-content auto max-content;
     grid-gap: 0.25rem;
-    padding-bottom: 1rem;
 
+    button {
+      background: $primary-black;
+    }
+  }
 
+  &.current {
     .gm--file-btn {
-        grid-area: btn;
-        padding: 0.25rem;
-        display: grid;
-        grid-gap: 0.25rem;
-
-        button {
-            background: $primary-black;
-        }
+      grid-template-columns: auto max-content;
     }
 
-    &.current {
-        .gm--file-btn {
-            grid-template-columns: auto max-content;
-        }
+    .current-btn {
+      background: $primary-black-lighter;
+    }
+  }
 
-        .current-btn {
-            background: $primary-black-lighter;
-        }
+  &.history {
+    .gm--file-btn {
+      grid-template-columns: min-content auto;
     }
 
-    &.history {
-        .gm--file-btn {
-            grid-template-columns: min-content auto;
-        }
-
-        .history-btn {
-            background: $primary-black-lighter;
-        }
+    .history-btn {
+      background: $primary-black-lighter;
     }
+  }
 
-    .content {
-        grid-area: content;
-        width: inherit;
-        height: available;
-        overflow: auto;
-        padding: 0.25rem;
-    }
+  .content {
+    grid-area: content;
+    width: inherit;
+    height: available;
+    overflow: auto;
+    padding: 0.25rem;
+  }
 
-    .commitment {
-        grid-area: commitment;
-        display: grid;
-        grid-template-areas: 'statistic statistic' 'input input' 'btn-commit option' 'expanded expanded';
-        grid-template-columns: auto calc(40px + 0.25rem);
-        grid-template-rows: 1fr 1fr max-content max-content;
-        grid-gap: 0 0.25rem;
-        width: inherit;
+  .commitment {
+    grid-area: commitment;
+    display: grid;
+    grid-template-areas: 'statistic statistic' 'input input' 'btn-commit option' 'expanded expanded';
+    grid-template-columns: auto calc(40px + 0.25rem);
+    grid-template-rows: 1fr 1fr max-content max-content;
+    grid-gap: 0 0.25rem;
+    width: inherit;
 
-        .files-checkAll {
-            grid-area: statistic;
-            display: grid;
-            grid-template-columns: 32px auto;
-            grid-template-rows: 1fr;
-            grid-gap: 0;
-            border-bottom: 1px solid $primary-black-lighter;
+    .files-checkAll {
+      grid-area: statistic;
+      display: grid;
+      grid-template-columns: 32px auto;
+      grid-template-rows: 1fr;
+      grid-gap: 0;
+      border-bottom: 1px solid $primary-black-lighter;
 
-            .added-checkbox {
-                width: 100%;
-                height: 100%;
+      .added-checkbox {
+        width: 100%;
+        height: 100%;
 
-                span {
-                    &:first-child {
-                        position: relative;
-                        width: 14px;
-                        height: 14px;
+        span {
+          &:first-child {
+            position: relative;
+            width: 14px;
+            height: 14px;
 
-                        svg {
-                            top: 1px;
-                            left: 0;
-                        }
-                    }
-                }
+            svg {
+              top: 1px;
+              left: 0;
             }
+          }
+        }
+      }
 
             .added-title {
                 display: flex;
@@ -108,80 +108,80 @@
             }
         }
 
-        .commit-title {
-            grid-area: input;
-            position: relative;
+    .commit-title {
+      grid-area: input;
+      position: relative;
 
-            input {
-                height: 100%;
-                width: 100%;
-                border-radius: 0;
-                border-left: none;
-                border-right: none;
-            }
-        }
-
-        .commitment-btn {
-            grid-area: btn-commit;
-            padding: 0.25rem 0 0.25rem 0.25rem;
-        }
-
-        .commitment-btn-more {
-            grid-area: option;
-            width: min-content;
-            padding: 0.25rem 0.25rem 0.25rem 0;
-
-            button {
-                background: $primary-black-foreground;
-                transition: background-color 0.2s;
-            }
-        }
-
-        .commitment-option-expanded {
-            grid-area: expanded;
-            display: flex;
-            flex-direction: column;
-            margin-top: 0.25rem;
-            width: inherit;
-
-            > .option {
-                margin: 0 0 0.25rem;
-                width: inherit;
-                display: grid;
-                padding: 0 0.25rem;
-                grid-template-columns: 40px calc(100% - 40px);
-                align-items: center;
-                grid-gap: 0.5rem;
-
-                &.opacity-nonFocus {
-                    opacity: 0.2;
-                }
-
-                .option-title, .option-preview {
-                    font-size: 0.8rem;
-                    display: flex;
-                    width: available;
-                    flex-direction: column;
-                    justify-content: center;
-                    padding: 0 0.25rem 0 0;
-
-                    .option-info {
-                        font-size: 0.7rem;
-                        width: inherit;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-
-                    input.custom-commit {
-                        padding-left: 0.5rem;
-                    }
-                }
-
-                .option-btn {
-
-                }
-            }
-        }
+      input {
+        height: 100%;
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
     }
+
+    .commitment-btn {
+      grid-area: btn-commit;
+      padding: 0.25rem 0 0.25rem 0.25rem;
+    }
+
+    .commitment-btn-more {
+      grid-area: option;
+      width: min-content;
+      padding: 0.25rem 0.25rem 0.25rem 0;
+
+      button {
+        background: $primary-black-foreground;
+        transition: background-color 0.2s;
+      }
+    }
+
+    .commitment-option-expanded {
+      grid-area: expanded;
+      display: flex;
+      flex-direction: column;
+      margin-top: 0.25rem;
+      width: inherit;
+
+      > .option {
+        margin: 0 0 0.25rem;
+        width: inherit;
+        display: grid;
+        padding: 0 0.25rem;
+        grid-template-columns: 40px calc(100% - 40px);
+        align-items: center;
+        grid-gap: 0.5rem;
+
+        &.opacity-nonFocus {
+          opacity: 0.2;
+        }
+
+        .option-title, .option-preview {
+          font-size: 0.8rem;
+          display: flex;
+          width: available;
+          flex-direction: column;
+          justify-content: center;
+          padding: 0 0.25rem 0 0;
+
+          .option-info {
+            font-size: 0.7rem;
+            width: inherit;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          input.custom-commit {
+            padding-left: 0.5rem;
+          }
+        }
+
+        .option-btn {
+
+        }
+      }
+    }
+  }
 }

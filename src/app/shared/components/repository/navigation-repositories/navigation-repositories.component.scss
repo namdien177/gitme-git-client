@@ -1,174 +1,174 @@
 @import "../../../../../styles/theme";
 
 :host {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    height: calc(100vh - 112px);
-    width: 100%;
-    background-color: $primary-black-darker;
-    z-index: 10050;
-    padding: 0;
-    box-shadow: $shadow-light;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  height: calc(100vh - 112px);
+  width: 100%;
+  background-color: $primary-black-darker;
+  z-index: 10050;
+  padding: 0;
+  box-shadow: $shadow-light;
 }
 
 .container-fluid {
+  display: grid;
+  grid-template-areas: 'search' 'action' 'list';
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content max-content auto;
+  height: 100%;
+  z-index: 10050;
+  grid-gap: 1rem;
+  padding: 1rem;
+
+  .backdrop {
+    z-index: 2;
+  }
+
+  .add-new-repository {
+    grid-area: action;
     display: grid;
-    grid-template-areas: 'search' 'action' 'list';
-    grid-template-columns: 1fr;
-    grid-template-rows: max-content max-content auto;
-    height: 100%;
-    z-index: 10050;
-    grid-gap: 1rem;
-    padding: 1rem;
+    justify-content: right;
+    position: relative;
+    min-height: 36px;
+    overflow: hidden;
+    transition: 0.05s;
+    z-index: 3;
 
-    .backdrop {
-        z-index: 2;
+    &.repo-action-on {
+      min-height: calc(62px * 3 + 0.5rem * 2);
+
+      .button-init {
+        right: -100%;
+      }
+
+      .button-slide {
+        left: 0;
+      }
     }
 
-    .add-new-repository {
-        grid-area: action;
+    .button-init {
+      position: absolute;
+      right: 0;
+      top: 0;
+      transition: 0.2s;
+    }
+
+    .button-slide {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      display: grid;
+      grid-template-areas: 'clone''exist''new';
+      grid-template-columns: auto;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-gap: 0.5rem;
+      transition: 0.2s;
+
+      .btn-action {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        user-select: none;
+        background: $primary-black;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: $primary-black-lighter;
+        }
+
+        &.clone-action {
+          grid-area: clone;
+        }
+
+        &.exist-action {
+          grid-area: exist;
+        }
+
+        &.new-action {
+          grid-area: new;
+        }
+      }
+    }
+
+    .add-new-repository-type {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 90;
+      display: grid;
+      place-content: center;
+
+      .choose-type-action {
         display: grid;
-        justify-content: right;
-        position: relative;
-        min-height: 36px;
-        overflow: hidden;
-        transition: 0.05s;
-        z-index: 3;
+        grid-template-rows: repeat(3, 1fr);
+        grid-template-columns: 1fr;
+        grid-gap: 0.5rem;
+        padding: 1.25rem;
+        border-radius: 0.5rem;
+        box-shadow: $shadow-light;
+        background: $primary-black;
+        z-index: 100;
+        width: 100%;
+        height: 100%;
 
-        &.repo-action-on {
-            min-height: calc(62px * 3 + 0.5rem * 2);
+        .type {
+          width: 100%;
+          padding: 0.75rem;
+          border-radius: 0.5rem;
+          border: none;
+          cursor: pointer;
+          user-select: none;
+          background: $primary-black;
+          transition: background-color 0.2s;
 
-            .button-init {
-                right: -100%;
-            }
-
-            .button-slide {
-                left: 0;
-            }
+          &:hover {
+            background: $primary-light;
+          }
         }
-
-        .button-init {
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: 0.2s;
-        }
-
-        .button-slide {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            display: grid;
-            grid-template-areas: 'clone''exist''new';
-            grid-template-columns: auto;
-            grid-template-rows: 1fr 1fr 1fr;
-            grid-gap: 0.5rem;
-            transition: 0.2s;
-
-            .btn-action {
-                width: 100%;
-                padding: 0.75rem;
-                border-radius: 4px;
-                border: none;
-                cursor: pointer;
-                user-select: none;
-                background: $primary-black;
-                transition: background-color 0.2s;
-
-                &:hover {
-                    background: $primary-black-lighter;
-                }
-
-                &.clone-action {
-                    grid-area: clone;
-                }
-
-                &.exist-action {
-                    grid-area: exist;
-                }
-
-                &.new-action {
-                    grid-area: new;
-                }
-            }
-        }
-
-        .add-new-repository-type {
-            position: fixed;
-            top: 32px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 90;
-            display: grid;
-            place-content: center;
-
-            .choose-type-action {
-                display: grid;
-                grid-template-rows: repeat(3, 1fr);
-                grid-template-columns: 1fr;
-                grid-gap: 0.5rem;
-                padding: 1.25rem;
-                border-radius: 0.5rem;
-                box-shadow: $shadow-light;
-                background: $primary-black;
-                z-index: 100;
-                width: 100%;
-                height: 100%;
-
-                .type {
-                    width: 100%;
-                    padding: 0.75rem;
-                    border-radius: 0.5rem;
-                    border: none;
-                    cursor: pointer;
-                    user-select: none;
-                    background: $primary-black;
-                    transition: background-color 0.2s;
-
-                    &:hover {
-                        background: $primary-light;
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 
-    .list-repositories {
-        grid-area: list;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        position: relative;
+  .list-repositories {
+    grid-area: list;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 
-        .repo {
-            margin-bottom: 0.5rem;
-        }
+    .repo {
+      margin-bottom: 0.5rem;
     }
+  }
 
-    .search-repositories {
-        grid-area: search;
-        display: flex;
-        flex-direction: column;
-        position: relative;
+  .search-repositories {
+    grid-area: search;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 
-        input.search {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            font-size: 1rem;
-            line-height: 1.8rem;
-            transition: font-size 0.25s;
+    input.search {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      font-size: 1rem;
+      line-height: 1.8rem;
+      transition: font-size 0.25s;
 
-            &:focus-within {
-                font-size: 1.2rem;
-            }
+      &:focus-within {
+        font-size: 1.2rem;
+      }
 
-            &:focus {
-                background: rgba(0, 0, 0, 0.2);
-            }
-        }
+      &:focus {
+        background: rgba(0, 0, 0, 0.2);
+      }
     }
+  }
 }

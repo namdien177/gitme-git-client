@@ -5,10 +5,10 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 
 @NgModule()
 export class UtilityModule {
-    static forRoot(): ModuleWithProviders {
-        return {
-            ngModule: UtilityModule,
-            providers: []
-        };
-    }
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: UtilityModule,
+      providers: []
+    };
+  }
 }

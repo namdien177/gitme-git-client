@@ -8,7 +8,7 @@ describe('BranchNewOptionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BranchNewOptionComponent ]
+      declarations: [BranchNewOptionComponent]
     })
     .compileComponents();
   }));

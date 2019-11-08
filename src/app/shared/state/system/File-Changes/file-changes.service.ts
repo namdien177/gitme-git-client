@@ -6,14 +6,14 @@ import { StatusSummary } from '../../../model/statusSummary.model';
 @Injectable({ providedIn: 'root' })
 export class FileChangesService {
 
-    constructor(
-        private fileChangesStore: FileChangesStore,
-        private http: HttpClient
-    ) {
-    }
+  constructor(
+    private fileChangesStore: FileChangesStore,
+    private http: HttpClient
+  ) {
+  }
 
-    set(summary: StatusSummary) {
-        const arrAll = summary.files;
-        const arrDeletedDir = summary.deleted;
-    }
+  set(summary: StatusSummary) {
+    const arrAll = summary.files;
+    const arrDeletedDir = summary.deleted;
+  }
 }

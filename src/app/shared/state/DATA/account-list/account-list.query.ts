@@ -5,8 +5,8 @@ import { AccountListState, AccountListStore } from './account-list.store';
 @Injectable({ providedIn: 'root' })
 export class AccountListQuery extends QueryEntity<AccountListState> {
 
-    constructor(protected store: AccountListStore) {
-        super(store);
-    }
+  constructor(protected store: AccountListStore) {
+    super(store);
+  }
 
 }

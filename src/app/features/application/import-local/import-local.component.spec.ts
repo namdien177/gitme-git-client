@@ -8,7 +8,7 @@ describe('ImportLocalComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ImportLocalComponent ]
+      declarations: [ImportLocalComponent]
     })
     .compileComponents();
   }));

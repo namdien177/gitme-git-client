@@ -1,5 +1,5 @@
 export interface SystemResponse {
-    message: string;
-    value: any;
-    status: boolean;
+  message: string;
+  value: any;
+  status: boolean;
 }

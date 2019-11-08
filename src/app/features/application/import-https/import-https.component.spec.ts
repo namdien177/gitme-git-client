@@ -8,7 +8,7 @@ describe('ImportHttpsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ImportHttpsComponent ]
+      declarations: [ImportHttpsComponent]
     })
     .compileComponents();
   }));

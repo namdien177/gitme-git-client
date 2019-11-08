@@ -8,7 +8,7 @@ describe('CommitMenuComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommitMenuComponent ]
+      declarations: [CommitMenuComponent]
     })
     .compileComponents();
   }));

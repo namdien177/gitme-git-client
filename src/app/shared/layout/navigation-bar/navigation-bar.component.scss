@@ -1,0 +1,207 @@
+@import "src/styles/theme";
+
+:host {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-areas: 'buttons files' 'router files';
+    grid-template-columns: auto 350px;
+    grid-template-rows: 80px calc(100vh - 112px);
+    grid-gap: 0;
+
+    .buttons-bar {
+        grid-area: buttons;
+        display: grid;
+        grid-template-areas: 'repository branches';
+        grid-template-columns: auto 350px;
+        grid-gap: 0;
+    }
+
+    .files-commit {
+        grid-area: files;
+        display: grid;
+        grid-template-areas: 'fetch' 'commit' 'title' 'checkbox' 'files-list';
+        grid-template-columns: 1fr;
+        grid-template-rows: 80px 80px 40px 32px calc(100vh - 264px);
+        grid-gap: 0;
+    }
+
+    .content-router {
+        grid-area: router;
+    }
+}
+
+.files-commit {
+    box-shadow: $shadow-light;
+    background: $primary-black-darker;
+
+    .branch-actions {
+        grid-area: fetch;
+    }
+
+    .branch-commit {
+        grid-area: commit;
+
+        button {
+            height: 100%;
+        }
+    }
+
+    .commit-title {
+        grid-area: title;
+        position: relative;
+
+        input {
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+    }
+
+    .files-checkAll {
+        grid-area: checkbox;
+        display: grid;
+        grid-template-columns: 32px auto;
+        grid-template-rows: 1fr;
+        grid-gap: 0;
+        border-bottom: 1px solid $primary-black-lighter;
+
+        .added-checkbox {
+            width: 100%;
+            height: 100%;
+
+            span {
+                &:first-child {
+                    position: relative;
+                    width: 14px;
+                    height: 14px;
+
+                    svg {
+                        top: 1px;
+                        left: 0;
+                    }
+                }
+            }
+        }
+
+        .added-title {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            line-height: 0.85rem;
+            user-select: none;
+            cursor: pointer;
+        }
+    }
+
+    .content {
+        grid-area: files-list;
+    }
+}
+
+.function {
+    background-color: $primary-black;
+    user-select: none;
+    display: grid;
+    align-items: center;
+    transition: all 0.2s;
+    box-shadow: $shadow-light;
+
+    .inner-title {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+
+        &.feature-right {
+            display: grid;
+            padding: 0;
+            grid-template-columns: auto 50px;
+            grid-template-rows: 100%;
+
+            .main-function {
+                padding: 0.5rem 0 0.5rem 0.5rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+            }
+
+            .right-feature {
+                height: 100%;
+                width: 100%;
+                display: grid;
+                place-content: center;
+                cursor: pointer;
+
+                &:hover {
+                    background: rgba(0, 0, 0, 0.05);
+                }
+            }
+        }
+
+        &.raw {
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+
+            &.feature-right {
+                display: grid;
+                grid-template-columns: auto max-content;
+                grid-template-rows: 1fr;
+                align-items: center;
+                grid-gap: 0.5rem;
+            }
+        }
+
+        .status, .title-secondary {
+            font-size: 0.7rem;
+            line-height: 0.7rem;
+            display: flex;
+            align-items: center;
+
+            .badge {
+                padding: 0.15rem 0.3rem;
+                font-size: 0.6rem;
+                line-height: 0.6rem;
+
+                &:not(:first-child) {
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+    }
+
+    &.repo-selection {
+        grid-area: repository;
+        position: relative;
+    }
+
+    &.repo-branches {
+        grid-area: branches;
+        position: relative;
+
+        .list-branches {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            height: calc(100vh - 112px);
+            z-index: 99;
+        }
+    }
+
+    &.active {
+        background-color: $primary-black;
+    }
+}

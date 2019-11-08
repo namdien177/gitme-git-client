@@ -3,18 +3,18 @@ import { CommitOptions } from '../state/DATA/repository-branches';
 import { UtilityService } from '../utilities/utility.service';
 
 @Pipe({
-    name: 'gitCommitOptions'
+  name: 'gitCommitOptions'
 })
 export class GitCommitOptionsPipe implements PipeTransform {
 
-    constructor(private utilitiesService: UtilityService) {
-    }
+  constructor(private utilitiesService: UtilityService) {
+  }
 
-    transform(value: CommitOptions, ...args: any[]): any {
-        if (!!value) {
-            return this.utilitiesService.stringifyObjectOption(value);
-        }
-        return 'none';
+  transform(value: CommitOptions, ...args: any[]): any {
+    if (!!value) {
+      return this.utilitiesService.stringifyObjectOption(value);
     }
+    return 'none';
+  }
 
 }

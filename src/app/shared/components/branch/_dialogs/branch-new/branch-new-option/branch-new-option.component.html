@@ -1,1 +1,105 @@
-<p>branch-new-option works!</p>
+<form [formGroup]="formBuilder"
+      class="form-container">
+  <div class="form-content">
+    <div class="form-group">
+      <label for="branchName">
+        New branch name
+      </label>
+      <input class="form-control form-control-float form-control-dark"
+             formControlName="branchNameInput"
+             id="branchName"
+             placeholder="feature/abc"
+             type="text">
+      <ng-container *ngIf="branchName.dirty">
+        <small *ngIf="branchName.errors?.match"
+               class="text-danger">
+          This branch is already existed
+        </small>
+        <small *ngIf="branchName.errors?.length"
+               class="text-danger">
+          Branch name must have at lease 1 character!
+        </small>
+      </ng-container>
+      <ng-container *ngIf="!!parseNameBranch">
+        <small class="text-warning">
+          {{parseNameBranch}}
+        </small>
+      </ng-container>
+    </div>
+    <span>Checkout from</span>
+    <div class="form-radio-branches">
+      <label *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) !== 2" class="card"
+             for="fromDefault">
+        <div class="card-body branch-name">
+          <div class="branch-checkbox acomi-checkbox-control">
+            <input [value]="0"
+                   class="acomi-input-box"
+                   formControlName="fromBranch"
+                   hidden
+                   id="fromDefault"
+                   type="radio"/>
+            <div class="cbx">
+              <span>
+                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="branch-choice">
+            From master
+          </div>
+        </div>
+      </label>
+
+      <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 2">
+        <h4 class="m-0 mb-1 text-muted weight-lighter">Branch master was not found</h4>
+        <small class="text-muted">Current branch will be selected</small>
+      </div>
+
+      <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 0">
+        <h4 class="m-0 mb-1 text-muted weight-lighter">Already on branch default</h4>
+        <small class="text-muted">Current branch will be selected</small>
+      </div>
+
+      <label class="card" for="fromCurrent">
+        <div class="card-body branch-name additional">
+          <div class="branch-checkbox acomi-checkbox-control">
+            <input [value]="1"
+                   class="acomi-input-box"
+                   formControlName="fromBranch"
+                   hidden
+                   id="fromCurrent"
+                   type="radio"/>
+            <div class="cbx">
+                            <span>
+                                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                </svg>
+                            </span>
+            </div>
+          </div>
+          <div class="branch-choice">
+            From current branch
+          </div>
+          <small class="branch-subName text-muted">
+            {{branch.name}}
+          </small>
+        </div>
+      </label>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button (click)="cancel()"
+            color="warn"
+            mat-flat-button>
+      {{emittedDataFromView.decision.noText}}
+    </button>
+    <button (click)="checkoutFrom()"
+            [disabled]="formBuilder.invalid"
+            color="primary"
+            mat-raised-button>
+      {{emittedDataFromView.decision.yesText}}
+    </button>
+  </div>
+</form>

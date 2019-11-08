@@ -7,75 +7,75 @@ import { RepositoryStatusService } from '../../../shared/state/DATA/repository-s
 import { StatusSummary } from '../../../shared/model/statusSummary.model';
 
 @Component({
-    selector: 'gitme-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.scss']
+  selector: 'gitme-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
-    diffStatus: GitDiffState = null;
+  diffStatus: GitDiffState = null;
 
-    statusSummary: StatusSummary = null;
+  statusSummary: StatusSummary = null;
 
-    info: {
-        dir: string;
-        name: string;
-    } = {
-        dir: null,
-        name: null
-    };
+  info: {
+    dir: string;
+    name: string;
+  } = {
+    dir: null,
+    name: null
+  };
 
-    private componentDestroy: Subject<boolean> = new Subject<boolean>();
+  private componentDestroy: Subject<boolean> = new Subject<boolean>();
 
-    constructor(
-        private gitDiffService: GitDiffService,
-        private utilityService: UtilityService,
-        private repositoryStatusService: RepositoryStatusService,
-    ) {
-    }
+  constructor(
+    private gitDiffService: GitDiffService,
+    private utilityService: UtilityService,
+    private repositoryStatusService: RepositoryStatusService,
+  ) {
+  }
 
-    ngOnInit() {
-        this.observeStatusChange();
-        this.observeDiff();
-    }
+  ngOnInit() {
+    this.observeStatusChange();
+    this.observeDiff();
+  }
 
-    openDirectory() {
+  openDirectory() {
 
-    }
+  }
 
-    ngOnDestroy(): void {
-        this.componentDestroy.next(true);
-    }
+  ngOnDestroy(): void {
+    this.componentDestroy.next(true);
+  }
 
-    private observeDiff() {
-        this.gitDiffService.getDiff()
-        .pipe(
-            takeUntil(this.componentDestroy)
-        )
-        .subscribe(
-            diffStatus => {
-                this.diffStatus = diffStatus;
-                if (!!diffStatus && diffStatus.directory) {
-                    const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
-                    this.info = {
-                        name: splitName.end,
-                        dir: splitName.front
-                    };
-                } else {
-                    this.info = {
-                        name: null,
-                        dir: null
-                    };
-                }
-            }
-        );
-    }
+  private observeDiff() {
+    this.gitDiffService.getDiff()
+    .pipe(
+      takeUntil(this.componentDestroy)
+    )
+    .subscribe(
+      diffStatus => {
+        this.diffStatus = diffStatus;
+        if (!!diffStatus && diffStatus.directory) {
+          const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
+          this.info = {
+            name: splitName.end,
+            dir: splitName.front
+          };
+        } else {
+          this.info = {
+            name: null,
+            dir: null
+          };
+        }
+      }
+    );
+  }
 
-    private observeStatusChange() {
-        this.repositoryStatusService.select().pipe(
-            distinctUntilChanged()
-        ).subscribe(statusSum => {
-            this.statusSummary = statusSum;
-        });
-    }
+  private observeStatusChange() {
+    this.repositoryStatusService.select().pipe(
+      distinctUntilChanged()
+    ).subscribe(statusSum => {
+      this.statusSummary = statusSum;
+    });
+  }
 }
