@@ -3,7 +3,7 @@ import {SpectronClient} from 'spectron';
 
 import commonSetup from './common-setup';
 
-describe('gitme-git-client App', function () {
+describe('angular-electron App', function () {
   commonSetup.apply(this);
 
   let browser: any;

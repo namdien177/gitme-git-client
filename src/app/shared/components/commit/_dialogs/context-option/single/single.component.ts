@@ -32,11 +32,6 @@ export class SingleComponent implements OnInit {
     }
   }
 
-  get ignoreStatus(): boolean {
-    const forbidden = /[\/\\]*\.gitignore$/g;
-    return !this.file.path.match(forbidden);
-  }
-
   ngOnInit() {
     const splitPath = this.data.file.path.split('.');
     this.extension = splitPath[splitPath.length - 1];
@@ -68,23 +63,14 @@ export class SingleComponent implements OnInit {
     }
   }
 
-    ignoreThisFile() {
-        this.branchServices.ignoreFiles(this.repository, this.file)
-        .subscribe(
-            status => {
-                this.dismissed('IGNORED');
-            }
-        );
-    }
-
-    ignoreThisExtension() {
-        this.branchServices.ignoreExtension(this.repository, this.file).subscribe(
-            status => {
-                console.log(status);
-                this.dismissed('IGNORED');
-            }
-        );
-    }
+  ignoreThisFile() {
+    this.branchServices.ignoreFile(this.repository, this.file)
+    .subscribe(
+      status => {
+        this.dismissed('IGNORED');
+      }
+    );
+  }
 }
 
 export type ACTION_ON_FILE = 'OPEN_FOLDER' | 'REVERT' | 'CANCEL' | 'IGNORED';

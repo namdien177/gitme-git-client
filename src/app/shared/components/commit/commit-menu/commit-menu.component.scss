@@ -91,22 +91,15 @@
         }
       }
 
-            .added-title {
-                display: flex;
-                align-items: center;
-                font-size: 0.85rem;
-                line-height: 0.85rem;
-                user-select: none;
-                cursor: pointer;
-                position: relative;
-
-                &:hover {
-                    &:after {
-
-                    }
-                }
-            }
-        }
+      .added-title {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        line-height: 0.85rem;
+        user-select: none;
+        cursor: pointer;
+      }
+    }
 
     .commit-title {
       grid-area: input;

@@ -374,9 +374,7 @@ export class GitService {
     .checkIgnore([...filePath]);
   }
 
-  async addFilesToIgnore(repository: Repository, ...relativeFilePath: string[]) {
-        const rootIgnore = pathNode.join(repository.directory, '.gitignore');
-
+  async addToIgnore(repository: Repository, ...relativeFilePath: string[]) {
     // Check if file is already in ignore
     const statusIgnore = await this.isFileIgnored(repository, ...relativeFilePath);
     const addIgnore = [];
@@ -390,43 +388,21 @@ export class GitService {
     }
 
     // Check if file ignore is already exist
+    const rootIgnore = pathNode.join(repository.directory, '.gitignore');
     const concatPath = '\n' + relativeFilePath.join('\n');
-        if (this.fileSystem.isFileExist(rootIgnore)) {
-            // File already exist => write to file
-            return await this.fileSystem.quickAppendStringTo(rootIgnore, '', concatPath);
-        } else {
-            // Create file .gitignore
-            const createStatus = await this.fileSystem.createFile('.gitignore', concatPath, repository.directory, '', false);
-            return createStatus.status;
-        }
+    if (this.fileSystem.isFileExist(rootIgnore)) {
+      // File already exist => write to file
+      return await this.fileSystem.quickAppendStringTo(rootIgnore, '', concatPath);
+    } else {
+      // Create file .gitignore
+      const createStatus = await this.fileSystem.createFile('.gitignore', concatPath, repository.directory, '', false);
+      return createStatus.status;
     }
+  }
 
-  async addExtensionToIgnore(repository: Repository, ...filePaths: string[]) {
-        const rootIgnore = pathNode.join(repository.directory, '.gitignore');
-
-        const extractedExtension: string[] = filePaths.map(path => {
-            const fileNode = pathNode.join(repository.directory, path);
-            const ext = pathNode.extname(fileNode);
-            return `*${ ext }`;
-        });
-        console.log(extractedExtension);
-        const extensionJoin: string = '\n' + extractedExtension.join('\n');
-        let ignoreStatus: boolean;
-        if (!this.fileSystem.isFileExist(rootIgnore)) {
-            // File already exist => write to file
-            ignoreStatus = (await this.fileSystem.createFile(
-                '.gitignore', extensionJoin, repository.directory, '', false
-            )).status;
-        } else {
-            ignoreStatus = await this.fileSystem.quickAppendStringTo(rootIgnore, '', extensionJoin);
-        }
-
-        return ignoreStatus;
-    }
-
-    isRemoteAvailable(repository: Repository) {
-        return !!repository.remote;
-    }
+  isRemoteAvailable(repository: Repository) {
+    return !!repository.remote;
+  }
 
   isFetchRemoteAvailable(repository: Repository) {
     if (!this.isRemoteAvailable(repository)) {
