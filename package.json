@@ -91,6 +91,7 @@
     "@datorama/akita-ng-entity-service": "1.1.1",
     "@fortawesome/fontawesome-free": "5.11.2",
     "@types/chart.js": "2.8.10",
+    "@types/passport": "^1.0.1",
     "@types/prismjs": "1.16.0",
     "animate.css": "^3.7.2",
     "chart.js": "^2.5.0",
@@ -102,6 +103,8 @@
     "moment": "^2.24.0",
     "node-machine-id": "1.1.12",
     "node-pty": "0.9.0-beta22",
+    "passport": "^0.4.0",
+    "passport-github": "^1.1.0",
     "prismjs": "1.17.1",
     "simple-git": "^1.126.0",
     "uniqid": "^5.0.3"
