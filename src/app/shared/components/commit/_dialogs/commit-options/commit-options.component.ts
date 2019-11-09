@@ -10,13 +10,6 @@ import { CommitOptions } from '../../../../state/DATA/repository-branches';
   styleUrls: ['./commit-options.component.scss']
 })
 export class CommitOptionsComponent implements OnInit {
-
-  // @debug
-  debuging = {
-    value: '"do hoang nam <do.hoangnam9x@gmail.com>"',
-    argument: '--author'
-  };
-
   errorMessage = null;
 
   formOptions: FormGroup;

@@ -32,7 +32,6 @@ export class RepositoriesService {
     private accountListService: AccountListService,
     private repositoryBranchesService: RepositoryBranchesService,
     private securityService: SecurityService,
-    private utilitiesService: UtilityService
   ) {
   }
 
@@ -47,7 +46,7 @@ export class RepositoriesService {
     const systemDefaultName = this.securityService.appUUID;
     if (isNewAccount) {
       // Save the new credential to file store;
-      const storeNewAccount = this.dataService.createAccountData(credentials, systemDefaultName);
+      const storeNewAccount = await this.dataService.createAccountData(credentials, systemDefaultName);
       if (!storeNewAccount) {
         return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
       }
@@ -64,7 +63,6 @@ export class RepositoriesService {
         'user.name': credentials.name_local
       };
       await this.addConfig(newRepository, config);
-      // this.gitService.gitInstance(newRepository.directory)
     }
 
     return statusSave;
@@ -77,7 +75,6 @@ export class RepositoriesService {
   async load() {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
-
     if (!!!configFile) {
       return;
     }
