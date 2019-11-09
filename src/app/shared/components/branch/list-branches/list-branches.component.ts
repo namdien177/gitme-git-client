@@ -93,30 +93,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
          * 2 = bring changes to
          */
         (final: 1 | 2) => {
-          console.log(final);
-          console.log(this._temporaryBranchInfo);
-          const branchToGo = this._temporaryBranchInfo.fromBranch === this.branch.name ?
-            null : this._temporaryBranchInfo.fromBranch;
-          if (final === 2) {
-            // create new branch and bring changes to
-            return this.repositoryBranchesService.newBranchFrom(
-              this.repository,
-              this._temporaryBranchInfo.name,
-              branchToGo
-            );
-          }
-
-          // stash changes and create new branch
-          return this.repositoryBranchesService.stashChanges(this.repository).pipe(
-            switchMap(stash => {
-              console.log(stash);
-              return this.repositoryBranchesService.newBranchFrom(
-                this.repository,
-                this._temporaryBranchInfo.name,
-                branchToGo
-              );
-            })
-          );
+          return this.createBranchMethod(final);
         }
       ),
     ).subscribe(
@@ -137,6 +114,31 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       data: defaultStash
     }).afterClosed().pipe(
       map(res => res === undefined ? 0 : res)
+    );
+  }
+
+  createBranchMethod(methodCode: 1 | 2) {
+    const branchToGo = this._temporaryBranchInfo.fromBranch === this.branch.name ?
+      null : this._temporaryBranchInfo.fromBranch;
+    if (methodCode === 2) {
+      // create new branch and bring changes to
+      return this.repositoryBranchesService.newBranchFrom(
+        this.repository,
+        this._temporaryBranchInfo.name,
+        branchToGo
+      );
+    }
+
+    // stash changes and create new branch
+    return this.repositoryBranchesService.stashChanges(this.repository).pipe(
+      switchMap(stash => {
+        console.log(stash);
+        return this.repositoryBranchesService.newBranchFrom(
+          this.repository,
+          this._temporaryBranchInfo.name,
+          branchToGo
+        );
+      })
     );
   }
 }
