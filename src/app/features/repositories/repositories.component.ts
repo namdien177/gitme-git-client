@@ -37,7 +37,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
     this.watchingBranch();          // Observing repository
-    this.watchingFileChanges();     // Observing file changes by chokidar
+    // this.watchingFileChanges();     // Observing file changes by chokidar
     this.loopRefreshBranchStatus(); // Loop to auto fetching
   }
 
@@ -85,13 +85,14 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
 
   /**
    * Default looping 15s
-   * Fetching and retrieve status for every 15 second.
+   * Fetching and retrieve status for every 5 second.
    * @param loopDuration
    */
-  private loopRefreshBranchStatus(loopDuration = 15000) {
+  private loopRefreshBranchStatus(loopDuration = 5000) {
     interval(loopDuration)
     .pipe(
       takeUntil(this.componentDestroyed),
+      takeWhile(() => this.isViewChangeTo === 'changes'),
       switchMap(() => {
         console.log('running')
         if (!!this.repository && !!this.activeBranch) {
@@ -103,7 +104,9 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       distinctUntilChanged(),
-      switchMap(() => this.observingBranchStatus()),
+      switchMap(() => {
+        return this.observingBranchStatus();
+      }),
       distinctUntilChanged(),
     ).subscribe((status) => {
       this.statusSummary = status;
@@ -129,12 +132,14 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
-        if (!!this.repository) {
-          const newDir = this.repository.directory;
-          this.fileWatchesService.switchTo(newDir);
-        }
-        return fromPromise(this.repositoryBranchesService.load(selectedRepo));
+        // TODO: check chodikar
+        // if (!!this.repository) {
+        //   const newDir = this.repository.directory;
+        //   return fromPromise(this.fileWatchesService.switchTo(newDir));
+        // }
+        return of(null);
       }),
+      switchMap(() => fromPromise(this.repositoryBranchesService.load(this.repository))),
       switchMap(() => this.observingBranchStatus())
     )
     .subscribe(
