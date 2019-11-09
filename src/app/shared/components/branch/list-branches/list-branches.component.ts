@@ -75,24 +75,20 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
         this._temporaryBranchInfo = newBranch;
         return this.repositoriesService.getBranchStatus(this.repository);
       }),
-      switchMap((checkAvailable: StatusSummary) => {
-        if (checkAvailable.files.length > 0) {
-          // Have changes => stash or bring?
-          return of(true);
-        }
-        return of(false);
-      }),
+      map((
+        // Have changes => stash or bring?
+        checkAvailable: StatusSummary) => checkAvailable.files.length > 0
+      ),
       switchMap((needStash: boolean) => {
         if (needStash) {
           return this.openStashMenu();
         }
-        return of(0);
+        return of(2);
       }),
       takeWhile(action => action !== 0),
       switchMap(
         /**
          * @param final Choices from making a new branch
-         * 0 = cancel
          * 1 = stash
          * 2 = bring changes to
          */
