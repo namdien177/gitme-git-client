@@ -3,10 +3,6 @@
 :host {
   display: flex;
   flex-direction: column;
-
-  > *:not(:nth-last-child) {
-    margin-bottom: 0.75rem;
-  }
 }
 
 .decision {
@@ -16,4 +12,8 @@
   > *:not(:last-child) {
     margin-right: 0.5rem;
   }
+}
+
+.body {
+  font-size: 0.8rem;
 }
