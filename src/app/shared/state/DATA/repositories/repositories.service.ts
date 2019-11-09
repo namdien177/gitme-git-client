@@ -17,6 +17,7 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
+import { compareArray } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -83,7 +84,16 @@ export class RepositoriesService {
     for (const idRepository of repositoryFile) {
       const repos = await this.dataService.getRepositoriesConfigData(idRepository);
       if (!!repos && !!repos.repository) {
-        repositories.push(repos.repository);
+        if (this.fileService.isDirectoryExist(repos.repository.directory)) {
+          const repository: Repository = { ...repos.repository } as Repository;
+          const updatedBranch = await this.gitService.getBranchInfo(repository.directory, repository.branches);
+          // update local file
+          if (compareArray(updatedBranch, repository.branches)) {
+            await this.dataService.updateRepositoryData(repository, true);
+          }
+          repository.branches = updatedBranch;
+          repositories.push(repository);
+        }
       }
     }
 
@@ -266,7 +276,6 @@ export class RepositoriesService {
    * Fetching data
    * @param repository
    * @param branch
-   * @param load
    * @param option
    */
   fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {

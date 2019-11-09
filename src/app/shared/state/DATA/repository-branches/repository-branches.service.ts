@@ -87,10 +87,22 @@ export class RepositoryBranchesService {
     ).pipe(map(_ => true));
   }
 
+  /**
+   * TODO: check message and re-stash
+   * @param repository
+   * @param message
+   */
   stashChanges(repository: Repository, message?: string) {
     return fromPromise(
       this.gitService.addStash(repository, message)
     );
+  }
+
+  deleteBranch(repository: Repository, branch: RepositoryBranchSummary) {
+    //  $ git push -d <remote_name> <branch_name>       <---- Delete remotely
+    //  $ git branch -d <branch_name>                   <---- Delete locally
+    console.log(branch);
+    console.log(repository);
   }
 
   set(listBranch: RepositoryBranchSummary[]) {

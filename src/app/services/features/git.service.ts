@@ -89,7 +89,7 @@ export class GitService {
     const branchesOutPut: RepositoryBranchSummary[] = [];
 
     if (branchRemoteRaw.all.length > branchLocalRaw.all.length) {
-      // In case there is no local-only branch.
+      // In case there are remote branches.
       Object.keys(branchRemoteRaw.branches).forEach(branchRemoteInstance => {
         const slidedSlash = branchRemoteInstance.split('/');
         const trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
@@ -114,7 +114,7 @@ export class GitService {
         }
       });
     } else {
-      // In case there are local-only branch.
+      // In case there are local-only branches.
       Object.keys(branchLocalRaw.branches).forEach(branchLocalInstance => {
         let trackingOn = null;
         const existRemoteLocal = branchRemoteRaw.all.find(nameRemoteBranch => {

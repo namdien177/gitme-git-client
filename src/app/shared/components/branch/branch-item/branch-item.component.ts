@@ -58,7 +58,8 @@ export class BranchItemComponent implements OnInit {
 
   onRightClick() {
     const dataPassing = {
-      branch: this.branchSummary
+      branch: this.branchSummary,
+      repository: this.repository
     };
     if (this.branchSummary.current) {
       Object.assign(dataPassing, { status: this.status });
