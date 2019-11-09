@@ -17,7 +17,6 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { UtilityService } from '../../../utilities/utility.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -267,6 +266,7 @@ export class RepositoriesService {
    * Fetching data
    * @param repository
    * @param branch
+   * @param load
    * @param option
    */
   fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
