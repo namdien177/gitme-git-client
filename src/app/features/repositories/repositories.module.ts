@@ -11,6 +11,8 @@ import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
 import { ShareRepositoryComponentsModule } from '../../shared/components/repository/ShareRepositoryComponents.module';
 import { ShareBranchComponentsModule } from '../../shared/components/branch/ShareBranchComponents.module';
 import { ShareCommitComponentsModule } from '../../shared/components/commit/ShareCommitComponents.module';
+import { LoginComponent } from './login/login.component';
+import { ReturnComponent } from './return/return.component';
 
 
 const declareComps = [
@@ -24,6 +26,8 @@ const declareComps = [
         RepoChangesComponent,
         RepoHistoryComponent,
         RepoSettingsComponent,
+        LoginComponent,
+        ReturnComponent,
     ],
     exports: [],
     imports: [

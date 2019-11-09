@@ -79,7 +79,6 @@ export class FileWatchesService implements OnDestroy {
   }
 
   switchTo(path: string) {
-    this.unwatch();
     this.watch(path);
   }
 

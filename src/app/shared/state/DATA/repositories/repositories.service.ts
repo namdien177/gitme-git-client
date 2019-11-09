@@ -281,7 +281,8 @@ export class RepositoriesService {
     repository.timestamp = moment().valueOf();
     return fromPromise(
       this.gitService.fetchInfo(repository, credential, branch)
-    ).pipe(
+    )
+    .pipe(
       switchMap(res => {
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
       }),
@@ -320,7 +321,7 @@ export class RepositoriesService {
   }
 
   async updateExistingRepositoryOnLocalDatabase(repositoryUpdate: Repository) {
-    const configFile: AppConfig = await this.getAppConfig();
+   const configFile: AppConfig = await this.getAppConfig();
 
     const repositoryFileDirectory = configFile.repository_config;
     const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
@@ -342,7 +343,6 @@ export class RepositoriesService {
         );
       }
     }
-
     return statusUpdate;
   }
 
