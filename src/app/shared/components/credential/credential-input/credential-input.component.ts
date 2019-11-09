@@ -21,10 +21,10 @@ export class CredentialInputComponent implements OnInit, AfterViewInit {
   accountForm: FormGroup;
 
   arrayTemplateAvatar = [
-    '/assets/1.svg',
-    '/assets/2.svg',
-    '/assets/3.svg',
-    '/assets/4.png',
+    '/assets/avatar/1.svg',
+    '/assets/avatar/2.svg',
+    '/assets/avatar/3.svg',
+    '/assets/avatar/4.jpg',
   ];
 
   constructor(

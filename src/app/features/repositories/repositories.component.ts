@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { debounceTime, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
@@ -101,7 +101,9 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
         return of(null);
       }),
-      switchMap(() => this.observingBranchStatus())
+      distinctUntilChanged(),
+      switchMap(() => this.observingBranchStatus()),
+      distinctUntilChanged(),
     ).subscribe((status) => {
       this.statusSummary = status;
       if (status) {
@@ -121,13 +123,14 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    * Retrieve current selected repository
    */
   private watchingRepository() {
-    this.repositoriesService.selectActive()
+    this.repositoriesService.selectActive(true)
     .pipe(
+      distinctUntilChanged(),
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
         if (!!this.repository) {
-          const dir = this.repository.directory;
-          this.fileWatchesService.switchTo(dir);
+          const newDir = this.repository.directory;
+          this.fileWatchesService.switchTo(newDir);
         }
         return fromPromise(this.repositoryBranchesService.load(selectedRepo));
       }),
@@ -166,7 +169,9 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       takeUntil(this.componentDestroyed),
       takeWhile(() => this.isViewChangeTo === 'changes'),
       debounceTime(200),
-      switchMap(() => this.observingBranchStatus())
+      distinctUntilChanged(),
+      switchMap(() => this.observingBranchStatus()),
+      distinctUntilChanged()
     ).subscribe(
       (status: StatusSummary) => {
         this.statusSummary = status;

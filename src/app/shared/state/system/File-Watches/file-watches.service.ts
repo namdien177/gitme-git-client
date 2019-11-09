@@ -40,7 +40,6 @@ export class FileWatchesService implements OnDestroy {
   }
 
   watch(watchingPath: string) {
-    this.unwatch();
     this.watcher = this.chokidar.watch(watchingPath, {
       cwd: watchingPath,
       ignored: this.ignoreDefault,

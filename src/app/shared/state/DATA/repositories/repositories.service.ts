@@ -32,7 +32,6 @@ export class RepositoriesService {
     private accountListService: AccountListService,
     private repositoryBranchesService: RepositoryBranchesService,
     private securityService: SecurityService,
-    private utilitiesService: UtilityService
   ) {
   }
 
@@ -76,7 +75,6 @@ export class RepositoriesService {
   async load() {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
-
     if (!!!configFile) {
       return;
     }

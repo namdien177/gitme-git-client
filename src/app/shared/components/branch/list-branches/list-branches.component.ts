@@ -74,12 +74,12 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       console.log(final);
     });
 
-    this.repositoryBranchesService.newBranchFrom(
-      this.repository,
-      'test-create-2',
-      this.branch
-    ).subscribe(result => {
-      console.log(result);
-    });
+    // this.repositoryBranchesService.newBranchFrom(
+    //   this.repository,
+    //   'test-create-2',
+    //   this.branch
+    // ).subscribe(result => {
+    //   console.log(result);
+    // });
   }
 }
