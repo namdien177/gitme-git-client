@@ -4,35 +4,46 @@
     Adding existing local repository
   </h2>
 
-  <div *ngIf="infoDialogs.type !== null"
-       [class.bg-danger]="infoDialogs.type == 'ERROR'"
-       [class.bg-info]="infoDialogs.type == 'INFO'"
-       [class.bg-warning]="infoDialogs.type == 'WARNING'"
-       class="info-dialog card">
-    <div [class.text-black]="infoDialogs.type == 'WARNING'"
-         [class.text-white]="infoDialogs.type == 'ERROR' || infoDialogs.type == 'INFO'"
-         class="card-body">
-      {{infoDialogs.message}}
+  <div *ngIf="!!repository_register_error"
+       class="info-dialog card bg-danger">
+    <div class="card-body text-white">
+      {{repository_register_error}}
     </div>
   </div>
+
+  <ng-container *ngIf="repository_directory.dirty && repository_directory.invalid">
+    <div *ngIf="repository_directory.hasError('directory')"
+         class="info-dialog card bg-danger">
+      <div class="card-body text-white">
+        {{repository_directory.getError('directory')}}
+      </div>
+    </div>
+
+    <div *ngIf="repository_directory.hasError('repository')"
+         class="info-dialog card bg-warning">
+      <div class="card-body text-black">
+        {{repository_directory.getError('repository')}}
+      </div>
+    </div>
+  </ng-container>
 
   <div class="repository-information">
     <h2 class="weight-lighter mb-0">Local Repository</h2>
     <div class="block-secondary-title">
-      <label class="m-0" for="directory">
+      <span class="m-0">
         Repository directory
-      </label>
+      </span>
     </div>
-    <div class="wrap--ng">
-      <input class="form-control form-control-dark form-control-float"
-             formControlName="repo_dir_display"
-             id="directory">
+    <label (click)="chooseDirectory()" class="wrap--ng">
+      <input class="form-control form-control-dark form-control-float cursor-pointer"
+             formControlName="repository_directory"
+             id="directory"
+             readonly>
 
-      <div (click)="chooseDirectory()"
-           class="icon-folder--container">
+      <span class="icon-folder--container">
         <em class="fas fa-folder"></em>
-      </div>
-    </div>
+      </span>
+    </label>
     <small *ngIf="repo_name.valid" class="text-muted">
       Repository will be added to manage list as "{{repo_name.value}}"
     </small>
@@ -41,14 +52,14 @@
   <div class="repository-credentials">
     <h2 class="weight-lighter">Repository Repository</h2>
     <div class="btn--section">
-      <button (click)="isExistingAccount = true"
+      <button (click)="switchAccountChooseMode(true)"
               [class.bg-success]="isExistingAccount"
               [class.bg-transparent]="!isExistingAccount"
               class="text-white"
               mat-flat-button>
         Saved Account
       </button>
-      <button (click)="isExistingAccount = false"
+      <button (click)="switchAccountChooseMode(false)"
               [class.bg-success]="!isExistingAccount"
               [class.bg-transparent]="isExistingAccount"
               class="text-white"
@@ -71,7 +82,7 @@
       Cancel
     </button>
     <button (click)="submitNewRepository()"
-            [disabled]="formRegisterRepository.invalid || needCreateNewGitDirectory"
+            [disabled]="formRegisterRepository.invalid || needCreateNewGitDirectory || formRegisterRepository.pending"
             color="primary"
             mat-raised-button>
       Confirm

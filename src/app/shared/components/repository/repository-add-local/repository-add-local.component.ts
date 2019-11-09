@@ -85,7 +85,7 @@ export class RepositoryAddLocalComponent implements OnInit {
   }
 
   chooseDirectory() {
-    const dir = this.electron.dialog.showOpenDialogSync(this.electron.getCurrentWindow(), {
+    const dir = this.electron.dialog.showOpenDialog(this.electron.getCurrentWindow(), {
       title: 'Choose directory',
       properties: ['openDirectory'],
       defaultPath: osNode.homedir()

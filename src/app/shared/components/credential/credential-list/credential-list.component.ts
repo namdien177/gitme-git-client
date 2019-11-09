@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Account, AccountListQuery, AccountListState } from '../../../state/DATA/account-list';
+import { Account, AccountListService } from '../../../state/DATA/account-list';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -10,20 +10,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class CredentialListComponent implements OnInit, AfterViewInit {
 
   @Output() accountSelectedChange: EventEmitter<Account> = new EventEmitter();
-  @Output() isExistingCredentialValid: EventEmitter<boolean> = new EventEmitter();
 
-  listExistedAccount: AccountListState[] = [];
+  listExistedAccount: Account[] = [];
   accountForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private accountListQuery: AccountListQuery,
+    private accountListQuery: AccountListService,
   ) {
-    this.accountListQuery.selectAll().subscribe(
-      listExisted => {
-        this.listExistedAccount = listExisted;
-      }
-    );
+
   }
 
   get account() {
@@ -35,22 +30,24 @@ export class CredentialListComponent implements OnInit, AfterViewInit {
       account: [null, [Validators.required]]
     });
 
-    this.emitAccount();
+    this.accountListQuery.getAsync()
+    .subscribe(
+      accounts => {
+        this.listExistedAccount = accounts;
+        if (!!accounts && Array.isArray(accounts) && !!this.account.value) {
+          this.account.setValue(accounts[0]);
+        }
+      }
+    );
   }
 
   ngAfterViewInit(): void {
-    this.accountForm.valueChanges.subscribe(val => {
-      this.onCheckboxChanges();
+    this.account.valueChanges.subscribe((val: Account) => {
+      this.emitAccount(val);
     });
   }
 
-  onCheckboxChanges() {
-    this.emitAccount();
-  }
-
-  emitAccount() {
-    const valueSelected: Account = this.account.value;
-    this.accountSelectedChange.emit(valueSelected);
-    this.isExistingCredentialValid.emit(this.accountForm.valid);
+  emitAccount(data: Account) {
+    this.accountSelectedChange.emit(data);
   }
 }

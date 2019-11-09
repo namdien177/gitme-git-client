@@ -70,7 +70,7 @@ export class RepositoryCloneComponent implements OnInit, AfterViewInit {
   }
 
   chooseDirectory() {
-    const dir = this.electron.dialog.showOpenDialogSync(this.electron.getCurrentWindow(), {
+    const dir = this.electron.dialog.showOpenDialog(this.electron.getCurrentWindow(), {
       title: 'Choose clone repository',
       properties: ['openDirectory'],
       defaultPath: osNode.homedir()

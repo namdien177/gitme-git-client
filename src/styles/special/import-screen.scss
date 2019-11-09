@@ -78,6 +78,8 @@
   position: relative;
   overflow: hidden;
   border-radius: 0.25rem;
+  cursor: pointer;
+  user-select: none;
 
   .form-control {
     padding-right: calc(36px + 0.5rem);
@@ -91,8 +93,6 @@
     width: 36px;
     display: grid;
     place-content: center;
-    cursor: pointer;
-    user-select: none;
     background-color: transparent;
     transition: background-color 0.2s;
 
