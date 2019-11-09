@@ -67,9 +67,9 @@ export class BranchNewOptionComponent implements OnInit {
         shouldNotExistInArray(this.branches, 'existing branches')
       ]],
       branchNameInput: ['', [
-        // Validators.required,
-        // Validators.minLength(1),
-        // shouldNotExistInArray(this.branches, 'existing branches')
+        Validators.required,
+        Validators.minLength(1),
+        shouldNotExistInArray(this.branches, 'existing branches')
       ]],
       fromBranch: [1, [Validators.required]]
     });

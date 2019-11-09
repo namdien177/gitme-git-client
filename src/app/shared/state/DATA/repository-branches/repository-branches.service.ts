@@ -72,18 +72,24 @@ export class RepositoryBranchesService {
    * @param branchName
    * @param fromBranch
    */
-  newBranchFrom(repository: Repository, branchName: string, fromBranch: RepositoryBranchSummary = null) {
+  newBranchFrom(repository: Repository, branchName: string, fromBranch?: string) {
     let fromBranchName = '';
     if (fromBranch) {
-      fromBranchName = fromBranch.name;
+      fromBranchName = fromBranch;
       return fromPromise(
         this.gitService.gitInstance(repository.directory)
         .checkoutBranch(branchName, fromBranchName)
-      );
+      ).pipe(map(_ => true));
     }
     return fromPromise(
       this.gitService.gitInstance(repository.directory)
       .checkoutLocalBranch(branchName)
+    ).pipe(map(_ => true));
+  }
+
+  stashChanges(repository: Repository, message?: string) {
+    return fromPromise(
+      this.gitService.addStash(repository, message)
     );
   }
 

@@ -1,0 +1,74 @@
+<form [formGroup]="choices" class="form-container">
+  <h3 class="m-0">{{emittedDataFromView.title}}</h3>
+  <div class="form-content">
+    <p class="mt-0">{{emittedDataFromView.body}}</p>
+    <div class="form-radio-branches">
+
+      <label class="card" for="stashChanges">
+        <div class="card-body branch-checkout-choice">
+          <div class="branch-checkbox acomi-checkbox-control">
+            <input [value]="1"
+                   class="acomi-input-box"
+                   formControlName="stash"
+                   hidden
+                   id="stashChanges"
+                   type="radio"/>
+            <div class="cbx">
+              <span>
+                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="branch-choice">
+            Stash the changes
+          </div>
+          <small class="branch-subName text-muted">
+            The changes will be saved on this branch without committing.
+          </small>
+        </div>
+      </label>
+
+      <label class="card" for="followChanges">
+        <div class="card-body branch-checkout-choice">
+          <div class="branch-checkbox acomi-checkbox-control">
+            <input [value]="2"
+                   class="acomi-input-box"
+                   formControlName="stash"
+                   hidden
+                   id="followChanges"
+                   type="radio"/>
+            <div class="cbx">
+              <span>
+                <svg height="10px" viewbox="0 0 12 10" width="12px">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="branch-choice">
+            Bring the changes
+          </div>
+          <small class="branch-subName text-muted">
+            The changes will be bought over to the new branch.
+          </small>
+        </div>
+      </label>
+
+    </div>
+  </div>
+  <div class="form-actions">
+    <button (click)="confirm(0)"
+            color="warn"
+            mat-flat-button>
+      {{emittedDataFromView.decision.noText}}
+    </button>
+    <button (click)="confirm(stash.value)"
+            [disabled]="choices.invalid"
+            color="primary"
+            mat-raised-button>
+      {{emittedDataFromView.decision.yesText}}
+    </button>
+  </div>
+</form>
