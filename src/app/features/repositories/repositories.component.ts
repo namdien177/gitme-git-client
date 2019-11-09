@@ -93,6 +93,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       takeUntil(this.componentDestroyed),
       takeWhile(() => this.isViewChangeTo === 'changes'),
       switchMap(() => {
+        console.log('running')
         if (!!this.repository && !!this.activeBranch) {
           return this.repositoriesService.fetch(
             { ...this.repository } as Repository,

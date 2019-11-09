@@ -42,7 +42,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
+    console.log(this.branches);
   }
 
   openOptionNewBranch() {

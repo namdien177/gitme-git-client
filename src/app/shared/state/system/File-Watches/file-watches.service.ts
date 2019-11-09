@@ -80,6 +80,7 @@ export class FileWatchesService implements OnDestroy {
     }
   }
 
+
   async switchTo(path: string) {
     this.unwatch(true);
     this.watch(path);

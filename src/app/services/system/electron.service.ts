@@ -141,6 +141,13 @@ export class ElectronService implements OnDestroy {
   minimizeApplication() {
     this.window.minimize();
   }
+  loadUrl(url){
+    this.window.loadURL(url);
+  }
+
+  callLoginGithub(){
+    ipcRenderer.send("github-authenticate","yes");
+  }
 
   private setupUUID() {
     if (!this.localStorage.isAvailable(DefineCommon.ELECTRON_APPS_UUID_KEYNAME)) {

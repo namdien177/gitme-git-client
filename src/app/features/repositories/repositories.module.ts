@@ -13,6 +13,7 @@ import { ShareBranchComponentsModule } from '../../shared/components/branch/Shar
 import { ShareCommitComponentsModule } from '../../shared/components/commit/ShareCommitComponents.module';
 
 
+
 const declareComps = [
     RepositoriesComponent,
     DashboardComponent,
@@ -23,7 +24,7 @@ const declareComps = [
         ...declareComps,
         RepoChangesComponent,
         RepoHistoryComponent,
-        RepoSettingsComponent,
+        RepoSettingsComponent
     ],
     exports: [],
     imports: [

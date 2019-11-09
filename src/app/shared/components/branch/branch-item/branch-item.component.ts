@@ -34,8 +34,11 @@ export class BranchItemComponent implements OnInit {
       this.status = { ...status } as StatusSummary;
     });
   }
+  currentBranchSummary :any = undefined;
 
   ngOnInit() {
+    this.currentBranchSummary = this.branchSummary;
+    
   }
 
   checkoutBranches() {

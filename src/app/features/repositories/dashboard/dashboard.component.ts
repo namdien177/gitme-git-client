@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
 import { StatusSummary } from '../../../shared/model/statusSummary.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'gitme-dashboard',
@@ -31,6 +32,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private gitDiffService: GitDiffService,
     private utilityService: UtilityService,
     private repositoryStatusService: RepositoryStatusService,
+    private router: Router
   ) {
   }
 
