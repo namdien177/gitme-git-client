@@ -49,7 +49,6 @@ export class BranchOptionsComponent implements OnInit {
       })
     )
     .subscribe((data: { changeName, pushRemote, removeRemote }) => {
-      console.log(data);
       this._bottomSheetRef.dismiss('RELOAD');
     });
   }
@@ -66,7 +65,7 @@ export class BranchOptionsComponent implements OnInit {
           }
           return of(null);
         }),
-        takeWhile(result => !!result && !!result.local && !!result.remote),
+        takeWhile(result => !!result || !!result.local || !!result.remote),
       );
       this.processAfterDeleteProcess(deleteProcess);
     } else {
@@ -106,11 +105,8 @@ export class BranchOptionsComponent implements OnInit {
         return of('No Changes');
       })
     ).subscribe(
-      statusLoad => {
-        console.log(statusLoad);
-        if (statusLoad === 'No Changes') {
-          this._bottomSheetRef.dismiss('RELOAD');
-        }
+      () => {
+        this._bottomSheetRef.dismiss('RELOAD');
       }
     );
   }

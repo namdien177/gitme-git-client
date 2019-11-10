@@ -154,17 +154,6 @@ export class GitService {
     return branchesOutPut;
   }
 
-  isRemoteBranch(branchName: string) {
-    const regRemotes = /^(remotes\/\w+\/).+/;
-    if (regRemotes.exec(branchName)) {
-      const extractBySlash = branchName.split('/');
-      return {
-        isRemote: true,
-        trackOn: extractBySlash
-      };
-    }
-  }
-
   branch(directory: string, ...options: string[]) {
     return this.gitInstance(directory)
     .branch(options);

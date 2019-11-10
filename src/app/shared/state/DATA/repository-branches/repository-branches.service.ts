@@ -183,12 +183,12 @@ export class RepositoryBranchesService {
           ['-d']
         );
       }
-
+    } else {
       if (pushToRemote) {
         status.pushRemote = await this.gitService.pushUpStream(
           repository.directory,
           newName,
-          branch.tracking.name
+          'origin'
         );
       }
     }

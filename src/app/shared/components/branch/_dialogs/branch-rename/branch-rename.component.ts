@@ -60,10 +60,7 @@ export class BranchRenameComponent implements OnInit {
         { value: false, disabled: !this.currentData.has_remote },
         []
       ),
-      pushToRemote: new FormControl(
-        { value: false, disabled: this.currentData.has_remote },
-        []
-      ),
+      pushToRemote: [false, []],
     });
 
     // Listen to input branch to parse to safe name
@@ -76,7 +73,7 @@ export class BranchRenameComponent implements OnInit {
         this.name.setValue(value);
         this.parseNameBranch = null;
       } else {
-        this.name.setValue(safeValue.name);
+        this.name.setValue(value);
         this.parseNameBranch = safeValue.msg;
       }
     });
