@@ -1,1 +1,18 @@
-<p>yes-no-decision works!</p>
+<h2 class="weight-lighter m-0 mb-2">
+  {{emittedDataFromView.title}}
+</h2>
+<p class="mt-0 mb-2 body text-muted">
+  {{emittedDataFromView.body}}
+</p>
+<div class="decision">
+  <button (click)="closeDialog(false)"
+          class="bg-primary-black-darker"
+          mat-flat-button>
+    {{emittedDataFromView.decision.noText}}
+  </button>
+  <button (click)="closeDialog(true)"
+          color="primary"
+          mat-raised-button>
+    {{emittedDataFromView.decision.yesText}}
+  </button>
+</div>

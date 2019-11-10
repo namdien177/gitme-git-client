@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
-import { fromPromise } from 'rxjs/internal-compatibility';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { FileWatchesService } from '../../shared/state/system/File-Watches';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
@@ -94,7 +93,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       takeUntil(this.componentDestroyed),
       takeWhile(() => this.isViewChangeTo === 'changes'),
       switchMap(() => {
-        console.log('running')
+        console.log('running');
         if (!!this.repository && !!this.activeBranch) {
           return this.repositoriesService.fetch(
             { ...this.repository } as Repository,
@@ -139,8 +138,9 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         // }
         return of(null);
       }),
-      switchMap(() => fromPromise(this.repositoryBranchesService.load(this.repository))),
-      switchMap(() => this.observingBranchStatus())
+      tap(() => this.repositoryBranchesService.load(this.repository)),
+      switchMap(() => this.observingBranchStatus()),
+      distinctUntilChanged(),
     )
     .subscribe(
       (status: StatusSummary) => {
@@ -156,13 +156,17 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    * Observing branch status
    */
   private watchingBranch() {
-    this.repositoryBranchesService.select()
-    .subscribe(
-      listBranch => {
+    this.repositoryBranchesService
+    .select()
+    .pipe(
+      switchMap(listBranch => {
         this.branches = listBranch;
-        this.activeBranch = listBranch.find(branch => {
-          return branch.current;
-        });
+        return this.repositoryBranchesService.selectActive();
+      })
+    )
+    .subscribe(
+      activeBranch => {
+        this.activeBranch = activeBranch;
       }
     );
   }

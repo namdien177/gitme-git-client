@@ -1,11 +1,23 @@
-<div class="card mb-1">
+<small class="text-muted">
+  On branch:
+</small>
+
+<h2 class="m-0 weight-lighter">
+  {{data.branch.name}}
+</h2>
+<hr>
+<div (click)="deleteBranch()" class="card mb-1">
   <div class="card-body">
     Delete branch
+    <br>
+    <small class="text-warning">The action cannot be undone</small>
   </div>
 </div>
 
-<div class="card mb-1">
+<div (click)="renameBranch()" class="card mb-1">
   <div class="card-body">
     Rename branch
+    <br>
+    <small class="text-warning">The action cannot be undone</small>
   </div>
 </div>

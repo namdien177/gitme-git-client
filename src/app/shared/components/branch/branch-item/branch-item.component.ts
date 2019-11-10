@@ -5,6 +5,8 @@ import { RepositoriesService, Repository } from '../../../state/DATA/repositorie
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { MatBottomSheet } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
+import { switchMap, takeWhile } from 'rxjs/operators';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-branch-item',
@@ -14,7 +16,7 @@ import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-option
 export class BranchItemComponent implements OnInit {
 
   @Input() branchSummary: RepositoryBranchSummary;
-
+  currentBranchSummary: any = undefined;
   private repository: Repository = null;
   private status: StatusSummary = null;
 
@@ -34,11 +36,10 @@ export class BranchItemComponent implements OnInit {
       this.status = { ...status } as StatusSummary;
     });
   }
-  currentBranchSummary :any = undefined;
 
   ngOnInit() {
     this.currentBranchSummary = this.branchSummary;
-    
+
   }
 
   checkoutBranches() {
@@ -60,8 +61,12 @@ export class BranchItemComponent implements OnInit {
   }
 
   onRightClick() {
+    if (this.branchSummary.name === 'master') {
+      return;
+    }
     const dataPassing = {
-      branch: this.branchSummary
+      branch: this.branchSummary,
+      repository: this.repository
     };
     if (this.branchSummary.current) {
       Object.assign(dataPassing, { status: this.status });
@@ -69,6 +74,19 @@ export class BranchItemComponent implements OnInit {
     this.matBottomSheet.open(BranchOptionsComponent, {
       panelClass: ['bg-primary-black', 'p-2-option'],
       data: dataPassing
-    });
+    }).afterDismissed().pipe(
+      takeWhile(data => !!data),
+      switchMap(
+        responseType => {
+          console.log(responseType);
+          return fromPromise(this.repositoriesService.load());
+        }
+      )
+    ).subscribe(
+      branchReload => {
+        console.log(branchReload);
+        this.repositoryBranchService.load(this.repository);
+      }
+    );
   }
 }
