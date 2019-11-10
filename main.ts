@@ -1,13 +1,23 @@
-import { app, BrowserWindow, screen, ipcMain, session } from 'electron';
+import { app, BrowserWindow, ipcMain, screen, session } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import * as os from 'os';
-var https = require("https");
-var querystring = require('querystring');
+import * as https from 'https';
+import * as querystring from 'querystring';
 
 let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
+
+// Manhnd - github oauth app
+const GITHUB_OAUTH = {
+  redirect_uri: 'http://localhost:4200',
+  url: `https://github.com/login/oauth/authorize?`,
+  client_id: 'ef1953071ea4ad95f02d',
+  client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd',
+  // Full access public & private repo.
+  // More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
+  scopes: ['repo']
+};
 
 function createWindow() {
 
@@ -30,7 +40,7 @@ function createWindow() {
 
   if (serve) {
     require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`),
+      electron: require(`${ __dirname }/node_modules/electron`),
     });
     win.loadURL('http://localhost:4200');
   } else {
@@ -88,10 +98,7 @@ try {
 }
 
 ipcMain.on('github-authenticate', function (event, arg) {
-  // Manhnd - github oauth app
-  const GITHUB_OAUTH = {redirect_uri: 'http://localhost:4200', url : `https://github.com/login/oauth/authorize?`, client_id: 'ef1953071ea4ad95f02d', client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd', scopes: ['repo'] // Full access public & private repo. More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
-  }
-  const githubAuthUrl = `${GITHUB_OAUTH.url}client_id=${GITHUB_OAUTH.client_id}&scope=${GITHUB_OAUTH.scopes}`;
+  const githubAuthUrl = `${ GITHUB_OAUTH.url }client_id=${ GITHUB_OAUTH.client_id }&scope=${ GITHUB_OAUTH.scopes }`;
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
   const authWindow = new BrowserWindow({
@@ -100,6 +107,7 @@ ipcMain.on('github-authenticate', function (event, arg) {
     show: false,
     parent: win,
     modal: true,
+    skipTaskbar: true,
     webPreferences: {
       nodeIntegration: false
     }
@@ -107,16 +115,30 @@ ipcMain.on('github-authenticate', function (event, arg) {
   authWindow.loadURL(githubAuthUrl);
   authWindow.webContents.on('did-finish-load', function () {
     authWindow.show();
-    authWindow.webContents.openDevTools();
+    if (serve) {
+      authWindow.webContents.openDevTools();
+    }
   });
-  const access_token = undefined;
-  const crashError = undefined;
-  const closedByUser = true;
+  let access_token = null;
+  let crashError = null;
+
+  const clearSession = (urlSession: string, authWindowPassing: BrowserWindow) => {
+    if (urlSession.includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
+      const githubSession = authWindowPassing.webContents.session;
+      // clear cookies for next time login;
+      githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
+        storages: [
+          'cookies', 'localstorage'
+        ]
+      });
+    }
+  };
+
   const handleUrl = function (codeUrl) {
     console.log(url);
     const raw_code = /code=([^&]*)/.exec(codeUrl) || null,
-    code = (raw_code && raw_code.length > 1) ? raw_code[1] : null,
-    error = /\?error=(.+)$/.exec(codeUrl);
+      code = (raw_code && raw_code.length > 1) ? raw_code[1] : null,
+      error = /\?error=(.+)$/.exec(codeUrl);
 
     if (code || error) {
       // Close the browser if code found or error
@@ -130,9 +152,9 @@ ipcMain.on('github-authenticate', function (event, arg) {
       console.log('code recieved: ' + code);
 
       const postData = querystring.stringify({
-          'client_id' : GITHUB_OAUTH.client_id,
-          'client_secret' : GITHUB_OAUTH.client_secret,
-          'code' : code
+        'client_id': GITHUB_OAUTH.client_id,
+        'client_secret': GITHUB_OAUTH.client_secret,
+        'code': code
       });
 
       const post = {
@@ -141,45 +163,41 @@ ipcMain.on('github-authenticate', function (event, arg) {
         method: 'POST',
         headers:
           {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Content-Length': postData.length,
-              'Accept': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': postData.length,
+            'Accept': 'application/json'
           }
       };
 
-      const req = https.request(post, function(response){
+      const req = https.request(post, function (response) {
         let result = '';
-        response.on('data', function(data) {
+        response.on('data', function (data) {
           result = result + data;
         });
         response.on('end', function () {
-              const json = JSON.parse(result.toString());
-              console.log('access token:' + json.access_token);
-              if (response && response.ok) {
-                  console.log(response.body.access_token);
-              }
-          });
+          const json = JSON.parse(result.toString());
+          console.log('access token:' + json.access_token);
+          access_token = json.access_token;
+          if (response && response['ok']) {
+            console.log(response['body'].access_token);
+            access_token = json.access_token;
+          }
+        });
         response.on('error', function (err) {
-              console.error('ERROR: ' + err.message);
-          });
+          console.error('ERROR: ' + err.message);
+          crashError = err;
+        });
       });
 
       req.write(postData);
       req.end();
-  } else if (error) {
+    } else if (error) {
       console.error('couldnt login to github!');
-  }
-  }
-  authWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
-      const githubSession = authWindow.webContents.session;
-      // clear cookies for next time login;
-      githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
-        storages: [
-          'cookies', 'localstorage'
-        ]
-      });
+      crashError = error;
     }
+  };
+  authWindow.webContents.on('will-navigate', (eventNavigate, urlPassing) => {
+    clearSession(urlPassing, authWindow);
     handleUrl(url);
   });
   const filter = {
@@ -187,16 +205,17 @@ ipcMain.on('github-authenticate', function (event, arg) {
   };
   session.defaultSession.webRequest.onCompleted(filter, (details) => {
     const onCompleteUrl = details.url;
-    if (url.toString().includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
-      const githubSession = authWindow.webContents.session;
-      // clear cookies for next time login;
-      githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
-        storages: [
-          'cookies', 'localstorage'
-        ]
-      });
-    }
-    handleUrl(url);
+    clearSession(onCompleteUrl, authWindow);
+    // if (url.toString().includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
+    //   const githubSession = authWindow.webContents.session;
+    //   // clear cookies for next time login;
+    //   githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
+    //     storages: [
+    //       'cookies', 'localstorage'
+    //     ]
+    //   });
+    // }
+    handleUrl(onCompleteUrl);
   });
-  authWindow.on('close', () => event.returnValue = closedByUser ? { error: 'popup closed!' } : { access_token, crashError });
-})
+  authWindow.on('close', () => event.returnValue = { access_token, crashError });
+});
