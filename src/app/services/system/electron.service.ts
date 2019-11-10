@@ -141,12 +141,13 @@ export class ElectronService implements OnDestroy {
   minimizeApplication() {
     this.window.minimize();
   }
-  loadUrl(url){
+  loadUrl(url) {
     this.window.loadURL(url);
   }
 
-  callLoginGithub(){
-    ipcRenderer.send("github-authenticate","yes");
+  callLoginGithub() {
+    const val = ipcRenderer.sendSync('github-authenticate', 'yes');
+    console.log(val);
   }
 
   private setupUUID() {
