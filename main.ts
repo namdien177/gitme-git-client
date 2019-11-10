@@ -198,7 +198,7 @@ ipcMain.on('github-authenticate', function (event, arg) {
   };
   authWindow.webContents.on('will-navigate', (eventNavigate, urlPassing) => {
     clearSession(urlPassing, authWindow);
-    handleUrl(url);
+    handleUrl(urlPassing);
   });
   const filter = {
     urls: ['https://*.github.com/*']
