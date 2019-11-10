@@ -88,70 +88,65 @@ try {
 }
 
 ipcMain.on('github-authenticate', function (event, arg) {
-  //Manhnd - github oauth app
-  const GITHUB_OAUTH = {
-    redirect_uri: 'http://localhost:4200',
-    url : `https://github.com/login/oauth/authorize?`,
-    client_id: 'ef1953071ea4ad95f02d',
-    client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd',
-    scopes: ["repo"] // Full access public & private repo. More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
+  // Manhnd - github oauth app
+  const GITHUB_OAUTH = {redirect_uri: 'http://localhost:4200', url : `https://github.com/login/oauth/authorize?`, client_id: 'ef1953071ea4ad95f02d', client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd', scopes: ['repo'] // Full access public & private repo. More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
   }
   const githubAuthUrl = `${GITHUB_OAUTH.url}client_id=${GITHUB_OAUTH.client_id}&scope=${GITHUB_OAUTH.scopes}`;
   const electronScreen = screen;
   const size = electronScreen.getPrimaryDisplay().workAreaSize;
-	var authWindow = new BrowserWindow({
+  const authWindow = new BrowserWindow({
     width: size.width > 1280 ? 1280 : size.width,
     height: size.height > 720 ? 720 : size.height,
-		show: false,
-		parent: win,
-		modal: true,
-		webPreferences: {
-			nodeIntegration: false
-		}
-	});
-
-	authWindow.loadURL(githubAuthUrl);
-	authWindow.webContents.on('did-finish-load', function () {
+    show: false,
+    parent: win,
+    modal: true,
+    webPreferences: {
+      nodeIntegration: false
+    }
+  });
+  authWindow.loadURL(githubAuthUrl);
+  authWindow.webContents.on('did-finish-load', function () {
     authWindow.show();
     authWindow.webContents.openDevTools();
-	});
-
-	var access_token, error;
-	var closedByUser = true;
-
-	var handleUrl = function (url) {
+  });
+  const access_token = undefined;
+  const crashError = undefined;
+  const closedByUser = true;
+  const handleUrl = function (codeUrl) {
     console.log(url);
-		var raw_code = /code=([^&]*)/.exec(url) || null,
+    const raw_code = /code=([^&]*)/.exec(codeUrl) || null,
     code = (raw_code && raw_code.length > 1) ? raw_code[1] : null,
-    error = /\?error=(.+)$/.exec(url);
+    error = /\?error=(.+)$/.exec(codeUrl);
 
     if (code || error) {
       // Close the browser if code found or error
+      console.log(code);
       authWindow.close();
     }
 
     // If there is a code in the callback, proceed to get token from github
     if (code) {
-      console.log("code recieved: " + code);
-      
+
+      console.log('code recieved: ' + code);
+
       const postData = querystring.stringify({
-          "client_id" : GITHUB_OAUTH.client_id,
-          "client_secret" : GITHUB_OAUTH.client_secret,
-          "code" : code
+          'client_id' : GITHUB_OAUTH.client_id,
+          'client_secret' : GITHUB_OAUTH.client_secret,
+          'code' : code
       });
-      
+
       const post = {
-        host: "github.com",
-        path: "/login/oauth/access_token",
-        method: "POST",
-        headers: 
-          { 
+        host: 'github.com',
+        path: '/login/oauth/access_token',
+        method: 'POST',
+        headers:
+          {
               'Content-Type': 'application/x-www-form-urlencoded',
               'Content-Length': postData.length,
-              "Accept": "application/json"
+              'Accept': 'application/json'
           }
       };
-      
+
       const req = https.request(post, function(response){
         let result = '';
         response.on('data', function(data) {
@@ -159,41 +154,49 @@ ipcMain.on('github-authenticate', function (event, arg) {
         });
         response.on('end', function () {
               const json = JSON.parse(result.toString());
-              console.log("access token:" + json.access_token);
+              console.log('access token:' + json.access_token);
               if (response && response.ok) {
                   console.log(response.body.access_token);
               }
           });
         response.on('error', function (err) {
-              console.error("ERROR: " + err.message);
+              console.error('ERROR: ' + err.message);
           });
       });
-      
+
       req.write(postData);
       req.end();
   } else if (error) {
-      console.error("couldn't login to github!");
+      console.error('couldnt login to github!');
   }
-
-	}
-
-	authWindow.webContents.on('will-navigate', (event, url) => handleUrl(url));
-	var filter = {
-		urls: ['https://*.github.com/*']
-	};
-	session.defaultSession.webRequest.onCompleted(filter, (details) => {
-    var url = details.url;
-    if(url.includes('code=')){
+  }
+  authWindow.webContents.on('will-navigate', (event, url) => {
+    if (url.includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
       const githubSession = authWindow.webContents.session;
-      //clear cookies for next time login;
-      githubSession.clearStorageData({
+      // clear cookies for next time login;
+      githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
         storages: [
           'cookies', 'localstorage'
         ]
-      })
+      });
     }
-		handleUrl(url);
-	});
-
-	authWindow.on('close', () => event.returnValue = closedByUser ? { error: 'popup closed!' } : { access_token, error })
+    handleUrl(url);
+  });
+  const filter = {
+    urls: ['https://*.github.com/*']
+  };
+  session.defaultSession.webRequest.onCompleted(filter, (details) => {
+    const onCompleteUrl = details.url;
+    if (url.toString().includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
+      const githubSession = authWindow.webContents.session;
+      // clear cookies for next time login;
+      githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
+        storages: [
+          'cookies', 'localstorage'
+        ]
+      });
+    }
+    handleUrl(url);
+  });
+  authWindow.on('close', () => event.returnValue = closedByUser ? { error: 'popup closed!' } : { access_token, crashError });
 })
