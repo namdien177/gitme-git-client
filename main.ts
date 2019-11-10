@@ -129,10 +129,7 @@ ipcMain.on('github-authenticate', function (event, arg) {
     await clearSession(urlPassing, authWindow);
     const data = await handleUrl(urlPassing, authWindow);
     access_token = !!data ? data : access_token;
-    if (!!authWindow && !!authWindow.getBrowserView()) {
-      //   // Close the browser if code found or error
-      authWindow.close();
-    }
+    authWindow.close();
   });
 
   session.defaultSession.webRequest.onCompleted(filter, async (details) => {
@@ -141,10 +138,8 @@ ipcMain.on('github-authenticate', function (event, arg) {
     access_token = await handleUrl(onCompleteUrl, authWindow);
     // Close the browser if code found or error
     // authWindow.close();
-    if (!!authWindow && !!authWindow.getBrowserView()) {
-      //   // Close the browser if code found or error
-      authWindow.close();
-    }
+    // console.log('142');
+    // authWindow.close();
   });
 
   authWindow.on('close', () => event.returnValue = { access_token, crashError });
