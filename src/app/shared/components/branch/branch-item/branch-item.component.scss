@@ -3,7 +3,7 @@
 :host {
   position: relative;
   padding: 0;
-  transition: all 0.2s ease-out 0.2s;
+  transition: all 0.1s ease-out 0.1s;
 
   &:hover {
     padding: 0 calc(40px + 0.5rem) 0 0;
@@ -91,6 +91,6 @@
   transition: opacity 0.2s;
 
   i {
-    transform: rotate(270deg);
+    transform: rotate(180deg);
   }
 }

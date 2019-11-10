@@ -145,4 +145,8 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       })
     );
   }
+
+  trackBranchID(index: number, item: RepositoryBranchSummary) {
+    return item.id;
+  }
 }
