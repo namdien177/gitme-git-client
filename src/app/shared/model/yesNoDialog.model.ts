@@ -1,9 +1,9 @@
 import { CommitOptions } from '../state/DATA/repository-branches';
 
-export interface YesNoDialogModel {
+export interface YesNoDialogModel<type = any> {
   title: string;
   body: string;
-  data: any;
+  data: type;
   decision: {
     yesText: string;
     noText?: string;

@@ -1,0 +1,34 @@
+@import "src/styles/theme";
+
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.decision {
+  display: flex;
+  justify-content: flex-end;
+
+  > *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+
+.body {
+  font-size: 0.8rem;
+}
+
+.form-container {
+  &, &.form-group {
+    display: flex;
+    flex-direction: column;
+
+    > *:not(:last-child) {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .form-group {
+    min-height: 85px;
+  }
+}

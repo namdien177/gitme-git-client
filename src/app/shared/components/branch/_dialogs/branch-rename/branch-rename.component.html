@@ -1,0 +1,77 @@
+<h2 class="weight-lighter m-0 mb-2">
+  {{emittedDataFromView.title}}
+</h2>
+<p class="mt-0 mb-2 body text-muted">
+  {{emittedDataFromView.body}}
+</p>
+
+<form [formGroup]="formNewName" class="form-container">
+  <div class="form-group">
+    <label for="branchName" class="mb-1">
+      New branch name
+    </label>
+    <input class="form-control form-control-float form-control-dark"
+           formControlName="name"
+           id="branchName"
+           placeholder="feature/abc"
+           type="text">
+    <ng-container *ngIf="name.dirty">
+      <small *ngIf="name.errors?.match"
+             class="text-danger">
+        This branch is already existed
+      </small>
+      <small *ngIf="name.errors?.length"
+             class="text-danger">
+        Branch name must have at lease 1 character!
+      </small>
+    </ng-container>
+    <ng-container *ngIf="!!parseNameBranch">
+      <small class="text-warning">
+        {{parseNameBranch}}
+      </small>
+    </ng-container>
+  </div>
+  <div class="form-group">
+    <mat-checkbox formControlName="removeOnRemote">
+      Remove on remote
+    </mat-checkbox>
+    <br>
+    <small class="text-muted">
+      <ng-container *ngIf="currentData.has_remote">
+        This action will delete the branch on the source remote.
+        <span class="text-danger">This action cannot be undo, please consider!</span>
+      </ng-container>
+      <ng-container *ngIf="!currentData.has_remote">
+        This branch only available on local
+      </ng-container>
+    </small>
+  </div>
+  <div class="form-group">
+    <mat-checkbox formControlName="pushToRemote">
+      Push to remote
+    </mat-checkbox>
+    <br>
+    <small class="text-muted">
+      <ng-container *ngIf="!currentData.has_remote">
+        Push the current local branch to remote
+      </ng-container>
+      <ng-container *ngIf="currentData.has_remote">
+        This branch is already on remote
+      </ng-container>
+    </small>
+  </div>
+</form>
+
+<div class="decision">
+  <button (click)="dialogRef.close(undefined)"
+          class="bg-primary-black-darker"
+          mat-flat-button>
+    {{emittedDataFromView.decision.noText}}
+  </button>
+  <button (click)="confirmAction()"
+          [disabled]="formNewName.invalid || formNewName.pending"
+          color="primary"
+          mat-raised-button>
+    {{emittedDataFromView.decision.yesText}}
+  </button>
+</div>

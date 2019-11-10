@@ -34,8 +34,12 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
     private repositoriesService: RepositoriesService,
     private matDialog: MatDialog
   ) {
-    this.repository = this.repositoriesService.getActive();
-    this.branch = this.repositoryBranchesService.getActive();
+    this.repositoryBranchesService.selectActive().subscribe(
+      br => this.branch = br
+    );
+    this.repositoriesService.selectActive().subscribe(
+      rp => this.repository = rp
+    );
   }
 
   ngAfterViewInit(): void {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RepositoriesStore } from './repositories.store';
 import { Repository } from './repository.model';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesQuery } from './repositories.query';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
@@ -17,7 +17,7 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { compareArray } from '../../../utilities/utilityHelper';
+import { compareBranchesArray } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -88,7 +88,8 @@ export class RepositoriesService {
           const repository: Repository = { ...repos.repository } as Repository;
           const updatedBranch = await this.gitService.getBranchInfo(repository.directory, repository.branches);
           // update local file
-          if (compareArray(updatedBranch, repository.branches)) {
+          if (!compareBranchesArray(repository.branches, updatedBranch)) {
+            console.log('Updated branch list');
             await this.dataService.updateRepositoryData(repository, true);
           }
           repository.branches = updatedBranch;
@@ -237,6 +238,12 @@ export class RepositoriesService {
     );
   }
 
+  /**
+   * TODO: check this
+   * @param repository
+   * @param branches
+   * @param option
+   */
   push(repository: Repository, branches: RepositoryBranchSummary[], option?: { [git: string]: string }) {
     // get account
     const credential: Account = this.accountListService.getOneSync(
@@ -264,7 +271,7 @@ export class RepositoriesService {
       }),
       switchMap(status => {
         if (status.pushURL) {
-          this.gitService.push(repository, status.pushURL, credential, option);
+          // this.gitService.push(repository, status.pushURL, credential, option);
         }
         return of(true);
       }),
@@ -289,6 +296,7 @@ export class RepositoriesService {
       this.gitService.fetchInfo(repository, credential, branch)
     )
     .pipe(
+      takeWhile(shouldValid => !!shouldValid.fetchData),
       switchMap(res => {
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
       }),
@@ -327,7 +335,7 @@ export class RepositoriesService {
   }
 
   async updateExistingRepositoryOnLocalDatabase(repositoryUpdate: Repository) {
-   const configFile: AppConfig = await this.getAppConfig();
+    const configFile: AppConfig = await this.getAppConfig();
 
     const repositoryFileDirectory = configFile.repository_config;
     const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
