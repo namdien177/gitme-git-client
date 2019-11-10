@@ -206,15 +206,6 @@ ipcMain.on('github-authenticate', function (event, arg) {
   session.defaultSession.webRequest.onCompleted(filter, (details) => {
     const onCompleteUrl = details.url;
     clearSession(onCompleteUrl, authWindow);
-    // if (url.toString().includes('code=')) { // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
-    //   const githubSession = authWindow.webContents.session;
-    //   // clear cookies for next time login;
-    //   githubSession.clearStorageData({ // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
-    //     storages: [
-    //       'cookies', 'localstorage'
-    //     ]
-    //   });
-    // }
     handleUrl(onCompleteUrl);
   });
   authWindow.on('close', () => event.returnValue = { access_token, crashError });
