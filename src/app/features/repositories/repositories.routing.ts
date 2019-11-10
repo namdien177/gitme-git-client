@@ -10,7 +10,6 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'histories', component: RepoHistoryComponent },
-
     ]
   }
 ];

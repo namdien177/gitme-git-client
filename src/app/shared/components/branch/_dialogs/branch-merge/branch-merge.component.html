@@ -1,1 +1,23 @@
-<p>branch-merge works!</p>
+<h2 class="m-0 weight-lighter title">
+  {{data.title}}
+</h2>
+<p class="mt-0 mb-2 body text-muted body">
+  {{data.body}}
+</p>
+
+<form class="form-container">
+  <div class="search">
+    <input class="form-control form-control-dark form-control-float"
+           placeholder="Find branch"
+           type="text">
+  </div>
+
+  <div class="list-display">
+    <div *ngFor="let branch of displayBranches; let i = index; trackBy: trackBranchID"
+         [class.selected]="branch.id === selectedBranch?.id"
+         (click)="checkMerge(branch)"
+         class="row-d">
+      {{branch.name}}
+    </div>
+  </div>
+</form>

@@ -3,10 +3,12 @@ import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../sta
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { StatusSummary } from '../../../model/statusSummary.model';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet, MatDialog } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
+import { BranchMergeComponent } from '../_dialogs/branch-merge/branch-merge.component';
 
 @Component({
   selector: 'gitme-branch-item',
@@ -24,7 +26,8 @@ export class BranchItemComponent implements OnInit {
     private repositoryBranchService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
     private repositoriesService: RepositoriesService,
-    private matBottomSheet: MatBottomSheet
+    private matBottomSheet: MatBottomSheet,
+    private matDialog: MatDialog
   ) {
     this.repositoriesService.selectActive(false)
     .subscribe(repo => {
@@ -86,6 +89,30 @@ export class BranchItemComponent implements OnInit {
       branchReload => {
         console.log(branchReload);
         this.repositoryBranchService.load(this.repository);
+      }
+    );
+  }
+
+  openMerge() {
+    const dataMerge: YesNoDialogModel = {
+      title: 'Merge branch',
+      body: `Choosing a branch to merge into ${ this.branchSummary.name }`,
+      data: {
+        branch: this.branchSummary,
+        repository: this.repository
+      },
+      decision: {
+        noText: 'Cancel',
+        yesText: 'Merge'
+      }
+    };
+
+    const dialogMerge = this.matDialog.open(
+      BranchMergeComponent, {
+        width: '500px',
+        height: '600px',
+        data: dataMerge,
+        panelClass: 'bg-primary-black-mat-dialog',
       }
     );
   }
