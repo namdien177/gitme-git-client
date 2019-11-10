@@ -48,6 +48,8 @@ export class FileSystemService {
     return this.appELECTRON;
   }
 
+
+
   /**
    * Check if directory exist.
    * If it's not a directory, or not exist, return false

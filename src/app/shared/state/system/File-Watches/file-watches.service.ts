@@ -6,8 +6,7 @@ import { FileWatchesQuery } from './file-watches.query';
 @Injectable({ providedIn: 'root' })
 export class FileWatchesService implements OnDestroy {
 
-  private chokidar: typeof chokidarNode;
-  private watcher: typeof chokidarNode.FSWatcher.prototype = null;
+  private watcher = null;
 
   private ignoreDefault = [
     '/node_modules',
@@ -32,7 +31,6 @@ export class FileWatchesService implements OnDestroy {
     private store: FileWatchesStore,
     private query: FileWatchesQuery,
   ) {
-    this.chokidar = chokidarNode;
   }
 
   selectChanges() {
@@ -40,12 +38,15 @@ export class FileWatchesService implements OnDestroy {
   }
 
   watch(watchingPath: string) {
-    this.unwatch();
-    this.watcher = this.chokidar.watch(watchingPath, {
+    this.watcher = chokidarNode.watch(watchingPath, {
       cwd: watchingPath,
       ignored: this.ignoreDefault,
       persistent: true,
-      ignoreInitial: true
+      ignoreInitial: true,
+      usePolling: false,
+      interval: 100,
+      binaryInterval: 300,
+      alwaysStat: false,
     });
 
     this.watcher.on(
@@ -55,6 +56,7 @@ export class FileWatchesService implements OnDestroy {
         path: string,
         stats?: typeof fsNode.Stats
       ) => {
+        console.log(path);
         this.store.update({
           isChange: true,
           path: path,
@@ -63,11 +65,11 @@ export class FileWatchesService implements OnDestroy {
       });
   }
 
-  unwatch(emit = false) {
+  async unwatch(emit = false) {
     if (this.watcher) {
-      this.watcher.close();
+      await this.watcher.close();
     }
-    this.watcher = null;
+    this.watcher = false;
 
     if (emit) {
       this.store.update({
@@ -78,8 +80,9 @@ export class FileWatchesService implements OnDestroy {
     }
   }
 
-  switchTo(path: string) {
-    this.unwatch();
+
+  async switchTo(path: string) {
+    this.unwatch(true);
     this.watch(path);
   }
 

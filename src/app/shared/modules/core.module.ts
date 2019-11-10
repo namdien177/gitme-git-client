@@ -35,8 +35,6 @@ const declareComps = [
   OverCountedDirective,
   SimpleEllipsisDirective,
   ReactiveEllipsisDirective,
-  // CredentialInputComponent,
-  // CredentialListComponent,
   SmallLoadComponent,
   SectionLoadComponent
 ];

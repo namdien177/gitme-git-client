@@ -8,6 +8,7 @@ import { MaterialModule } from './material.module';
 import { BranchOptionsComponent } from '../components/branch/_dialogs/branch-options/branch-options.component';
 import { BranchNewOptionComponent } from '../components/branch/_dialogs/branch-new/branch-new-option/branch-new-option.component';
 import { SingleComponent as CommitOptionsSingleComponent } from '../components/commit/_dialogs/context-option/single/single.component';
+import { BranchCheckoutStashComponent } from '../components/branch/_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
 
 
 const dialogComps = [
@@ -18,6 +19,7 @@ const dialogComps = [
   CommitOptionsSingleComponent,
   BranchOptionsComponent,
   BranchNewOptionComponent,
+  BranchCheckoutStashComponent
 ];
 
 @NgModule({

@@ -17,7 +17,6 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { UtilityService } from '../../../utilities/utility.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -32,7 +31,6 @@ export class RepositoriesService {
     private accountListService: AccountListService,
     private repositoryBranchesService: RepositoryBranchesService,
     private securityService: SecurityService,
-    private utilitiesService: UtilityService
   ) {
   }
 
@@ -47,7 +45,7 @@ export class RepositoriesService {
     const systemDefaultName = this.securityService.appUUID;
     if (isNewAccount) {
       // Save the new credential to file store;
-      const storeNewAccount = this.dataService.createAccountData(credentials, systemDefaultName);
+      const storeNewAccount = await this.dataService.createAccountData(credentials, systemDefaultName);
       if (!storeNewAccount) {
         return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
       }
@@ -64,7 +62,6 @@ export class RepositoriesService {
         'user.name': credentials.name_local
       };
       await this.addConfig(newRepository, config);
-      // this.gitService.gitInstance(newRepository.directory)
     }
 
     return statusSave;
@@ -77,7 +74,6 @@ export class RepositoriesService {
   async load() {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
-
     if (!!!configFile) {
       return;
     }
@@ -270,6 +266,7 @@ export class RepositoriesService {
    * Fetching data
    * @param repository
    * @param branch
+   * @param load
    * @param option
    */
   fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
@@ -281,7 +278,8 @@ export class RepositoriesService {
     repository.timestamp = moment().valueOf();
     return fromPromise(
       this.gitService.fetchInfo(repository, credential, branch)
-    ).pipe(
+    )
+    .pipe(
       switchMap(res => {
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
       }),
@@ -320,7 +318,7 @@ export class RepositoriesService {
   }
 
   async updateExistingRepositoryOnLocalDatabase(repositoryUpdate: Repository) {
-    const configFile: AppConfig = await this.getAppConfig();
+   const configFile: AppConfig = await this.getAppConfig();
 
     const repositoryFileDirectory = configFile.repository_config;
     const repositories: Repository[] = await this.getAllRepositoryFromConfig(repositoryFileDirectory);
@@ -342,7 +340,6 @@ export class RepositoriesService {
         );
       }
     }
-
     return statusUpdate;
   }
 

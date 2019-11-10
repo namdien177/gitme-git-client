@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { FileSystemService } from './services/system/fileSystem.service';
 import { GitService } from './services/features/git.service';
+import * as passport from 'passport';
 
 @Component({
   selector: 'gitme-root',

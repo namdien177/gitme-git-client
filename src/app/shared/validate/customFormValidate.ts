@@ -1,5 +1,9 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { isAccountType } from '../state/DATA/account-list';
+import { GitService } from '../../services/features/git.service';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { map } from 'rxjs/operators';
+import { FileSystemService } from '../../services/system/fileSystem.service';
 
 /**
  * Check if length of the array larger than the specified length.
@@ -38,5 +42,22 @@ export function shouldNotExistInArray(array: string[], sourceName: string = 'arr
     });
 
     return !isMatch ? null : { match: `${ value } is existed in the ${ sourceName }` };
+  };
+}
+
+export function IsRepository(gitService: GitService) {
+  return (control: AbstractControl) => {
+    return fromPromise(gitService.isGitProject(control.value)).pipe(
+      map(res => {
+        return res ? null : { repository: 'This is not a valid repository' };
+      })
+    );
+  };
+}
+
+export function IsAValidDirectory(fileSystem: FileSystemService) {
+  return (control: AbstractControl) => {
+    const status = fileSystem.isDirectoryExist(control.value);
+    return status ? null : { directory: 'This is not a valid directory' };
   };
 }
