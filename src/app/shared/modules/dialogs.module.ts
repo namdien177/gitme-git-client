@@ -9,6 +9,8 @@ import { BranchOptionsComponent } from '../components/branch/_dialogs/branch-opt
 import { BranchNewOptionComponent } from '../components/branch/_dialogs/branch-new/branch-new-option/branch-new-option.component';
 import { SingleComponent as CommitOptionsSingleComponent } from '../components/commit/_dialogs/context-option/single/single.component';
 import { BranchCheckoutStashComponent } from '../components/branch/_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
+import { BranchRenameComponent } from '../components/branch/_dialogs/branch-rename/branch-rename.component';
+import { BranchMergeComponent } from '../components/branch/_dialogs/branch-merge/branch-merge.component';
 
 
 const dialogComps = [
@@ -19,7 +21,9 @@ const dialogComps = [
   CommitOptionsSingleComponent,
   BranchOptionsComponent,
   BranchNewOptionComponent,
-  BranchCheckoutStashComponent
+  BranchCheckoutStashComponent,
+  BranchRenameComponent,
+  BranchMergeComponent,
 ];
 
 @NgModule({

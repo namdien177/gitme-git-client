@@ -78,102 +78,85 @@ export class GitService {
    * @param oldBranches   Retrieve from repository configs
    */
   async getBranchInfo(directory: string, oldBranches: RepositoryBranchSummary[] = []): Promise<RepositoryBranchSummary[]> {
-    const branchRemoteRaw = await this.gitInstance(directory).branch(['-r']);
-    const branchLocalRaw = await this.gitInstance(directory).branch([]);
+    const branchRemoteRaw = await this.branch(directory, '-r', '-vv');
+    const branchLocalRaw = await this.branch(directory, '-vv');
     const branchTracking = await this.getBranchTracking(directory);
 
     if (!branchTracking) {
-      return null;
+      return [];
     }
-
     const branchesOutPut: RepositoryBranchSummary[] = [];
 
-    if (branchRemoteRaw.all.length > branchLocalRaw.all.length) {
-      // In case there is no local-only branch.
-      Object.keys(branchRemoteRaw.branches).forEach(branchRemoteInstance => {
-        const slidedSlash = branchRemoteInstance.split('/');
-        const trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
-        const extractedNameRemote = slidedSlash.slice(1).join('/');   // remove origin/
-        const existInstanceLocal = branchLocalRaw.all.find(nameLocalBranch => nameLocalBranch === extractedNameRemote);
-        if (!!existInstanceLocal && existInstanceLocal.length > 0) {
-          const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
-            branchRemoteRaw.branches[branchRemoteInstance],
-            existInstanceLocal,
-            branchLocalRaw.branches[existInstanceLocal].current,
-            null, trackingOn, true, true
-          );
-          branchesOutPut.push(branchItem);
-        } else {
-          const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
-            branchRemoteRaw.branches[branchRemoteInstance],
-            branchRemoteInstance,
-            branchRemoteRaw.branches[branchRemoteInstance].current,
-            null, trackingOn, true, false
-          );
-          branchesOutPut.push(branchItem);
-        }
-      });
-    } else {
-      // In case there are local-only branch.
-      Object.keys(branchLocalRaw.branches).forEach(branchLocalInstance => {
-        let trackingOn = null;
-        const existRemoteLocal = branchRemoteRaw.all.find(nameRemoteBranch => {
-          const slidedSlash = nameRemoteBranch.split('/');
-          trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
-          const extractedNameRemote = slidedSlash.slice(1).join('/');   // remove origin/
-          return branchLocalInstance === extractedNameRemote;
-        });
-        if (!!existRemoteLocal && existRemoteLocal.length > 0) {
-          const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
-            branchRemoteRaw.branches[existRemoteLocal],
-            branchLocalInstance,
-            branchLocalRaw.branches[branchLocalInstance].current,
-            null, trackingOn, true, true
-          );
-          branchesOutPut.push(branchItem);
-        } else {
-          const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
-            branchRemoteRaw.branches[existRemoteLocal],
-            branchLocalInstance,
-            branchLocalRaw.branches[branchLocalInstance].current,
-            null, trackingOn, false, true
-          );
-          branchesOutPut.push(branchItem);
-        }
-      });
-    }
+    // result from remote first
+    // after that, looping all local and check for local-only branch and status.
+    Object.keys(branchRemoteRaw.branches).forEach(branchRemoteName => {
+      // contain [<name tracker>, <name branch>, etc]
+      // tracker normally will be origin
+      const slidedSlash = branchRemoteName.split('/');
+      const trackingOn = branchTracking.find(track => track.name === slidedSlash[0]);
+      // get the true name of the branch be hind tracker
+      const branchName = slidedSlash.slice(1).join('/');
+      // If exist local, copy the current and change the local/remote status
+      const existInstanceLocal = branchLocalRaw.all.find(
+        nameLocalBranch => nameLocalBranch === branchName
+      );
+      if (!!existInstanceLocal) {
+        const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+          branchRemoteRaw.branches[branchRemoteName],
+          branchName,
+          branchLocalRaw.branches[existInstanceLocal].current,
+          null, trackingOn, true, true
+        );
+        branchesOutPut.push(branchItem);
+      } else {
+        const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+          branchRemoteRaw.branches[branchRemoteName],
+          branchName,
+          branchRemoteRaw.branches[branchRemoteName].current,
+          null, trackingOn, true, false
+        );
+        branchesOutPut.push(branchItem);
+      }
+    });
 
-    // update from oldBranch
-    if (branchesOutPut.length > oldBranches.length) {
-      branchesOutPut.forEach((branch, index, selfArr) => {
-        const findFromOld = this.findBranchFromListBranch(branch, oldBranches);
+    // Looping all local array to find "local only"
+    Object.keys(branchLocalRaw.branches).forEach(branchLocalName => {
+      const existedValue = branchesOutPut.find(br => br.name === branchLocalName);
+      /**
+       * Branch local only will not in remotes
+       */
+      if (!existedValue) {
+        const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
+          branchLocalRaw.branches[branchLocalName],
+          branchLocalName,
+          branchLocalRaw.branches[branchLocalName].current,
+          null, null, false, true
+        );
+        branchesOutPut.push(branchItem);
+      }
+    });
 
-        if (findFromOld) {
-          selfArr[index].id = findFromOld.id;
-          selfArr[index].last_update = findFromOld.last_update;
-          selfArr[index].options = findFromOld.options;
-        } else {
-          selfArr[index].id = this.securityService.randomID;
-          selfArr[index].last_update = null;
-          selfArr[index].options = null;
-        }
-      });
-    } else {
-      oldBranches.forEach((branch, index, selfArr) => {
-        const findFromNew = this.findBranchFromListBranch(branch, branchesOutPut);
+    // update other information from oldBranch
+    branchesOutPut.forEach((branch, index, self) => {
+      const existed = oldBranches.find(ob => ob.name === branch.name);
+      if (existed) {
+        branchesOutPut[index].id = existed.id;
+        branchesOutPut[index].last_update = existed.last_update;
+        branchesOutPut[index].options = existed.options;
+      } else {
+        branchesOutPut[index].id = this.securityService.randomID;
+        branchesOutPut[index].last_update = null;
+        branchesOutPut[index].options = null;
+      }
+    });
 
-        if (findFromNew) {
-          findFromNew.id = selfArr[index].id;
-          findFromNew.last_update = selfArr[index].last_update;
-          findFromNew.options = selfArr[index].options;
-        } else {
-          // do nothing, will be removed as both local and remote cannot be found
-          // This can be due to branch removed, renamed, etc.
-        }
-      });
-    }
-
+    console.log(branchesOutPut);
     return branchesOutPut;
+  }
+
+  branch(directory: string, ...options: string[]) {
+    return this.gitInstance(directory)
+    .branch(options);
   }
 
   async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
@@ -232,6 +215,12 @@ export class GitService {
   }
 
   async fetchInfo(repository: Repository, credentials: Account, branch: RepositoryBranchSummary) {
+    if (!branch.tracking) {
+      return {
+        fetchData: null,
+        repository
+      };
+    }
     // retrieve the directory for gitInstance to execute
     const { directory } = repository;
     let urlRemote = branch.tracking.fetch;
@@ -276,25 +265,39 @@ export class GitService {
 
   /**
    * TODO: checking git issue for more info.
-   * @param repository
-   * @param branchURL
-   * @param credentials
+   * @param directory
+   * @param branchName
+   * @param remoteType
    * @param options
    */
-  push(repository: Repository, branchURL: string, credentials: Account, options?: { [o: string]: string }) {
-    const urlRemote = this.utilities.addCredentialsToRemote(branchURL, credentials);
-    // this.gitInstance(repository.directory).raw(
-    //     [
-    //         // `${urlRemote}`
-    //         'push',
-    //         `--repo=${ urlRemote }`,
-    //         '--all'
-    //     ]
-    // ).then(r => console.log(r));
-    return this.gitInstance(repository.directory).push().then(() => {
-      console.log('push complete');
-      return true;
-    });
+  push(directory, branchName, remoteType = 'origin', options?: { [key: string]: null | string | any }) {
+    return this.gitInstance(directory).push(
+      remoteType,
+      branchName,
+      options
+    );
+  }
+
+  /**
+   * For pushing new branch to remote
+   * @param directory
+   * @param branchName
+   * @param remoteType
+   * @param options
+   */
+  pushUpStream(directory: string, branchName: string, remoteType = 'origin', options?: { [key: string]: null | string | any }) {
+    const defaultOptions = {
+      '-u': null // Upstream
+    };
+    if (options && Object.keys(options).length > 0) {
+      Object.assign(defaultOptions, options);
+    }
+    return this.gitInstance(directory)
+    .push(
+      remoteType,
+      branchName,
+      defaultOptions
+    );
   }
 
   /**
@@ -313,6 +316,25 @@ export class GitService {
     await instanceGit.addConfig('user.name', account.name_local);
     await instanceGit.addConfig('user.email', account.username);
     return instanceGit.commit(message, fileList, option);
+  }
+
+  /**
+   * Status: Done
+   * @param repository
+   * @param branchName
+   * @param credentials
+   */
+  async switchBranch(repository: Repository, branchName: string, credentials?: Account) {
+    if (!this.isGitProject(repository.directory)) {
+      return false;
+    }
+
+    return await this.gitInstance(repository.directory).checkout(branchName)
+    .then(resolve => true)
+    .catch(err => {
+      console.log(err);
+      return false;
+    });
   }
 
   async revert(repository: Repository, files: string[]) {
@@ -356,18 +378,6 @@ export class GitService {
     ]);
   }
 
-  async switchBranch(repository: Repository, branch: RepositoryBranchSummary, credentials?: Account) {
-    if (!this.isGitProject(repository.directory)) {
-      return false;
-    }
-
-    return await this.gitInstance(repository.directory).checkout(branch.name)
-    .then(resolve => true)
-    .catch(err => {
-      console.log(err);
-      return false;
-    });
-  }
 
   async isFileIgnored(repository: Repository, ...filePath: string[]) {
     return this.gitInstance(repository.directory)

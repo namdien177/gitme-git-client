@@ -28,7 +28,7 @@
     </div>
     <span>Checkout from</span>
     <div class="form-radio-branches">
-      <label *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) !== 2" class="card"
+      <label *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) !== 0" class="card"
              for="fromDefault">
         <div class="card-body branch-name">
           <div class="branch-checkbox acomi-checkbox-control">
@@ -52,10 +52,10 @@
         </div>
       </label>
 
-      <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 2">
-        <h4 class="m-0 mb-1 text-muted weight-lighter">Branch master was not found</h4>
-        <small class="text-muted">Current branch will be selected</small>
-      </div>
+      <!--      <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 2">-->
+      <!--        <h4 class="m-0 mb-1 text-muted weight-lighter">Branch master was not found</h4>-->
+      <!--        <small class="text-muted">Current branch will be selected</small>-->
+      <!--      </div>-->
 
       <div *ngIf="getSelectBaseBranchStatus('master', branch.name, branches) === 0">
         <h4 class="m-0 mb-1 text-muted weight-lighter">Already on branch default</h4>
@@ -72,11 +72,11 @@
                    id="fromCurrent"
                    type="radio"/>
             <div class="cbx">
-                            <span>
-                                <svg height="10px" viewbox="0 0 12 10" width="12px">
-                                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                                </svg>
-                            </span>
+              <span>
+                  <svg height="10px" viewbox="0 0 12 10" width="12px">
+                      <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                  </svg>
+              </span>
             </div>
           </div>
           <div class="branch-choice">

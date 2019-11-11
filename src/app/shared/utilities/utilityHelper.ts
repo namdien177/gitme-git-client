@@ -1,3 +1,5 @@
+import { RepositoryBranchSummary } from '../state/DATA/repository-branches';
+
 const typeCache: { [label: string]: boolean } = {};
 
 type Predicate = (oldValues: Array<any>, newValues: Array<any>) => boolean;
@@ -47,10 +49,96 @@ export function distinctChanges(
   newValues: Array<any>,
   conditions: Predicate[]
 ): boolean {
-  if (conditions.every(cond => cond(oldValues, newValues))) {
+  return !conditions.every(cond => cond(oldValues, newValues));
+}
+
+export function compareArray(arr1, arr2) {
+
+  // Check if the arrays are the same length
+  if (arr1.length !== arr2.length) {
     return false;
   }
+
+  // Check if all items exist and are in the same order
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  // Otherwise, return true
   return true;
+}
+
+/**
+ * Return false if two array different
+ * @param oldBranches
+ * @param newBranches
+ */
+export function compareBranchesArray(oldBranches: RepositoryBranchSummary[], newBranches: RepositoryBranchSummary[]) {
+  if (oldBranches.length !== newBranches.length) {
+    return false;
+  }
+  let identical = true;
+  newBranches.every(newBranch => {
+    const findInOld = oldBranches.find(br => br.name === newBranch.name);
+    if (!findInOld) {
+      identical = false;
+      return false;
+    }
+    if (
+      newBranch.has_local !== findInOld.has_local ||
+      newBranch.has_remote !== findInOld.has_remote ||
+      newBranch.current !== findInOld.current ||
+      newBranch.last_update !== findInOld.last_update ||
+      newBranch.commit !== findInOld.commit ||
+      newBranch.label !== findInOld.label
+    ) {
+      identical = false;
+      return false;
+    }
+
+    if (!newBranch.tracking !== !findInOld.tracking) {
+      identical = false;
+      return false;
+    }
+
+    if (!!newBranch.tracking) {
+      Object.keys(newBranch.tracking).every(trk => {
+        if (newBranch.tracking[trk] !== findInOld.tracking[trk]) {
+          identical = false;
+          return false;
+        }
+        return true;
+      });
+    }
+
+    if (!identical) {
+      return false;
+    }
+
+    if (!newBranch.options !== !findInOld.options) {
+      identical = false;
+      return false;
+    }
+
+    if (!!newBranch.options) {
+      if (newBranch.options.length !== findInOld.options.length) {
+        identical = false;
+        return false;
+      }
+
+      newBranch.options.every(opt => {
+        const oldOption = findInOld.options.find(op => op.value === opt.value && op.argument === opt.argument);
+        if (!oldOption) {
+          identical = false;
+          return false;
+        }
+        return true;
+      });
+    }
+    return identical;
+  });
+  return identical;
 }
 
 /**

@@ -37,7 +37,7 @@ export class RepositoryBranchesService {
    */
   checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
     this.setLoading();
-    return fromPromise(this.gitService.switchBranch(repo, branch))
+    return fromPromise(this.gitService.switchBranch(repo, branch.name))
     .pipe(
       map(status => {
         this.finishLoading();
@@ -56,11 +56,21 @@ export class RepositoryBranchesService {
     return fromPromise(this.gitService.revert(repository, dirList));
   }
 
+  /**
+   * Status: Done
+   * @param repository
+   * @param files
+   */
   ignoreFiles(repository: Repository, ...files: FileStatusSummaryView[]) {
     const dir = files.map(file => file.path);
     return fromPromise(this.gitService.addFilesToIgnore(repository, ...dir));
   }
 
+  /**
+   * Status: Done
+   * @param repository
+   * @param files
+   */
   ignoreExtension(repository: Repository, ...files: FileStatusSummaryView[]) {
     const dir = files.map(file => file.path);
     return fromPromise(this.gitService.addExtensionToIgnore(repository, ...dir));
@@ -87,10 +97,102 @@ export class RepositoryBranchesService {
     ).pipe(map(_ => true));
   }
 
+  /**
+   * TODO: check message and re-stash
+   * @param repository
+   * @param message
+   */
   stashChanges(repository: Repository, message?: string) {
     return fromPromise(
       this.gitService.addStash(repository, message)
     );
+  }
+
+  async deleteBranch(repository: Repository, branch: RepositoryBranchSummary, force: boolean = true) {
+    //  $ git push -d <remote_name> <branch_name>       <---- Delete remotely
+    //  $ git branch -d <branch_name>                   <---- Delete locally
+    console.log(branch);
+    console.log(repository);
+    const args = force ? '-D' : '-d';
+    const argsRemote = { '-d': null };
+
+    const removeStatus = {
+      local: null,
+      remote: null
+    };
+    const masterBranch = repository.branches.find(branchStored => branchStored.name === 'master');
+    if (!masterBranch || masterBranch.name === branch.name) {
+      // prevent deleting master branch
+      return removeStatus;
+    }
+
+    if (branch.has_remote) {
+      removeStatus.remote = await this.gitService.push(
+        repository.directory,
+        branch.name,
+        branch.tracking.name,
+        argsRemote
+      );
+    }
+
+    if (branch.has_local) {
+      // delete on local
+      // Require to checkout first => default checkout to master
+      const switchBranchStatus = await this.gitService.switchBranch(repository, masterBranch.name);
+      if (!switchBranchStatus) {
+        return removeStatus;
+      }
+      removeStatus.local = await this.gitService.branch(repository.directory, args, branch.name);
+    }
+
+    return removeStatus;
+  }
+
+  /**
+   * Change the name of selected branch
+   * @param repository
+   * @param branch
+   * @param newName
+   * @param removeOnRemote
+   * @param pushToRemote
+   */
+  async changeName(
+    repository: Repository,
+    branch: RepositoryBranchSummary, newName: string,
+    removeOnRemote: boolean, pushToRemote: boolean) {
+    // git branch -m new-name
+    // git push origin old-name -d
+    // git push origin -u new-name
+    const optionOnLocal = ['-m', `${ newName }`];
+    const status = {
+      changeName: null,
+      removeRemote: null,
+      pushRemote: null,
+    };
+
+    status.changeName = await this.gitService.branch(repository.directory, ...optionOnLocal);
+
+    if (branch.has_remote) {
+      // Only if having remote branch
+      if (removeOnRemote) {
+        // Delete remote branch then push new branch
+        status.removeRemote = await this.gitService.push(
+          repository.directory,
+          branch.name,
+          branch.tracking.name,
+          ['-d']
+        );
+      }
+    } else {
+      if (pushToRemote) {
+        status.pushRemote = await this.gitService.pushUpStream(
+          repository.directory,
+          newName,
+          'origin'
+        );
+      }
+    }
+    return status;
   }
 
   set(listBranch: RepositoryBranchSummary[]) {
