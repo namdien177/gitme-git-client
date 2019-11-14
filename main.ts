@@ -154,16 +154,12 @@ async function clearSession(urlSession: string, authWindowPassing: BrowserWindow
 }
 
 async function handleUrl(codeUrl, authWindow: BrowserWindow) {
-  console.log(codeUrl);
   const raw_code = /code=([^&]*)/.exec(codeUrl) || null,
     code = (raw_code && raw_code.length > 1) ? raw_code[1] : null,
     error = /\?error=(.+)$/.exec(codeUrl);
 
   // If there is a code in the callback, proceed to get token from github
   if (code) {
-
-    console.log('code recieved: ' + code);
-
     const postData = querystring.stringify({
       'client_id': GITHUB_OAUTH.client_id,
       'client_secret': GITHUB_OAUTH.client_secret,
@@ -190,16 +186,11 @@ async function handleUrl(codeUrl, authWindow: BrowserWindow) {
         });
         response.on('end', function () {
           const json = JSON.parse(result.toString());
-          console.log('access token:' + json.access_token);
+          console.log('access token:' + json.access_token); // Also other information
           resolve(json.access_token);
-          if (response && response['ok']) {
-            console.log(response['body'].access_token);
-            // resolve(json.access_token);
-          }
         });
         response.on('error', function (err) {
           console.error('ERROR: ' + err.message);
-          // _.crashError = err;
           resolve(null);
         });
       });
