@@ -8,12 +8,12 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-// Manhnd - github oauth app
+// namdien177 - github oauth app
 const GITHUB_OAUTH = {
   redirect_uri: 'http://localhost:4200',
   url: `https://github.com/login/oauth/authorize?`,
-  client_id: 'ef1953071ea4ad95f02d',
-  client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd',
+  client_id: 'b2c1fa872f64704b94a4',
+  client_secret: '1e3c5e56102b01548e6f8b450eb7df8afc5b8b56',
   // Full access public & private repo.
   // More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
   scopes: ['repo']
@@ -136,10 +136,6 @@ ipcMain.on('github-authenticate', function (event, arg) {
     const onCompleteUrl = details.url;
     await clearSession(onCompleteUrl, authWindow);
     access_token = await handleUrl(onCompleteUrl, authWindow);
-    // Close the browser if code found or error
-    // authWindow.close();
-    // console.log('142');
-    // authWindow.close();
   });
 
   authWindow.on('close', () => event.returnValue = { access_token, crashError });

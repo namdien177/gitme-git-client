@@ -7,7 +7,7 @@ export class StatusSummary {
   created: string[];
   current: string;
   deleted: any[];
-  files: FileStatusSummary[]; // file status summary
+  files: FileStatusSummary[];
   modified: string[];
   not_added: string[];
   renamed: any[];
