@@ -150,7 +150,6 @@ export class GitService {
       }
     });
 
-    console.log(branchesOutPut);
     return branchesOutPut;
   }
 
@@ -337,6 +336,34 @@ export class GitService {
     });
   }
 
+  async checkMergeStatus(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
+    const options = ['--no-ff', '--no-commit'];
+    /**
+     * Blindly merge then announce the changes
+     */
+    await this.gitInstance(repository.directory).merge([
+      branchToMerge.name,
+      branchTarget.name,
+      ...options
+    ]).catch(err => null);
+    // revert the branch merge status
+    // git merge --abort
+    // await this.gitInstance(repository.directory).merge(['--abort']);
+    return await this.getStatusOnBranch(repository);
+  }
+
+  async abortCheckMerge(repository: Repository) {
+    return await this.gitInstance(repository.directory).merge(['--abort']);
+  }
+
+  async confirmMerge(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
+    await this.gitInstance(repository.directory).merge([
+      branchToMerge.name,
+      branchTarget.name
+    ]).catch(err => null);
+    return await this.getStatusOnBranch(repository);
+  }
+
   async revert(repository: Repository, files: string[]) {
     if (files.length === 0) {
       // reset hard
@@ -377,7 +404,6 @@ export class GitService {
       'pop'
     ]);
   }
-
 
   async isFileIgnored(repository: Repository, ...filePath: string[]) {
     return this.gitInstance(repository.directory)
@@ -436,20 +462,6 @@ export class GitService {
 
   isRemoteAvailable(repository: Repository) {
     return !!repository.remote;
-  }
-
-  isFetchRemoteAvailable(repository: Repository) {
-    if (!this.isRemoteAvailable(repository)) {
-      return false;
-    }
-    return !!repository.remote.find(any => any.fetch != null);
-  }
-
-  isPullRemoteAvailable(repository: Repository) {
-    if (!this.isRemoteAvailable(repository)) {
-      return false;
-    }
-    return !!repository.remote.find(any => any.push != null);
   }
 
   private findBranchFromListBranch(branchToFind: RepositoryBranchSummary, listBranch: RepositoryBranchSummary[]) {

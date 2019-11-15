@@ -9,6 +9,7 @@ import { map, switchMap, takeWhile } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { BranchRenameComponent } from '../branch-rename/branch-rename.component';
+import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
 
 @Component({
   selector: 'gitme-branch-options',
@@ -16,6 +17,8 @@ import { BranchRenameComponent } from '../branch-rename/branch-rename.component'
   styleUrls: ['./branch-options.component.scss']
 })
 export class BranchOptionsComponent implements OnInit {
+
+  private currentActiveBranch: RepositoryBranchSummary = null;
 
   constructor(
     private _bottomSheetRef: MatBottomSheetRef<BranchOptionsComponent>,
@@ -28,6 +31,15 @@ export class BranchOptionsComponent implements OnInit {
     private repositoryBranchService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
   ) {
+    this.currentActiveBranch = this.repositoryBranchService.getActive();
+  }
+
+  get isMaster() {
+    return this.data.branch.name === 'master';
+  }
+
+  get isCurrent() {
+    return this.data.branch.name === this.currentActiveBranch.name;
   }
 
   ngOnInit() {
@@ -109,6 +121,34 @@ export class BranchOptionsComponent implements OnInit {
         this._bottomSheetRef.dismiss('RELOAD');
       }
     );
+  }
+
+  openMerge() {
+    const dataMerge: YesNoDialogModel = {
+      title: 'Merge status',
+      body: `Checking status of merge from branch ${ this.data.branch.name } to ${ this.currentActiveBranch.name }.`,
+      data: {
+        branchTarget: this.data.branch,
+        branchFrom: this.currentActiveBranch,
+        repository: this.data.repository
+      },
+      decision: {
+        noText: 'Cancel',
+        yesText: 'Merge'
+      }
+    };
+
+    const dialogMerge = this.matDialog.open(
+      BranchMergeComponent, {
+        width: '500px',
+        data: dataMerge,
+        panelClass: 'bg-primary-black-mat-dialog',
+      }
+    );
+
+    dialogMerge.afterClosed().subscribe(decision => {
+      console.log(decision);
+    });
   }
 
   private renamingDialogDecision() {

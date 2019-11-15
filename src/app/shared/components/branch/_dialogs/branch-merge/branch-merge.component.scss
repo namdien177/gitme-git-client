@@ -1,68 +1,23 @@
 @import "src/styles/theme";
 
 :host {
-  display: grid;
-  grid-template-areas: 'title' 'body' 'list' 'choices';
-  grid-template-columns: 1fr;
-  grid-template-rows: 29px calc(15px + 1rem) calc(552px - 80px - 1rem - 0.5rem * 3) 36px;
-  grid-gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
 
-  .title {
-    grid-area: title;
+  > *:not(:last-child) {
+    margin-bottom: 0.5rem;
   }
 
   .body {
-    grid-area: body;
-  }
-
-  .form-container {
-    grid-area: list;
+    font-size: 0.8rem;
   }
 }
 
-.decision {
+.form-actions {
   display: flex;
   justify-content: flex-end;
-  grid-area: choices;
 
   > *:not(:last-child) {
     margin-right: 0.5rem;
-  }
-}
-
-.body {
-  font-size: 0.8rem;
-}
-
-.form-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 36px auto 52px;
-  grid-template-areas: 'search' 'display' 'status';
-  grid-gap: 0.5rem;
-
-  .list-display {
-    grid-area: display;
-    overflow: auto;
-    padding: 1rem;
-    border: 2px solid $primary-black-foreground;
-    border-radius: 4px;
-
-    .row-d {
-      border-radius: 2px;
-      padding: 0.5rem 2rem 0.5rem 0.5rem;
-      cursor: pointer;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      &:hover {
-        background-color: $primary-black-darker;
-      }
-
-      &.selected {
-        background-color: $primary-black-lighter;
-      }
-    }
   }
 }

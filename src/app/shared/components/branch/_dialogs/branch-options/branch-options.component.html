@@ -6,7 +6,18 @@
   {{data.branch.name}}
 </h2>
 <hr>
-<div (click)="deleteBranch()" class="card mb-1">
+<div (click)="openMerge()"
+     *ngIf="!isCurrent"
+     class="card mb-1">
+  <div class="card-body">
+    Merge this branch
+    <br>
+    <small class="text-muted">Check and merge the changes from this branch to current branch</small>
+  </div>
+</div>
+<div (click)="deleteBranch()"
+     *ngIf="!isMaster"
+     class="card mb-1">
   <div class="card-body">
     Delete branch
     <br>
@@ -14,7 +25,9 @@
   </div>
 </div>
 
-<div (click)="renameBranch()" class="card mb-1">
+<div (click)="renameBranch()"
+     *ngIf="!isMaster"
+     class="card mb-1">
   <div class="card-body">
     Rename branch
     <br>

@@ -1,10 +1,10 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
-import { FormBuilder } from '@angular/forms';
-import { RepositoriesService, Repository } from '../../../../state/DATA/repositories';
+import { Repository } from '../../../../state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
-import { RepositoryStatusService } from '../../../../state/DATA/repository-status';
+import { RepositoryStatusService, RepositoryStatusState } from '../../../../state/DATA/repository-status';
+import { GitService } from '../../../../../services/features/git.service';
 
 @Component({
   selector: 'gitme-branch-merge',
@@ -13,34 +13,47 @@ import { RepositoryStatusService } from '../../../../state/DATA/repository-statu
 })
 export class BranchMergeComponent implements OnInit {
 
-  allBranches: RepositoryBranchSummary[] = [];
-  displayBranches: RepositoryBranchSummary[] = [];
-  selectedBranch: RepositoryBranchSummary = null;
+  branchStatus: RepositoryStatusState = null;
+  repository: Repository = null;
+  branchFrom: RepositoryBranchSummary = null;
+  branchTarget: RepositoryBranchSummary = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: YesNoDialogModel<{
       repository: Repository,
-      branch: RepositoryBranchSummary
+      branchTarget: RepositoryBranchSummary,
+      branchFrom: RepositoryBranchSummary
     }>,
     public dialogRef: MatDialogRef<BranchMergeComponent>,
-    private fb: FormBuilder,
-    private repositoryService: RepositoriesService,
     private branchService: RepositoryBranchesService,
-    private statusService: RepositoryStatusService
+    private statusService: RepositoryStatusService,
+    // debug
+    private git: GitService
   ) {
-    this.allBranches = this.branchService.get()
-    .filter(br => br.id !== data.data.branch.id);
-    this.displayBranches = [...this.allBranches];
+    dialogRef.disableClose = true;
+    this.branchStatus = this.statusService.get();
+    this.repository = this.data.data.repository;
+    this.branchFrom = this.data.data.branchFrom;
+    this.branchTarget = this.data.data.branchTarget;
   }
 
   ngOnInit() {
+
   }
 
   trackBranchID(index: number, item: RepositoryBranchSummary) {
     return item.id;
   }
 
-  checkMerge(branch: RepositoryBranchSummary) {
-    this.selectedBranch = branch;
+  testMerge(branch: RepositoryBranchSummary) {
+    this.git.checkMergeStatus(this.repository, this.branchFrom, this.branchTarget)
+    .then(stat => {
+      console.log(stat);
+    });
+  }
+
+  abortMerge() {
+    this.branchService.abortMerge(this.repository);
+    this.dialogRef.close(undefined);
   }
 }
