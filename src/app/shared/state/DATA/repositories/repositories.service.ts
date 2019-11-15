@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RepositoriesStore } from './repositories.store';
 import { Repository } from './repository.model';
-import { map, switchMap, takeWhile, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesQuery } from './repositories.query';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
@@ -50,6 +50,12 @@ export class RepositoriesService {
       if (!storeNewAccount) {
         return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
       }
+    } else {
+      // just update the info for sure
+      const updatedAccount = await this.dataService.updateAccountData(credentials);
+      if (!updatedAccount) {
+        return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
+      }
     }
 
     const statusSave = await this.saveToDatabase(newRepository);
@@ -59,8 +65,8 @@ export class RepositoriesService {
 
       // adding config to the system
       const config = {
-        'user.email': credentials.username,
-        'user.name': credentials.name_local
+        'user.email': credentials.email,
+        'user.name': credentials.name
       };
       await this.addConfig(newRepository, config);
     }
@@ -186,6 +192,10 @@ export class RepositoriesService {
     return this.query.getActive();
   }
 
+  get() {
+    return this.query.getAll();
+  }
+
   /**
    * STATUS: DONE
    * Remove the active state.
@@ -294,9 +304,9 @@ export class RepositoriesService {
     repository.timestamp = moment().valueOf();
     return fromPromise(
       this.gitService.fetchInfo(repository, credential, branch)
-    )
-    .pipe(
+    ).pipe(
       takeWhile(shouldValid => !!shouldValid.fetchData),
+      distinctUntilChanged(),
       switchMap(res => {
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
       }),

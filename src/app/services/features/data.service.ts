@@ -45,10 +45,10 @@ export class DataService {
     return null;
   }
 
-  async getAccountsConfigData(idAccount: string): Promise<AppAccounts> {
+  async getAccountsConfigData(idAccount: number): Promise<AppAccounts> {
     if (this.fileSystemService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_ACCOUNTS(idAccount))) {
       return await this.fileSystemService
-      .getFileContext<AppAccounts>(idAccount, DefineCommon.DIR_ACCOUNTS())
+      .getFileContext<AppAccounts>(idAccount.toString(), DefineCommon.DIR_ACCOUNTS())
       .then(val => val.status ? val.value : null)
       .catch(err => {
         console.log(err);
@@ -79,7 +79,7 @@ export class DataService {
       // file does not exist => create the file
       const defaultRepositoryConfig: AppAccounts = InitializeAccountConfig(account);
       const createStatus = await this.fileSystemService
-      .createFile(account.id, defaultRepositoryConfig, DefineCommon.DIR_ACCOUNTS());
+      .createFile(account.id.toString(), defaultRepositoryConfig, DefineCommon.DIR_ACCOUNTS());
 
       if (!createStatus.status) {
         return false;
@@ -164,7 +164,8 @@ export class DataService {
       }
     }
 
-    return await this.fileSystemService.updateFileContext<AppAccounts>(account.id, { account }, DefineCommon.DIR_ACCOUNTS()).then(
+    return await this.fileSystemService
+    .updateFileContext<AppAccounts>(account.id.toString(), { account }, DefineCommon.DIR_ACCOUNTS()).then(
       resolve => resolve.status
     );
   }

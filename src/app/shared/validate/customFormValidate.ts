@@ -36,7 +36,6 @@ export function isTypeAccount(account: object): ValidatorFn {
 export function shouldNotExistInArray(array: string[], sourceName: string = 'array') {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const value = control.value;
-
     const isMatch = array.some(toCheck => {
       return value === toCheck;
     });

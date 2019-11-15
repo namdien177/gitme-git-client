@@ -28,7 +28,7 @@ export class AccountListService {
     return this.query.getAll();
   }
 
-  getOneSync(idAccount: string) {
+  getOneSync(idAccount: number) {
     return this.query.getEntity(idAccount);
   }
 

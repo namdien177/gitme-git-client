@@ -162,7 +162,7 @@ export class GitService {
     let urlRemote = cloneURL;
     directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);
     if (credentials) {
-      urlRemote = this.utilities.addCredentialsToRemote(cloneURL, credentials);
+      urlRemote = this.utilities.addOauthTokenToRemote(cloneURL, credentials.oauth_token);
     }
     return git().clone(urlRemote, directory);
   }
@@ -176,7 +176,7 @@ export class GitService {
     const updateRepository = { ...repository };
     const remoteRepositoryReturn: RepositoryRemotes[] = [];
     const remoteBranchesReturn: RepositoryBranchSummary[] = [];
-    if (!this.isRemoteAvailable(repository)) {
+    if (!repository.remote) {
       updateRepository.remote = [];
     }
 
@@ -214,7 +214,7 @@ export class GitService {
   }
 
   async fetchInfo(repository: Repository, credentials: Account, branch: RepositoryBranchSummary) {
-    if (!branch.tracking) {
+    if (!branch.tracking || !branch.tracking.fetch) {
       return {
         fetchData: null,
         repository
@@ -224,7 +224,7 @@ export class GitService {
     const { directory } = repository;
     let urlRemote = branch.tracking.fetch;
     if (!!credentials) {
-      urlRemote = this.utilities.addCredentialsToRemote(urlRemote, credentials);
+      urlRemote = this.utilities.addOauthTokenToRemote(urlRemote, credentials.oauth_token);
     }
     const data = await this.gitInstance(directory).fetch(urlRemote);
     return {
@@ -234,7 +234,6 @@ export class GitService {
   }
 
   /**
-   * TODO: fetching all remotes, branches and status of current branch. If no branch is selected, default fetching master
    * @param directory
    */
   async getBranchTracking(directory: string) {
@@ -312,8 +311,8 @@ export class GitService {
     [properties: string]: string
   }) {
     const instanceGit = await this.gitInstance(repository.directory);
-    await instanceGit.addConfig('user.name', account.name_local);
-    await instanceGit.addConfig('user.email', account.username);
+    await instanceGit.addConfig('user.name', account.name);
+    await instanceGit.addConfig('user.email', account.email);
     return instanceGit.commit(message, fileList, option);
   }
 
@@ -364,6 +363,11 @@ export class GitService {
     return await this.getStatusOnBranch(repository);
   }
 
+  /**
+   * STATUS: DONE
+   * @param repository
+   * @param files
+   */
   async revert(repository: Repository, files: string[]) {
     if (files.length === 0) {
       // reset hard
@@ -378,6 +382,11 @@ export class GitService {
 
   }
 
+  /**
+   * TODO: Investigate special added files
+   * @param repository
+   * @param filePath
+   */
   async getDiffOfFile(repository: Repository, filePath: string) {
     return await this.gitInstance(repository.directory).diff(
       ['--', filePath]
@@ -405,11 +414,21 @@ export class GitService {
     ]);
   }
 
+  /**
+   * STATUS: DONE
+   * @param repository
+   * @param filePath
+   */
   async isFileIgnored(repository: Repository, ...filePath: string[]) {
     return this.gitInstance(repository.directory)
     .checkIgnore([...filePath]);
   }
 
+  /**
+   * STATUS: DONE
+   * @param repository
+   * @param relativeFilePath
+   */
   async addFilesToIgnore(repository: Repository, ...relativeFilePath: string[]) {
     const rootIgnore = pathNode.join(repository.directory, '.gitignore');
 
@@ -437,6 +456,11 @@ export class GitService {
     }
   }
 
+  /**
+   * STATUS: DONE
+   * @param repository
+   * @param filePaths
+   */
   async addExtensionToIgnore(repository: Repository, ...filePaths: string[]) {
     const rootIgnore = pathNode.join(repository.directory, '.gitignore');
 
@@ -460,8 +484,18 @@ export class GitService {
     return ignoreStatus;
   }
 
-  isRemoteAvailable(repository: Repository) {
-    return !!repository.remote;
+  isFetchRemoteAvailable(repository: Repository) {
+    if (!repository || !repository.remote || repository.remote.length === 0) {
+      return false;
+    }
+    return !!repository.remote.find(any => any.fetch != null);
+  }
+
+  isPullRemoteAvailable(repository: Repository) {
+    if (!repository || !repository.remote || repository.remote.length === 0) {
+      return false;
+    }
+    return !!repository.remote.find(any => any.push != null);
   }
 
   private findBranchFromListBranch(branchToFind: RepositoryBranchSummary, listBranch: RepositoryBranchSummary[]) {
@@ -508,19 +542,5 @@ export class GitService {
     });
 
     return branchTracking;
-  }
-
-  private getURLRemoteFromListGitRemotes(remoteInfo: {
-    refs: {
-      fetch: string;
-      push: string;
-    },
-    [key: string]: any
-  }, credentials?: Account) {
-    if (credentials) {
-      return this.utilities.addCredentialsToRemote(remoteInfo.refs.fetch, credentials);
-    } else {
-      return remoteInfo.refs.fetch;
-    }
   }
 }
