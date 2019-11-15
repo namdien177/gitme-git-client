@@ -36,6 +36,31 @@
         <span class="text-nowrap">
             {{activeBranch?.name}}
         </span>
+      </div>
+    </div>
+
+    <gitme-repo-branches *ngIf="isBranchBoxOpen"
+                         [(branches)]="branches"
+                         class="gm--branches-list"></gitme-repo-branches>
+  </div>
+
+  <div class="function gm--push" (click)="actionOnBranch()">
+    <div class="inner-title raw">
+      <div class="title-secondary text-muted">
+        Action
+      </div>
+      <div class="title">
+        <span class="text-nowrap">
+          <ng-container *ngIf="statusSummary?.ahead > 0 && statusSummary?.behind === 0">
+            Push the changes
+          </ng-container>
+          <ng-container *ngIf="statusSummary?.ahead >= 0 && statusSummary?.behind > 0">
+            Pull from remotes
+          </ng-container>
+          <ng-container *ngIf="statusSummary?.ahead ===0 && statusSummary?.behind ===0">
+            Fetch changes from remote
+          </ng-container>
+        </span>
         <div class="status">
           <div *ngIf="statusSummary?.behind > 0"
                class="badge badge-pill badge-secondary bg-info pull-request">
@@ -50,14 +75,6 @@
         </div>
       </div>
     </div>
-
-    <gitme-repo-branches *ngIf="isBranchBoxOpen"
-                         [(branches)]="branches"
-                         class="gm--branches-list"></gitme-repo-branches>
-  </div>
-
-  <div class="function gm--push">
-
   </div>
 
   <div class="function gm--settings">

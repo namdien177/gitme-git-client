@@ -4,10 +4,12 @@ import { RepositoryBranchSummary } from './repository-branch.model';
 import { RepositoryBranchesQuery } from './repository-branches.query';
 import { GitService } from '../../../../services/features/git.service';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileStatusSummaryView } from '../repository-status';
+import { Account, AccountListService } from '../account-list';
+import { UtilityService } from '../../../utilities/utility.service';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
@@ -15,7 +17,9 @@ export class RepositoryBranchesService {
   constructor(
     private store: RepositoryBranchesStore,
     private query: RepositoryBranchesQuery,
-    private gitService: GitService
+    private gitService: GitService,
+    private accountService: AccountListService,
+    private utilities: UtilityService
   ) {
   }
 
@@ -96,6 +100,63 @@ export class RepositoryBranchesService {
   }
 
   /**
+   * TODO: check this
+   * @param repository
+   * @param branch
+   * @param option
+   */
+  push(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
+    // get account
+    const credentials: Account = this.accountService.getOneSync(
+      repository.credential.id_credential
+    );
+
+    const remote = branch.tracking.push;
+    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+
+    if (branch.has_remote) {
+      // normal push
+      return fromPromise(
+        this.gitService.push(repository.directory, branch.name, OAuthRemote)
+      );
+    } else {
+      // perform upstream
+      return fromPromise(
+        this.gitService.pushUpStream(repository.directory, branch.name, OAuthRemote)
+      );
+    }
+
+
+    // // If the repository does not contain any remote => retrieve a full update
+    // return fromPromise(
+    //   this.gitService.updateRemotesRepository(repository, branches)
+    // )
+    // .pipe(
+    //   switchMap(updateData => {
+    //     repository = updateData.repository;
+    //     branches = updateData.branches;
+    //     const activeBranch = updateData.branches.find(branch => branch.id === updateData.activeBranch);
+    //
+    //     this.repositoryBranchesService.set(branches);
+    //     this.repositoryBranchesService.setActiveID(updateData.activeBranch);
+    //     const retrieveBranchRemotePush = repository.remote.find(remote => remote.id === updateData.activeBranch);
+    //
+    //     return of({
+    //       pushURL: retrieveBranchRemotePush.push,
+    //       branchName: activeBranch.name
+    //     });
+    //   }),
+    //   switchMap(status => {
+    //     if (status.pushURL) {
+    //       // this.gitService.push(repository, status.pushURL, credential, option);
+    //     }
+    //     return of(true);
+    //   }),
+    //   tap(() => this.updateExistingRepositoryOnLocalDatabase(repository)),
+    // );
+  }
+
+  /**
    * TODO: check message and re-stash
    * @param repository
    * @param message
@@ -147,6 +208,7 @@ export class RepositoryBranchesService {
   }
 
   /**
+   * STATUS: DONE
    * Change the name of selected branch
    * @param repository
    * @param branch
@@ -157,7 +219,8 @@ export class RepositoryBranchesService {
   async changeName(
     repository: Repository,
     branch: RepositoryBranchSummary, newName: string,
-    removeOnRemote: boolean, pushToRemote: boolean) {
+    removeOnRemote: boolean, pushToRemote: boolean
+  ) {
     // git branch -m new-name
     // git push origin old-name -d
     // git push origin -u new-name
@@ -168,6 +231,15 @@ export class RepositoryBranchesService {
       pushRemote: null,
     };
 
+    // get account
+    const credentials: Account = this.accountService.getOneSync(
+      repository.credential.id_credential
+    );
+
+    // Use remote of old branch
+    const remote = branch.tracking.push;
+    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+
     status.changeName = await this.gitService.branch(repository.directory, ...optionOnLocal);
 
     if (branch.has_remote) {
@@ -177,7 +249,7 @@ export class RepositoryBranchesService {
         status.removeRemote = await this.gitService.push(
           repository.directory,
           branch.name,
-          branch.tracking.name,
+          OAuthRemote,
           ['-d']
         );
       }
@@ -186,7 +258,7 @@ export class RepositoryBranchesService {
         status.pushRemote = await this.gitService.pushUpStream(
           repository.directory,
           newName,
-          'origin'
+          OAuthRemote
         );
       }
     }

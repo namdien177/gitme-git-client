@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { distinctUntilChanged, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
@@ -80,11 +80,28 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     }
   }
 
+  actionOnBranch() {
+    if (!this.statusSummary) {
+      return;
+    }
+    if (this.statusSummary.ahead > 0 && this.statusSummary.behind === 0) {
+      // Push changes
+      this.pushRemote();
+    } else if (this.statusSummary.ahead >= 0 && this.statusSummary.behind > 0) {
+      // Pull changes
+    } else {
+      // Fetch
+      if (this.repository && this.activeBranch) {
+        this.fetchRemote();
+      }
+    }
+  }
+
   /**
-   * Fetching every 20 second.
+   * Fetching every 30 second.
    * @param loopDuration
    */
-  private loopRefreshBranchStatus(loopDuration = 20000) {
+  private loopRefreshBranchStatus(loopDuration = 30000) {
     interval(loopDuration)
     .pipe(
       takeUntil(this.componentDestroyed),
@@ -162,5 +179,27 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     .subscribe(status => {
       this.statusSummary = status;
     });
+  }
+
+  private fetchRemote() {
+    // TODO set loading state
+    this.repositoriesService.fetch(
+      { ...this.repository } as Repository,
+      { ...this.activeBranch } as RepositoryBranchSummary
+    ).pipe(
+      map(() => this.repositoryBranchesService.updateAll(this.repository)),
+      switchMap(() => this.repositoriesService.getBranchStatus(this.repository))
+    ).subscribe((status) => {
+      this.statusSummary = status;
+      this.repositoryStatusService.set(status);
+    });
+  }
+
+  private pushRemote() {
+    this.repositoryBranchesService.push(this.repository, this.activeBranch).subscribe(
+      () => {
+        console.log('pushed');
+      }
+    );
   }
 }

@@ -36,7 +36,7 @@ export class AppComponent {
      */
     this.applicationStateService.observeApplicationState()
     .pipe(
-      takeWhile(state => !state.isLosingFocus),
+      distinctUntilChanged(),
       switchMap(() => this.watchingRepository()),
       switchMap(() => this.getActiveBranch()),
       switchMap(() => this.fetch()),
@@ -45,6 +45,7 @@ export class AppComponent {
     .subscribe((status: StatusSummary) => {
       this.repositoryStatusService.set(status);
     });
+    this.applicationStateService.setFocus();
   }
 
   listenerFocus() {

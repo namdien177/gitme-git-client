@@ -95,7 +95,6 @@ export class RepositoriesService {
           const updatedBranch = await this.gitService.getBranchInfo(repository.directory, repository.branches);
           // update local file
           if (!compareBranchesArray(repository.branches, updatedBranch)) {
-            console.log('Updated branch list');
             await this.dataService.updateRepositoryData(repository, true);
           }
           repository.branches = updatedBranch;
@@ -207,18 +206,11 @@ export class RepositoriesService {
   /**
    * STATUS: DONE
    * @param repository
-   * @param setLoading
    */
-  getBranchStatus(repository: Repository, setLoading = false) {
-    if (setLoading) {
-      this.setLoading();
-    }
+  getBranchStatus(repository: Repository) {
     return fromPromise(this.gitService.getStatusOnBranch(repository))
     .pipe(
       map(status => {
-        if (setLoading) {
-          this.finishLoading();
-        }
         return status;
       })
     );
@@ -249,47 +241,6 @@ export class RepositoriesService {
   }
 
   /**
-   * TODO: check this
-   * @param repository
-   * @param branches
-   * @param option
-   */
-  push(repository: Repository, branches: RepositoryBranchSummary[], option?: { [git: string]: string }) {
-    // get account
-    const credential: Account = this.accountListService.getOneSync(
-      repository.credential.id_credential
-    );
-
-    // If the repository does not contain any remote => retrieve a full update
-    return fromPromise(
-      this.gitService.updateRemotesRepository(repository, branches)
-    )
-    .pipe(
-      switchMap(updateData => {
-        repository = updateData.repository;
-        branches = updateData.branches;
-        const activeBranch = updateData.branches.find(branch => branch.id === updateData.activeBranch);
-
-        this.repositoryBranchesService.set(branches);
-        this.repositoryBranchesService.setActiveID(updateData.activeBranch);
-        const retrieveBranchRemotePush = repository.remote.find(remote => remote.id === updateData.activeBranch);
-
-        return of({
-          pushURL: retrieveBranchRemotePush.push,
-          branchName: activeBranch.name
-        });
-      }),
-      switchMap(status => {
-        if (status.pushURL) {
-          // this.gitService.push(repository, status.pushURL, credential, option);
-        }
-        return of(true);
-      }),
-      tap(() => this.updateExistingRepositoryOnLocalDatabase(repository)),
-    );
-  }
-
-  /**
    * Fetching data
    * @param repository
    * @param branch
@@ -309,9 +260,6 @@ export class RepositoriesService {
       distinctUntilChanged(),
       switchMap(res => {
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
-      }),
-      tap(() => {
-        this.load();
       })
     );
   }
