@@ -10,6 +10,7 @@ import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { BranchRenameComponent } from '../branch-rename/branch-rename.component';
 import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
+import { Account, AccountListService } from '../../../../state/DATA/account-list';
 
 @Component({
   selector: 'gitme-branch-options',
@@ -19,6 +20,7 @@ import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
 export class BranchOptionsComponent implements OnInit {
 
   private currentActiveBranch: RepositoryBranchSummary = null;
+  private currentAccount: Account = null;
 
   constructor(
     private _bottomSheetRef: MatBottomSheetRef<BranchOptionsComponent>,
@@ -30,8 +32,10 @@ export class BranchOptionsComponent implements OnInit {
     private matDialog: MatDialog,
     private repositoryBranchService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
+    private accountService: AccountListService
   ) {
     this.currentActiveBranch = this.repositoryBranchService.getActive();
+    this.currentAccount = this.accountService.getOneSync(this.data.repository.credential.id_credential);
   }
 
   get isMaster() {

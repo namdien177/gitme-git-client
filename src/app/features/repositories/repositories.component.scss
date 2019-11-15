@@ -109,10 +109,8 @@
         padding: 0.15rem 0.3rem;
         font-size: 0.6rem;
         line-height: 0.6rem;
-
-        &:not(:first-child) {
-          margin-left: 0.5rem;
-        }
+        border-radius: 4px;
+        margin-left: 0.5rem;
       }
     }
   }
