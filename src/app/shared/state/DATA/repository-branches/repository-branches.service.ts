@@ -24,7 +24,7 @@ export class RepositoryBranchesService {
    * Load branches information of a repository.
    * @param repository
    */
-  async load(repository: Repository) {
+  async updateAll(repository: Repository) {
     const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
     this.set(repoSum);
   }
@@ -36,11 +36,9 @@ export class RepositoryBranchesService {
    * @param branch
    */
   checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
-    this.setLoading();
     return fromPromise(this.gitService.switchBranch(repo, branch.name))
     .pipe(
       map(status => {
-        this.finishLoading();
         return status;
       })
     );
@@ -249,12 +247,7 @@ export class RepositoryBranchesService {
   }
 
   selectActive() {
-    this.setLoading();
-    return this.query.selectActive().pipe(
-      tap(() => {
-        this.finishLoading();
-      })
-    );
+    return this.query.selectActive();
   }
 
   getActive() {
@@ -267,13 +260,5 @@ export class RepositoryBranchesService {
 
   setActiveID(branchID: string) {
     this.store.setActive(branchID);
-  }
-
-  setLoading() {
-    this.store.setLoading(true);
-  }
-
-  finishLoading() {
-    this.store.setLoading(false);
   }
 }

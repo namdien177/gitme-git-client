@@ -92,17 +92,6 @@ try {
     }
   });
 
-  app.on('browser-window-focus', (event, window) => {
-    console.log('browser-window-focus', window.webContents.id);
-  });
-  app.on('browser-window-blur', (event, window) => {
-    if (win.webContents.isDevToolsFocused()) {
-      console.log('Ignore this case');
-    } else {
-      console.log('browser-window-blur', window.webContents.id);
-    }
-  });
-
 } catch (e) {
   // Catch Error
   // throw e;
