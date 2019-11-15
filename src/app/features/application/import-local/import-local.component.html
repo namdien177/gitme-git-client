@@ -53,38 +53,41 @@
     <h2 class="weight-lighter">Repository Repository</h2>
     <div class="btn--section">
       <button (click)="switchAccountChooseMode(true)"
-              [class.bg-success]="isExistingAccount"
-              [class.bg-transparent]="!isExistingAccount"
+              [class.bg-success]="isListAccountTab"
+              [class.bg-transparent]="!isListAccountTab"
               class="text-white"
-              mat-flat-button>
+              mat-flat-button
+              type="button">
         Saved Account
       </button>
       <button (click)="switchAccountChooseMode(false)"
-              [class.bg-success]="!isExistingAccount"
-              [class.bg-transparent]="isExistingAccount"
+              [class.bg-success]="!isListAccountTab"
+              [class.bg-transparent]="isListAccountTab"
               class="text-white"
-              mat-flat-button>
+              mat-flat-button
+              type="button">
         New Account
       </button>
     </div>
-    <ng-container *ngIf="isExistingAccount">
+    <ng-container *ngIf="isListAccountTab">
       <gitme-credential-list (accountSelectedChange)="listenAccount($event)">
       </gitme-credential-list>
     </ng-container>
 
-    <ng-container *ngIf="!isExistingAccount">
-      <gitme-credential-input (accountNewChange)="listenAccount($event)">
+    <ng-container *ngIf="!isListAccountTab">
+      <gitme-credential-input (accountNewChange)="listenAccount($event, true)">
       </gitme-credential-input>
     </ng-container>
   </div>
   <div class="confirmation-action">
-    <button (click)="cancel()" class="bg-transparent" mat-flat-button>
+    <button (click)="cancel()" class="bg-transparent" mat-flat-button type="button">
       Cancel
     </button>
     <button (click)="submitNewRepository()"
             [disabled]="formRegisterRepository.invalid || needCreateNewGitDirectory || formRegisterRepository.pending"
             color="primary"
-            mat-raised-button>
+            mat-raised-button
+            type="button">
       Confirm
     </button>
   </div>

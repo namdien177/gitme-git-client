@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Account } from '../state/DATA/account-list';
 import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
@@ -93,19 +92,20 @@ export class UtilityService {
     return nameWithDotGit.slice(0, nameWithDotGit.length - 4);
   }
 
-  addCredentialsToRemote(remoteURL: string, credentials: Account, isHTTPS: boolean = true) {
+  // TODO: change
+  addOauthTokenToRemote(remoteURL: string, token: string, isHTTPS: boolean = true) {
     if (isHTTPS) {
       const splitStr = remoteURL.split('//');
-      const userSafe = this.gitStringSafe(credentials.username);
-      const pwdSafe = this.gitStringSafe(this.securityService.decryptAES(credentials.password));
+      const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(token));
+
       let remoteCredentials = '';
-      splitStr.forEach((stringRemote, index) => {
-        remoteCredentials += stringRemote;
+      splitStr.forEach((parts, index) => {
+        remoteCredentials += parts;
         if (index !== splitStr.length - 1) {
           remoteCredentials += '//';
         }
         if (index === 0) {
-          remoteCredentials += userSafe + ':' + pwdSafe + '@';
+          remoteCredentials += tokenDecrypted + '@';
         }
       });
       return remoteCredentials;

@@ -19,7 +19,6 @@ import { DataService } from '../features/data.service';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService implements OnDestroy {
-  ipcRenderer: typeof ipcRenderer;
   webFrame: typeof webFrame;
   remote: typeof remote;
   childProcess: typeof childProcess;
@@ -38,7 +37,6 @@ export class ElectronService implements OnDestroy {
   ) {
     // Conditional imports
     if (ElectronService.isElectron()) {
-      this.ipcRenderer = electronNode.ipcRenderer;
       this.webFrame = electronNode.webFrame;
       this.remote = electronNode.remote;
       this.window = electronNode.remote.getCurrentWindow();
@@ -107,7 +105,7 @@ export class ElectronService implements OnDestroy {
     }
   }
 
-  async initializeAccountsFromLocalDatabase(account_config: string[]) {
+  async initializeAccountsFromLocalDatabase(account_config: number[]) {
     this.accountList.reset();
     if (!!account_config && account_config.length > 0) {
       /**
@@ -143,11 +141,6 @@ export class ElectronService implements OnDestroy {
   }
   loadUrl(url) {
     this.window.loadURL(url);
-  }
-
-  callLoginGithub() {
-    const val = ipcRenderer.sendSync('github-authenticate', 'yes');
-    console.log(val);
   }
 
   private setupUUID() {

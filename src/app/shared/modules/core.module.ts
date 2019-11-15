@@ -11,6 +11,7 @@ import { SmallLoadComponent } from '../components/UI/small-load/small-load.compo
 import { MaterialModule } from './material.module';
 import { SectionLoadComponent } from '../components/UI/section-load/section-load.component';
 import { SharedPipeModule } from '../pipe/shared-pipe.module';
+import { GithubApiService } from '../../services/features/github-api.service';
 
 const importModules = [];
 const exportModules = [];
@@ -27,7 +28,8 @@ const providers = [
   SecurityService,
   FileSystemService,
   UtilityService,
-  GitService
+  GitService,
+  GithubApiService
 ];
 
 const declareComps = [
