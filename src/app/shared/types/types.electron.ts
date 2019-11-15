@@ -34,3 +34,5 @@ export const processNode: typeof process = window.require('process');
 export const uuidNode: typeof uuid = window.require('uniqid');
 export const pathNode: typeof path = window.require('path');
 export const chokidarNode: typeof chokidar = window.require('chokidar');
+export const appNode = require('electron').remote.app;
+export const webContentsNode = require('electron').remote.getCurrentWebContents();

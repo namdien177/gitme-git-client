@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { distinctUntilChanged, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
-import { FileWatchesService } from '../../shared/state/system/File-Watches';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
 import { RepositoryStatusService } from '../../shared/state/DATA/repository-status';
 
@@ -31,12 +30,11 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
-    private fileWatchesService: FileWatchesService,
   ) {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
-    this.watchingBranch();          // Observing repository
-    // this.watchingFileChanges();     // Observing file changes by chokidar
+    this.watchingBranch();          // Observing branch
+    this.watchingStatus();          // Observing branch status
     this.loopRefreshBranchStatus(); // Loop to auto fetching
   }
 
@@ -83,11 +81,10 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Default looping 15s
-   * Fetching and retrieve status for every 5 second.
+   * Fetching every 20 second.
    * @param loopDuration
    */
-  private loopRefreshBranchStatus(loopDuration = 5000) {
+  private loopRefreshBranchStatus(loopDuration = 20000) {
     interval(loopDuration)
     .pipe(
       takeUntil(this.componentDestroyed),
@@ -102,9 +99,10 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       distinctUntilChanged(),
-      switchMap((fetch) => {
-        console.log(fetch);
-        return this.observingBranchStatus();
+      switchMap(() => {
+        return this.repositoriesService.getBranchStatus(
+          this.repository
+        );
       }),
       distinctUntilChanged(),
     ).subscribe((status) => {
@@ -126,28 +124,15 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    * Retrieve current selected repository
    */
   private watchingRepository() {
-    this.repositoriesService.selectActive(true)
+    this.repositoriesService
+    .selectActive()
     .pipe(
-      distinctUntilChanged(),
-      switchMap((selectedRepo: Repository) => {
-        this.repository = selectedRepo;
-        // TODO: check chodikar
-        // if (!!this.repository) {
-        //   const newDir = this.repository.directory;
-        //   return fromPromise(this.fileWatchesService.switchTo(newDir));
-        // }
-        return of(null);
-      }),
-      tap(() => this.repositoryBranchesService.load(this.repository)),
-      switchMap(() => this.observingBranchStatus()),
-      distinctUntilChanged(),
+      takeUntil(this.componentDestroyed),
+      distinctUntilChanged()
     )
     .subscribe(
-      (status: StatusSummary) => {
-        this.statusSummary = status;
-        if (status) {
-          this.repositoryStatusService.set(status);
-        }
+      (selectedRepo: Repository) => {
+        this.repository = selectedRepo;
       }
     );
   }
@@ -159,6 +144,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     this.repositoryBranchesService
     .select()
     .pipe(
+      takeUntil(this.componentDestroyed),
       switchMap(listBranch => {
         this.branches = listBranch;
         return this.repositoryBranchesService.selectActive();
@@ -171,36 +157,10 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Start listening to changes by Chokidar for better performance and cross-platform support
-   */
-  private watchingFileChanges() {
-    this.fileWatchesService.selectChanges().pipe(
-      takeUntil(this.componentDestroyed),
-      takeWhile(() => this.isViewChangeTo === 'changes'),
-      debounceTime(200),
-      distinctUntilChanged(),
-      switchMap(() => this.observingBranchStatus()),
-      distinctUntilChanged()
-    ).subscribe(
-      (status: StatusSummary) => {
-        this.statusSummary = status;
-        if (status) {
-          this.repositoryStatusService.set(status);
-        }
-      }
-    );
-  }
-
-  /**
-   * Return the current status of branch
-   */
-  private observingBranchStatus() {
-    if (!!this.repository) {
-      return this.repositoriesService.getBranchStatus(
-        this.repository
-      );
-    }
-    return of(null);
+  private watchingStatus() {
+    this.repositoryStatusService.select()
+    .subscribe(status => {
+      this.statusSummary = status;
+    });
   }
 }

@@ -17,7 +17,7 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { compareBranchesArray } from '../../../utilities/utilityHelper';
+import { compareBranchesArray, deepEquals } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -356,7 +356,7 @@ export class RepositoriesService {
     }[] = [];
 
     for (const repository of repositories) {
-      if (repository.id === repositoryUpdate.id) {
+      if (repository.id === repositoryUpdate.id && !deepEquals(repository, repositoryUpdate)) {
         const status = await this.dataService.updateRepositoryData(repositoryUpdate, true);
         statusUpdate.push(
           {

@@ -85,7 +85,7 @@ export class BranchItemComponent implements OnInit {
     ).subscribe(
       branchReload => {
         console.log(branchReload);
-        this.repositoryBranchService.load(this.repository);
+        this.repositoryBranchService.updateAll(this.repository);
       }
     );
   }
