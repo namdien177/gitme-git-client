@@ -150,7 +150,6 @@ export class GitService {
       }
     });
 
-    console.log(branchesOutPut);
     return branchesOutPut;
   }
 
@@ -334,6 +333,34 @@ export class GitService {
       console.log(err);
       return false;
     });
+  }
+
+  async checkMergeStatus(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
+    const options = ['--no-ff', '--no-commit'];
+    /**
+     * Blindly merge then announce the changes
+     */
+    await this.gitInstance(repository.directory).merge([
+      branchToMerge.name,
+      branchTarget.name,
+      ...options
+    ]).catch(err => null);
+    // revert the branch merge status
+    // git merge --abort
+    // await this.gitInstance(repository.directory).merge(['--abort']);
+    return await this.getStatusOnBranch(repository);
+  }
+
+  async abortCheckMerge(repository: Repository) {
+    return await this.gitInstance(repository.directory).merge(['--abort']);
+  }
+
+  async confirmMerge(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
+    await this.gitInstance(repository.directory).merge([
+      branchToMerge.name,
+      branchTarget.name
+    ]).catch(err => null);
+    return await this.getStatusOnBranch(repository);
   }
 
   /**

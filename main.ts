@@ -8,12 +8,12 @@ let win, serve;
 const args = process.argv.slice(1);
 serve = args.some(val => val === '--serve');
 
-// Manhnd - github oauth app
+// namdien177 - github oauth app
 const GITHUB_OAUTH = {
   redirect_uri: 'http://localhost:4200',
   url: `https://github.com/login/oauth/authorize?`,
-  client_id: 'ef1953071ea4ad95f02d',
-  client_secret: '3010fcc008c4254c3f502201315241e2ecf717cd',
+  client_id: 'b2c1fa872f64704b94a4',
+  client_secret: '1e3c5e56102b01548e6f8b450eb7df8afc5b8b56',
   // Full access public & private repo.
   // More Infor: https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/
   scopes: ['repo']
@@ -89,6 +89,17 @@ try {
     // dock icon is clicked and there are no other windows open.
     if (win === null) {
       createWindow();
+    }
+  });
+
+  app.on('browser-window-focus', (event, window) => {
+    console.log('browser-window-focus', window.webContents.id);
+  });
+  app.on('browser-window-blur', (event, window) => {
+    if (win.webContents.isDevToolsFocused()) {
+      console.log('Ignore this case');
+    } else {
+      console.log('browser-window-blur', window.webContents.id);
     }
   });
 
@@ -200,7 +211,6 @@ async function handleUrl(codeUrl) {
         });
         response.on('error', function (err) {
           console.error('ERROR: ' + err.message);
-          // _.crashError = err;
           resolve(null);
         });
       });

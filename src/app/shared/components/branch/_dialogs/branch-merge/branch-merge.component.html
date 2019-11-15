@@ -5,19 +5,17 @@
   {{data.body}}
 </p>
 
-<form class="form-container">
-  <div class="search">
-    <input class="form-control form-control-dark form-control-float"
-           placeholder="Find branch"
-           type="text">
-  </div>
+<div class="check-status">
 
-  <div class="list-display">
-    <div *ngFor="let branch of displayBranches; let i = index; trackBy: trackBranchID"
-         [class.selected]="branch.id === selectedBranch?.id"
-         (click)="checkMerge(branch)"
-         class="row-d">
-      {{branch.name}}
-    </div>
-  </div>
-</form>
+</div>
+
+<div class="form-actions">
+  <button color="warn"
+          mat-flat-button>
+    {{data.decision.noText}}
+  </button>
+  <button color="primary"
+          mat-raised-button>
+    {{data.decision.yesText}}
+  </button>
+</div>

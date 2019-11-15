@@ -195,6 +195,30 @@ export class RepositoryBranchesService {
     return status;
   }
 
+  async mergeBranch(
+    repository: Repository,
+    fromBranch: RepositoryBranchSummary, toBranch: RepositoryBranchSummary
+  ) {
+
+  }
+
+  temporaryMerge(
+    repository: Repository,
+    fromBranch: RepositoryBranchSummary, toBranch: RepositoryBranchSummary
+  ) {
+    return fromPromise(
+      this.gitService.checkMergeStatus(repository, fromBranch, toBranch)
+    );
+  }
+
+  abortMerge(
+    repository: Repository
+  ) {
+    return fromPromise(
+      this.gitService.abortCheckMerge(repository)
+    );
+  }
+
   set(listBranch: RepositoryBranchSummary[]) {
     listBranch.sort(
       (branchA, branchB) => {

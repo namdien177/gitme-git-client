@@ -64,9 +64,6 @@ export class BranchItemComponent implements OnInit {
   }
 
   onRightClick() {
-    if (this.branchSummary.name === 'master') {
-      return;
-    }
     const dataPassing = {
       branch: this.branchSummary,
       repository: this.repository
@@ -93,27 +90,5 @@ export class BranchItemComponent implements OnInit {
     );
   }
 
-  openMerge() {
-    const dataMerge: YesNoDialogModel = {
-      title: 'Merge branch',
-      body: `Choosing a branch to merge into ${ this.branchSummary.name }`,
-      data: {
-        branch: this.branchSummary,
-        repository: this.repository
-      },
-      decision: {
-        noText: 'Cancel',
-        yesText: 'Merge'
-      }
-    };
 
-    const dialogMerge = this.matDialog.open(
-      BranchMergeComponent, {
-        width: '500px',
-        height: '600px',
-        data: dataMerge,
-        panelClass: 'bg-primary-black-mat-dialog',
-      }
-    );
-  }
 }
