@@ -6,7 +6,7 @@ export interface Repository {
   directory: string;
   credential?: RepositoryCredential;
   branches?: RepositoryBranchSummary[];
-
+  remote?: RepositoryRemotes[];
   tags?: CommitTags[];
 
   timestamp?: number;
@@ -22,7 +22,7 @@ export interface RepositoryRemotes {
 }
 
 export interface RepositoryCredential {
-  id_credential: string;
+  id_credential: number;
   name?: string;
 }
 

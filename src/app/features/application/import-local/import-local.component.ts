@@ -9,7 +9,7 @@ import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { SecurityService } from '../../../services/system/security.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
-import { IsAValidDirectory, IsRepository } from '../../../shared/validate/customFormValidate';
+import { IsAValidDirectory, IsRepository, shouldNotExistInArray } from '../../../shared/validate/customFormValidate';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
@@ -20,33 +20,15 @@ import { debounceTime } from 'rxjs/operators';
 export class ImportLocalComponent implements OnInit {
 
   formRegisterRepository: FormGroup;
-  isExistingAccount = true;
+  isListAccountTab = true;
 
   needCreateNewGitDirectory = false;
-
   repository_register_error = null;
 
-  /**
-   * Identify credentials
-   */
-  credentials: Account = null;
+  listAccount: Account[] = [];
+  listRepository: Repository[] = [];
 
   private readonly electron: typeof electronNode.remote;
-  private formFieldBuilder = {
-    repository_directory: [
-      osNode.homedir(), [
-        Validators.required,
-        IsAValidDirectory(this.fileSystemService)
-      ],
-      IsRepository(this.gitPackService),
-    ],
-    repo_name: [
-      '', [Validators.required, Validators.minLength(1)]
-    ],
-    repo_account: [
-      null, [Validators.required]
-    ]
-  };
 
   constructor(
     private formBuilder: FormBuilder,
@@ -60,6 +42,8 @@ export class ImportLocalComponent implements OnInit {
     private router: Router
   ) {
     this.electron = electronNode.remote;
+    this.listRepository = this.repositoryService.get();
+    this.listAccount = this.accountListService.getSync();
   }
 
   get repo_name() {
@@ -75,7 +59,22 @@ export class ImportLocalComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.formRegisterRepository = this.formBuilder.group(this.formFieldBuilder);
+    this.formRegisterRepository = this.formBuilder.group({
+      repository_directory: [
+        osNode.homedir(), [
+          Validators.required,
+          IsAValidDirectory(this.fileSystemService),
+          shouldNotExistInArray(this.listRepository.map(re => re.directory))
+        ],
+        IsRepository(this.gitPackService),
+      ],
+      repo_name: [
+        '', [Validators.required, Validators.minLength(1)]
+      ],
+      repo_account: [
+        null, [Validators.required]
+      ]
+    });
 
     this.formRegisterRepository.valueChanges.pipe(
       debounceTime(100)
@@ -108,7 +107,7 @@ export class ImportLocalComponent implements OnInit {
     }
   }
 
-  listenAccount(account: Account) {
+  listenAccount(account: Account, cached = false) {
     this.repo_account.setValue(account);
   }
 
@@ -116,19 +115,20 @@ export class ImportLocalComponent implements OnInit {
     if (this.formRegisterRepository.invalid) {
       return;
     }
-
     const credentialsInstance: Account = <Account>this.repo_account.value;
-
     const repositoryInstance: Repository = {
       id: this.securityService.randomID,
       name: this.repo_name.value,
       directory: this.repository_directory.value,
       credential: {
         id_credential: credentialsInstance.id,
-        name: credentialsInstance.name_local,
+        name: credentialsInstance.name,
       },
       selected: true,
     };
+
+    const isExistedOnDB = !!this.listAccount
+    .find(account => account.id === credentialsInstance.id);
 
     /**
      * Confirm this will:
@@ -137,7 +137,10 @@ export class ImportLocalComponent implements OnInit {
      * * Fetching new repository => reassign main branch.
      */
     fromPromise(this.repositoryService.insertNewRepository(
-      repositoryInstance, credentialsInstance, !this.isExistingAccount
+      repositoryInstance,
+      credentialsInstance,
+      !isExistedOnDB
+      // !this.isListAccountTab
     )).subscribe(
       addStatus => {
         this.repository_register_error = null;
@@ -150,7 +153,7 @@ export class ImportLocalComponent implements OnInit {
   }
 
   switchAccountChooseMode(value: boolean) {
-    this.isExistingAccount = value;
+    this.isListAccountTab = value;
     this.repo_account.reset(null);
   }
 

@@ -15,7 +15,7 @@ export interface AppConfig {
   /**
    * ID of the account config json file
    */
-  account_config: string[];
+  account_config: number[];
 }
 
 export function InitializeAppConfig(machineID: string) {

@@ -37,10 +37,4 @@ export class WelcomeScreenComponent implements OnInit {
   openGitHub() {
     this.electron.shell.openExternal('https://github.com/namdien177/gitme-git-client');
   }
-
-  loginGithub(){
-    // const url = this.fileSystemService.loginGithubUrl();
-    // this.electronService.loadUrl(url);
-    this.electronService.callLoginGithub();
-  }
 }

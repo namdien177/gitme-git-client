@@ -158,7 +158,7 @@ export class RepositoryAddLocalComponent implements OnInit {
       directory: this.repo_dir.value,
       credential: {
         id_credential: credentialsInstance.id,
-        name: credentialsInstance.name_local,
+        name: credentialsInstance.name,
       },
       selected: true,
     };
