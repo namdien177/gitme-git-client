@@ -5,9 +5,10 @@ import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/repository-branches';
 import { distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
+import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/system/Loading-Indicator';
 
 
 @Component({
@@ -19,12 +20,15 @@ export class AppComponent implements AfterViewInit {
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
 
+  loadingState: Observable<LoadingIndicatorState>;
+
   constructor(
     public applicationStateService: ApplicationStateService,
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private ld: LoadingIndicatorService
   ) {
     translate.setDefaultLang('en');
     this.listenerFocus();
@@ -50,6 +54,8 @@ export class AppComponent implements AfterViewInit {
         console.log(fetchStatus);
       }
     );
+
+    this.loadingState = this.ld.observeLoadState();
   }
 
   ngAfterViewInit(): void {

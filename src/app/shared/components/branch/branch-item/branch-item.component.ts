@@ -3,12 +3,11 @@ import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../sta
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { StatusSummary } from '../../../model/statusSummary.model';
-import { MatBottomSheet, MatDialog } from '@angular/material';
+import { MatBottomSheet } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
-import { BranchMergeComponent } from '../_dialogs/branch-merge/branch-merge.component';
+import { LoadingIndicatorService } from '../../../state/system/Loading-Indicator';
 
 @Component({
   selector: 'gitme-branch-item',
@@ -27,7 +26,7 @@ export class BranchItemComponent implements OnInit {
     private repositoryStatusService: RepositoryStatusService,
     private repositoriesService: RepositoriesService,
     private matBottomSheet: MatBottomSheet,
-    private matDialog: MatDialog
+    private loading: LoadingIndicatorService
   ) {
     this.repositoriesService.selectActive(false)
     .subscribe(repo => {
@@ -48,12 +47,18 @@ export class BranchItemComponent implements OnInit {
   checkoutBranches() {
     if (!this.branchSummary.current) {
       if (this.repository && this.branchSummary && this.status.files.length === 0) {
+        this.loading.setLoading(`Checkout branch ${ this.branchSummary.name }`);
         this.repositoryBranchService.checkoutBranch(
           this.repository,
           this.branchSummary
-        ).subscribe(
-          status => {
+        )
+        .pipe(
+          switchMap(() => this.repositoryBranchService.updateAll(this.repository))
+        )
+        .subscribe(
+          () => {
             // Branch checkout status
+            this.loading.setFinish();
           }
         );
       } else if (this.repository && this.status.files.length > 0) {

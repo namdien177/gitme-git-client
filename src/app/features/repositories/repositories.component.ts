@@ -9,6 +9,7 @@ import { RepositoryStatusService } from '../../shared/state/DATA/repository-stat
 import { MatDialog } from '@angular/material';
 import { YesNoDialogModel } from '../../shared/model/yesNoDialog.model';
 import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conflict-viewer/conflict-viewer.component';
+import { LoadingIndicatorService } from '../../shared/state/system/Loading-Indicator';
 
 @Component({
   selector: 'gitme-repositories',
@@ -34,7 +35,8 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private loading: LoadingIndicatorService
   ) {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
@@ -195,7 +197,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
   }
 
   private fetchRemote() {
-    // TODO set loading state
+    this.loading.setLoading('Fetching!');
     this.repositoriesService.fetch(
       { ...this.repository } as Repository,
       { ...this.activeBranch } as RepositoryBranchSummary
@@ -205,25 +207,26 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     ).subscribe((status) => {
       this.statusSummary = status;
       this.repositoryStatusService.set(status);
+      this.loading.setFinish();
     });
   }
 
   private pushRemote() {
+    this.loading.setLoading('Pushing to remote. Please wait.');
     this.repositoryBranchesService.push(this.repository, this.activeBranch).subscribe(
       () => {
-        console.log('pushed');
+        this.loading.setFinish();
       }
     );
   }
 
   private pullRemote() {
+    this.loading.setLoading('Pulling from remote.');
     this.repositoryBranchesService.pull(this.repository, this.activeBranch)
     .pipe(
       filter(pr => !!pr),
       switchMap(() => this.repositoriesService.gitStatus(this.repository)),
       catchError(error => {
-        console.log(error);
-        console.dir(error);
         // potential conflict
         return this.repositoriesService.gitStatus(this.repository);
       }),
@@ -237,6 +240,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         } else {
           console.log('pull complete!');
         }
+        this.loading.setFinish();
       }
     );
   }

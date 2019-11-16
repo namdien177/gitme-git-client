@@ -6,14 +6,8 @@
   transition: all 0.1s ease-out 0.1s;
 
   &:hover {
-    padding: 0 calc(40px + 0.5rem) 0 0;
-
     .card {
       background-color: $primary-black-darker;
-    }
-
-    .merge-btn {
-      opacity: 1;
     }
   }
 }
@@ -73,24 +67,5 @@
       align-self: center;
       font-size: 0.7rem;
     }
-  }
-}
-
-.merge-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-  opacity: 0;
-  font-size: 0.7rem;
-  line-height: 1rem;
-  width: 40px;
-  background: $primary-black-darker;
-
-  transition: opacity 0.2s;
-
-  i {
-    transform: rotate(180deg);
   }
 }

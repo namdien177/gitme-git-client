@@ -32,7 +32,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private gitDiffService: GitDiffService,
     private utilityService: UtilityService,
     private repositoryStatusService: RepositoryStatusService,
-    private router: Router
   ) {
   }
 

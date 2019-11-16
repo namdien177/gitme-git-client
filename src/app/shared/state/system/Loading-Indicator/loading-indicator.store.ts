@@ -2,25 +2,19 @@ import { Injectable } from '@angular/core';
 import { Store, StoreConfig } from '@datorama/akita';
 
 export interface LoadingIndicatorState {
-  repository: boolean;
-  branch: boolean;
-  fetch: boolean;
-  push: boolean;
-  pull: boolean;
+  load: boolean;
+  note: string;
 }
 
 export function createInitialState(): LoadingIndicatorState {
   return {
-    repository: false,
-    branch: false,
-    fetch: false,
-    push: false,
-    pull: false
+    load: false,
+    note: '',
   };
 }
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'Loading-Indicator' })
+@StoreConfig({ name: 'Loading-Indicator', resettable: true })
 export class LoadingIndicatorStore extends Store<LoadingIndicatorState> {
 
   constructor() {
