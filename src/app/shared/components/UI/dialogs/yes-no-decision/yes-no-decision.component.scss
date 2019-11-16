@@ -4,16 +4,3 @@
   display: flex;
   flex-direction: column;
 }
-
-.decision {
-  display: flex;
-  justify-content: flex-end;
-
-  > *:not(:last-child) {
-    margin-right: 0.5rem;
-  }
-}
-
-.body {
-  font-size: 0.8rem;
-}

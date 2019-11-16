@@ -3,13 +3,14 @@ import { RepositoryBranchesStore } from './repository-branches.store';
 import { RepositoryBranchSummary } from './repository-branch.model';
 import { RepositoryBranchesQuery } from './repository-branches.query';
 import { GitService } from '../../../../services/features/git.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileStatusSummaryView } from '../repository-status';
 import { Account, AccountListService } from '../account-list';
 import { UtilityService } from '../../../utilities/utility.service';
+import { FileStatusSummary } from '../../../model/FileStatusSummary';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
@@ -125,35 +126,31 @@ export class RepositoryBranchesService {
         this.gitService.pushUpStream(repository.directory, branch.name, OAuthRemote)
       );
     }
+  }
 
+  /**
+   * Perform a pull request
+   * @param repository
+   * @param branch
+   * @param options
+   */
+  pull(repository: Repository, branch: RepositoryBranchSummary, options?: { [git: string]: string }) {
+    // get account
+    const credentials: Account = this.accountService.getOneSync(
+      repository.credential.id_credential
+    );
 
-    // // If the repository does not contain any remote => retrieve a full update
-    // return fromPromise(
-    //   this.gitService.updateRemotesRepository(repository, branches)
-    // )
-    // .pipe(
-    //   switchMap(updateData => {
-    //     repository = updateData.repository;
-    //     branches = updateData.branches;
-    //     const activeBranch = updateData.branches.find(branch => branch.id === updateData.activeBranch);
-    //
-    //     this.repositoryBranchesService.set(branches);
-    //     this.repositoryBranchesService.setActiveID(updateData.activeBranch);
-    //     const retrieveBranchRemotePush = repository.remote.find(remote => remote.id === updateData.activeBranch);
-    //
-    //     return of({
-    //       pushURL: retrieveBranchRemotePush.push,
-    //       branchName: activeBranch.name
-    //     });
-    //   }),
-    //   switchMap(status => {
-    //     if (status.pushURL) {
-    //       // this.gitService.push(repository, status.pushURL, credential, option);
-    //     }
-    //     return of(true);
-    //   }),
-    //   tap(() => this.updateExistingRepositoryOnLocalDatabase(repository)),
-    // );
+    const remote = branch.tracking.fetch;
+    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+
+    if (branch.has_remote) {
+      // normal push
+      return fromPromise(
+        this.gitService.pull(repository.directory, branch.name, OAuthRemote, options)
+      );
+    } else {
+      return of(null);
+    }
   }
 
   /**
@@ -265,25 +262,33 @@ export class RepositoryBranchesService {
     return status;
   }
 
-  async mergeBranch(
-    repository: Repository,
-    fromBranch: RepositoryBranchSummary, toBranch: RepositoryBranchSummary
-  ) {
-
+  async continueMerge(repository: Repository, files: FileStatusSummary[]) {
+    // get account
+    const credentials: Account = this.accountService.getOneSync(
+      repository.credential.id_credential
+    );
+    // Take paths
+    const paths: string[] = this.utilities.extractFilePathFromGitStatus(files);
+    return fromPromise(
+      this.gitService.mergeContinue(repository, paths, credentials)
+    );
   }
 
-  temporaryMerge(
+  getMergeStatus(
     repository: Repository,
     fromBranch: RepositoryBranchSummary, toBranch: RepositoryBranchSummary
   ) {
     return fromPromise(
-      this.gitService.checkMergeStatus(repository, fromBranch, toBranch)
+      this.gitService.mergePreview(repository, fromBranch, toBranch)
     );
   }
 
   abortMerge(
     repository: Repository
   ) {
+    /**
+     * TODO: need refresh
+     */
     return fromPromise(
       this.gitService.abortCheckMerge(repository)
     );

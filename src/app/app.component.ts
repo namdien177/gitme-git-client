@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { appNode as app, webContentsNode as webContents } from './shared/types/types.electron';
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/repository-branches';
-import { distinctUntilChanged, switchMap, takeWhile } from 'rxjs/operators';
+import { distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
@@ -15,7 +15,7 @@ import { RepositoryStatusService } from './shared/state/DATA/repository-status';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
 
@@ -36,15 +36,24 @@ export class AppComponent {
      */
     this.applicationStateService.observeApplicationState()
     .pipe(
-      distinctUntilChanged(),
+      startWith({ isLosingFocus: false }),
       switchMap(() => this.watchingRepository()),
       switchMap(() => this.getActiveBranch()),
-      switchMap(() => this.fetch()),
-      switchMap(() => this.getBranchStatus())
+      switchMap(() => this.getBranchStatus()),
+      switchMap((status: StatusSummary) => {
+        this.repositoryStatusService.set(status);
+        return this.fetch();
+      }),
     )
-    .subscribe((status: StatusSummary) => {
-      this.repositoryStatusService.set(status);
-    });
+    .subscribe(
+      (fetchStatus) => {
+        console.log(fetchStatus);
+      }
+    );
+  }
+
+  ngAfterViewInit(): void {
+    this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
   }
 
@@ -73,13 +82,11 @@ export class AppComponent {
     return this.repositoriesService
     .selectActive(true)
     .pipe(
-      distinctUntilChanged(),
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
         return of(null);
       }),
       switchMap(() => this.repositoryBranchesService.updateAll(this.repository)),
-      distinctUntilChanged(),
     );
   }
 
@@ -88,7 +95,7 @@ export class AppComponent {
    */
   private getBranchStatus() {
     if (!!this.repository) {
-      return this.repositoriesService.getBranchStatus(
+      return this.repositoriesService.gitStatus(
         this.repository
       );
     }

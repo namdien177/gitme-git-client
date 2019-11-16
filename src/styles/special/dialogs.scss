@@ -3,3 +3,16 @@
 .p-2-option {
   padding: 1rem !important;
 }
+
+.decision {
+  display: flex;
+  justify-content: flex-end;
+
+  > *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+
+.body {
+  font-size: 0.8rem;
+}

@@ -27,7 +27,11 @@ export class CodeHighlightService {
 
   async getHighlighted(st: string, langType: string = 'typescript') {
     const prismLangConfig = await Grammar(langType);
-    return this.prismJS.highlight(st, prismLangConfig.grammar, prismLangConfig.lang);
+    if (prismLangConfig.grammar) {
+      return this.prismJS.highlight(st, prismLangConfig.grammar, prismLangConfig.lang);
+    }
+
+    return st;
   }
 
   async getDiffHTML(diffString: string) {
