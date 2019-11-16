@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { GitDiffService } from '../../../../shared/state/DATA/git-diff';
 import { GitDiffResult } from '../../../../shared/model/gitDiff.model';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'gitme-repo-changes',
@@ -18,11 +19,15 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.gitDiffService.getDiff().subscribe(
+    this.gitDiffService.getDiff()
+    .pipe(
+      distinctUntilChanged()
+    )
+    .subscribe(
       diffStatus => {
         if (!!diffStatus && !!diffStatus.diff) {
-          console.log(diffStatus);
           this.outputHTML = diffStatus.diff;
+          this.cd.detectChanges();
         } else {
           this.outputHTML = null;
         }

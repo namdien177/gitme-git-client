@@ -9,6 +9,10 @@ import * as moment from 'moment';
 import { RemoteWithRefs } from 'simple-git/typings/response';
 import { FileSystemService } from '../system/fileSystem.service';
 import { pathNode } from '../../shared/types/types.electron';
+import { PullResult } from '../../shared/model/PullResult';
+import * as util from 'util';
+import * as child_process from 'child_process';
+import { parseDiffCheckResult, parseMergeResult } from '../../shared/utilities/merge-tree-parser';
 
 @Injectable()
 export class GitService {
@@ -252,7 +256,7 @@ export class GitService {
     return this.retrieveBranchTrackingArray(remoteArray);
   }
 
-  async getStatusOnBranch(repository: Repository) {
+  async branchStatus(repository: Repository) {
     return this.gitInstance(repository.directory).status();
   }
 
@@ -262,7 +266,7 @@ export class GitService {
   }
 
   /**
-   * TODO: checking git issue for more info.
+   * TODO: might need to check more condition
    * @param directory
    * @param branchName
    * @param remoteType
@@ -277,6 +281,7 @@ export class GitService {
   }
 
   /**
+   * TODO: might need to check more condition
    * For pushing new branch to remote
    * @param directory
    * @param branchName
@@ -295,6 +300,16 @@ export class GitService {
       remoteType,
       branchName,
       defaultOptions
+    );
+  }
+
+  pull(
+    directory: string, branchName: string, remoteType = 'origin',
+    options?: { [key: string]: null | string | any }
+  ): Promise<PullResult> {
+    return this.gitInstance(directory).pull(
+      remoteType, branchName,
+      options
     );
   }
 
@@ -328,39 +343,74 @@ export class GitService {
     }
 
     return await this.gitInstance(repository.directory).checkout(branchName)
-    .then(resolve => true)
+    .then(() => true)
     .catch(err => {
       console.log(err);
       return false;
     });
   }
 
-  async checkMergeStatus(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
-    const options = ['--no-ff', '--no-commit'];
-    /**
-     * Blindly merge then announce the changes
-     */
-    await this.gitInstance(repository.directory).merge([
-      branchToMerge.name,
-      branchTarget.name,
-      ...options
-    ]).catch(err => null);
-    // revert the branch merge status
-    // git merge --abort
-    // await this.gitInstance(repository.directory).merge(['--abort']);
-    return await this.getStatusOnBranch(repository);
+  async checkConflict(repository: Repository, ...filePath: string[]) {
+    const options = ['--check'];
+    if (filePath.length > 0) {
+      options.concat(filePath);
+    }
+    const stringCheck = await this.gitInstance(repository.directory).diff(options);
+    return parseDiffCheckResult(stringCheck);
   }
 
+  /**
+   * STATUS: DONE
+   * @param repository
+   */
   async abortCheckMerge(repository: Repository) {
     return await this.gitInstance(repository.directory).merge(['--abort']);
   }
 
-  async confirmMerge(repository: Repository, branchToMerge: RepositoryBranchSummary, branchTarget: RepositoryBranchSummary) {
-    await this.gitInstance(repository.directory).merge([
-      branchToMerge.name,
-      branchTarget.name
-    ]).catch(err => null);
-    return await this.getStatusOnBranch(repository);
+  /**
+   * TODO finish this shit in 3 days?
+   * @param repository
+   * @param files
+   * @param account
+   * @param mergeInfo
+   */
+  async mergeContinue(
+    repository: Repository, files: string[], account: Account,
+    mergeInfo?: { branchFromName: string, branchToName: string }
+  ) {
+    // Actually this will resolve the conflicts by a new commit and push to remote.
+    // Yes. The concept is just outstanding!
+    let message = '';
+    if (!!mergeInfo) {
+      const { branchFromName, branchToName } = mergeInfo;
+      message = `Resolve conflict for merge request from branch ${ branchFromName } to ${ branchToName }`;
+    } else {
+      message = 'Resolve conflict';
+    }
+    await this.commit(repository, account, message, files, { '-i': null });
+    return this.branchStatus(repository);
+  }
+
+  async getMergeBase(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
+    return this.gitInstance(repository.directory).raw([
+      'merge-base',
+      branchFrom.name,
+      branchTo.name
+    ]);
+  }
+
+  async mergePreview(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
+    const baseTree = await this.getMergeBase(repository, branchFrom, branchTo);
+    let executeCommand = `git merge-tree ${ baseTree } ${ branchTo.name } ${ branchFrom.name }`;
+    if (executeCommand.includes('\n')) {
+      executeCommand = executeCommand.replace(/\n/g, '');
+    }
+    const promisifyScript = util.promisify(this.run_script);
+    const mergePreviewRawText = await promisifyScript({
+      command: executeCommand,
+      directory: repository.directory
+    }).then(text => text, error => error.toString());
+    return parseMergeResult(mergePreviewRawText);
   }
 
   /**
@@ -542,5 +592,39 @@ export class GitService {
     });
 
     return branchTracking;
+  }
+
+  // This function will output the lines from the script
+  // and will return the full combined output
+  // as well as exit code when it's done (using the callback).
+  // Modified to 2 params for easier in promisify
+  private run_script(dataExecute: { command: string, directory: string }, callback) {
+    const { command, directory } = dataExecute;
+    const child = child_process.spawn(command, undefined, {
+      shell: true, cwd: directory,
+    });
+    let dataEnd = '';
+    // You can also use a variable to save the output for when the script closes later
+    child.on('error', (error) => {
+      console.log(error);
+    });
+
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (data) => {
+      // Here is the output
+      data = data.toString();
+      dataEnd = data;
+    });
+
+    child.stderr.setEncoding('utf8');
+    child.on('close', (code) => {
+      // Here you can get the exit code of the script
+      switch (code) {
+        case 0:
+          console.log('end');
+          break;
+      }
+      callback(dataEnd);
+    });
   }
 }

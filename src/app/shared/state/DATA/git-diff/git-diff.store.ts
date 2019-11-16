@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { Store, StoreConfig } from '@datorama/akita';
 import { GitDiffResult } from '../../../model/gitDiff.model';
 
+export type diffChangeStatus = 'change' | 'new' | 'delete' | 'conflicted';
+
 export interface GitDiffState {
   diff: GitDiffResult;
   directory: string;
-  status: 'change' | 'new' | 'delete';
+  status: diffChangeStatus;
   commit?: {
     original: string;
     toCompare: string

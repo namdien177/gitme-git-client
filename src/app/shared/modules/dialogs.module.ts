@@ -11,6 +11,7 @@ import { SingleComponent as CommitOptionsSingleComponent } from '../components/c
 import { BranchCheckoutStashComponent } from '../components/branch/_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
 import { BranchRenameComponent } from '../components/branch/_dialogs/branch-rename/branch-rename.component';
 import { BranchMergeComponent } from '../components/branch/_dialogs/branch-merge/branch-merge.component';
+import { ConflictViewerComponent } from '../components/UI/dialogs/conflict-viewer/conflict-viewer.component';
 
 
 const dialogComps = [
@@ -24,6 +25,7 @@ const dialogComps = [
   BranchCheckoutStashComponent,
   BranchRenameComponent,
   BranchMergeComponent,
+  ConflictViewerComponent,
 ];
 
 @NgModule({

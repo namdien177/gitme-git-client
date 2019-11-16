@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { StatusSummary } from '../../../model/statusSummary.model';
-import { createInitialState, FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { ArrayLengthShouldLargerThan } from '../../../validate/customFormValidate';
@@ -10,7 +9,7 @@ import { MatDialog } from '@angular/material';
 import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
 import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
-import { switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { GitDiffService } from '../../../state/DATA/git-diff';
 
 @Component({
@@ -25,7 +24,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   isViewChangeToChange: EventEmitter<'changes' | 'history'> = new EventEmitter<'changes' | 'history'>();
 
   repository: Repository = null;
-  statusSummary: StatusSummary = createInitialState();
+  statusSummaryFileLength = 0;
   activeBranch: RepositoryBranchSummary = null;
 
   formCommitment: FormGroup;
@@ -41,8 +40,12 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     private utilitiesService: UtilityService,
     private gitDiffService: GitDiffService,
     public dialog: MatDialog,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef
   ) {
+    this.watchingRepository();
+    this.watchingBranch();
+    this.watchingSummary();
   }
 
   get title() {
@@ -62,9 +65,6 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     this.setupFormCommitment();
-    this.watchingRepository();
-    this.watchingBranch();
-    this.watchingSummary();
   }
 
   ngOnDestroy(): void {
@@ -209,8 +209,12 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private watchingSummary() {
     this.repositoryStatusService.select()
-    .subscribe(status => {
-      this.statusSummary = status;
+    .pipe(
+      distinctUntilChanged(),
+      map(summary => summary.files.length)
+    ).subscribe(changes => {
+      this.statusSummaryFileLength = changes;
+      this.cd.markForCheck();
     });
   }
 

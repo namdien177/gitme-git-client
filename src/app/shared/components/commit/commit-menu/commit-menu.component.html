@@ -19,10 +19,9 @@
   <div class="content">
     <div class="commit-flies">
       <gitme-commit-files (checkingFiles)="setNewFilesCommit($event)"
-                          (isAllFileChecked)="eventEmitCheckBoxFile($event)"
-                          *ngIf="statusSummary?.files?.length > 0">
+                          (isAllFileChecked)="eventEmitCheckBoxFile($event)">
       </gitme-commit-files>
-      <p *ngIf="statusSummary?.files?.length == 0"
+      <p *ngIf="statusSummaryFileLength == 0"
          class="text-muted text-center nonSelectable">
         No change file to be committed
       </p>
@@ -31,7 +30,7 @@
 
   <form [formGroup]="formCommitment" class="commitment">
     <div (click)="toggleCheckboxAllFile()"
-         *ngIf="statusSummary?.files?.length > 0"
+         *ngIf="statusSummaryFileLength > 0"
          class="files-checkAll">
       <div class="added-checkbox acomi-checkbox-control">
         <input [checked]="checkboxAllFileStatus"
@@ -48,7 +47,8 @@
         </label>
       </div>
       <span class="added-title">
-                Select All ({{statusSummary?.files?.length}} file{{statusSummary?.files?.length > 1 ? 's' : ''}})
+                Select All ({{statusSummaryFileLength}}
+        file{{statusSummaryFileLength > 1 ? 's' : ''}})
             </span>
     </div>
 
@@ -78,7 +78,7 @@
       </button>
     </div>
 
-    <div *ngIf="customOptionCommit" class="commitment-option-expanded">
+    <div *ngIf="!!customOptionCommit" class="commitment-option-expanded">
       <div class="option">
         <div class="option-title">
           <button (click)="openCommitOptions()"

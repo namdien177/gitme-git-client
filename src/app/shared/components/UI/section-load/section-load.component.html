@@ -1,1 +1,12 @@
-<p>section-load works!</p>
+<div class="container-load">
+  <div class="blur"></div>
+  <div class="lds-ellipsis">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+  <div class="message">
+    {{!!loadState.note ? loadState.note : 'Loading'}}
+  </div>
+</div>

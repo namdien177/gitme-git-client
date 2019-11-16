@@ -1,0 +1,43 @@
+<h2 class="weight-lighter m-0 mb-2">
+  {{data.title}}
+</h2>
+<p class="mt-0 mb-2 body text-muted">
+  {{data.body}}
+</p>
+
+<div class="list-file">
+  <div *ngFor="let fileDirectory of listConflicted; trackBy: trackByPath"
+       class="row">
+    <div class="resolve-status" [class.resolved]="fileDirectory.status">
+      <ng-container *ngIf="!fileDirectory.status">
+        <i class="fa fa-warning text-warning"></i>
+      </ng-container>
+      <ng-container *ngIf="fileDirectory.status">
+        <i class="fa fa-check-circle text-success"></i>
+      </ng-container>
+    </div>
+    <div class="file-path">
+      {{fileDirectory.path}}
+    </div>
+    <div class="folder">
+      <i class="fa fa-folder-open"></i>
+    </div>
+    <div class="copy">
+      <i class="fa fa-copy"></i>
+    </div>
+  </div>
+</div>
+
+<div class="decision">
+  <button (click)="decision(true)"
+          [disabled]="!resolvedConflict"
+          color="primary"
+          mat-raised-button>
+    {{data.decision.yesText}}
+  </button>
+  <button (click)="decision(false)"
+          class="bg-primary-black-darker"
+          mat-raised-button>
+    {{data.decision.noText}}
+  </button>
+</div>

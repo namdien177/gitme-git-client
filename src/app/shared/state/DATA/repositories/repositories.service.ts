@@ -207,8 +207,8 @@ export class RepositoriesService {
    * STATUS: DONE
    * @param repository
    */
-  getBranchStatus(repository: Repository) {
-    return fromPromise(this.gitService.getStatusOnBranch(repository))
+  gitStatus(repository: Repository) {
+    return fromPromise(this.gitService.branchStatus(repository))
     .pipe(
       map(status => {
         return status;

@@ -1,0 +1,70 @@
+@import "src/styles/theme";
+
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-file {
+  //display: flex;
+  //flex-direction: column;
+  height: max-content;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+
+  .row {
+    padding: 0.5rem 4.5rem 0.5rem 2.5rem;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    margin-bottom: 0.2rem;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: $primary-black-lighter;
+    }
+
+    .file-path {
+      font-size: 0.85rem;
+      line-height: 1rem;
+      user-select: all;
+    }
+
+    .folder, .copy, .resolve-status {
+      position: absolute;
+      height: 100%;
+      width: 2rem;
+      display: grid;
+      place-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+
+      i::before {
+        color: whitesmoke !important;
+      }
+    }
+
+    .folder {
+      right: 2rem;
+    }
+
+    .copy {
+      right: 0;
+    }
+
+    .resolve-status {
+      left: 0;
+
+      &.resolved {
+        i::before {
+          color: #00c851 !important;
+        }
+      }
+    }
+  }
+}

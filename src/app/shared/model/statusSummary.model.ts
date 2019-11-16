@@ -3,7 +3,7 @@ import { FileStatusSummary } from './FileStatusSummary';
 export class StatusSummary {
   ahead: number;
   behind: number;
-  conflicted: any[];
+  conflicted: string[];
   created: string[];
   current: string;
   deleted: any[];

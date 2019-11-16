@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { createInitialState, LoadingIndicatorState } from '../../../state/system/Loading-Indicator';
 
 @Component({
   selector: 'gitme-section-load',
@@ -7,8 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SectionLoadComponent implements OnInit {
 
-  constructor() {
-  }
+  @Input()
+  loadState: LoadingIndicatorState = createInitialState();
 
   ngOnInit() {
   }

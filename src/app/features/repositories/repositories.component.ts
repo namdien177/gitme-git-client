@@ -1,11 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { distinctUntilChanged, map, switchMap, takeUntil, takeWhile } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, map, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
 import { RepositoryStatusService } from '../../shared/state/DATA/repository-status';
+import { MatDialog } from '@angular/material';
+import { YesNoDialogModel } from '../../shared/model/yesNoDialog.model';
+import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conflict-viewer/conflict-viewer.component';
+import { LoadingIndicatorService } from '../../shared/state/system/Loading-Indicator';
 
 @Component({
   selector: 'gitme-repositories',
@@ -24,12 +28,15 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
   isViewChangeTo: 'changes' | 'history' = 'changes';
 
   private componentDestroyed: Subject<boolean> = new Subject<boolean>();
+  private conflictViewerOpened = false;
 
   constructor(
     private repoMenuService: RepositoriesMenuService,
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
+    private matDialog: MatDialog,
+    private loading: LoadingIndicatorService
   ) {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
@@ -89,6 +96,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       this.pushRemote();
     } else if (this.statusSummary.ahead >= 0 && this.statusSummary.behind > 0) {
       // Pull changes
+      this.pullRemote();
     } else {
       // Fetch
       if (this.repository && this.activeBranch) {
@@ -117,7 +125,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       }),
       distinctUntilChanged(),
       switchMap(() => {
-        return this.repositoriesService.getBranchStatus(
+        return this.repositoriesService.gitStatus(
           this.repository
         );
       }),
@@ -176,30 +184,105 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
 
   private watchingStatus() {
     this.repositoryStatusService.select()
+    .pipe(
+      tap(status => {
+        if (status.conflicted.length > 0 && !this.conflictViewerOpened) {
+          this.conflictViewer();
+        }
+      })
+    )
     .subscribe(status => {
       this.statusSummary = status;
     });
   }
 
   private fetchRemote() {
-    // TODO set loading state
+    this.loading.setLoading('Fetching!');
     this.repositoriesService.fetch(
       { ...this.repository } as Repository,
       { ...this.activeBranch } as RepositoryBranchSummary
     ).pipe(
       map(() => this.repositoryBranchesService.updateAll(this.repository)),
-      switchMap(() => this.repositoriesService.getBranchStatus(this.repository))
+      switchMap(() => this.repositoriesService.gitStatus(this.repository))
     ).subscribe((status) => {
       this.statusSummary = status;
       this.repositoryStatusService.set(status);
+      this.loading.setFinish();
     });
   }
 
   private pushRemote() {
+    this.loading.setLoading('Pushing to remote. Please wait.');
     this.repositoryBranchesService.push(this.repository, this.activeBranch).subscribe(
       () => {
-        console.log('pushed');
+        this.loading.setFinish();
       }
     );
+  }
+
+  private pullRemote() {
+    this.loading.setLoading('Pulling from remote.');
+    this.repositoryBranchesService.pull(this.repository, this.activeBranch)
+    .pipe(
+      filter(pr => !!pr),
+      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
+      catchError(error => {
+        // potential conflict
+        return this.repositoriesService.gitStatus(this.repository);
+      }),
+      tap(summary => this.repositoryStatusService.set(summary))
+    )
+    .subscribe(
+      (result: StatusSummary) => {
+        if (result.conflicted.length > 0) {
+          // having conflict, display model warning and prepare merge-continue
+          console.log('conflict');
+        } else {
+          console.log('pull complete!');
+        }
+        this.loading.setFinish();
+      }
+    );
+  }
+
+  private conflictViewer() {
+    this.conflictViewerOpened = true;
+    const dataPassing: YesNoDialogModel = {
+      title: 'Conflicts detected',
+      body: 'There are some conflicts that need to be resolved before proceeding.',
+      data: {
+        repository: this.repository,
+        branch: this.activeBranch
+      },
+      decision: {
+        yesText: 'Proceed commit',
+        noText: 'Abort',
+      }
+    };
+
+    this.matDialog.open(ConflictViewerComponent, {
+      width: '450px',
+      panelClass: 'bg-primary-black-mat-dialog',
+      data: dataPassing
+    }).afterClosed()
+    .pipe(
+      tap(() => {
+        this.repositoryStatusService.select();
+      }),
+      switchMap((decision: boolean) => {
+        if (decision) {
+          // continue to merge
+          const fileList = this.statusSummary.files;
+          return this.repositoryBranchesService.continueMerge(this.repository, fileList);
+        } else {
+          // abort
+          return this.repositoryBranchesService.abortMerge(this.repository);
+        }
+      })
+    )
+    .subscribe(() => {
+      this.conflictViewerOpened = false;
+      this.fetchRemote();
+    });
   }
 }

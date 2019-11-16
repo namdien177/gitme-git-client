@@ -38,7 +38,11 @@ export class BranchMergeComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    this.git.mergePreview(this.repository, this.branchFrom, this.branchTarget).then(
+      res => {
+        console.log(res);
+      }
+    );
   }
 
   trackBranchID(index: number, item: RepositoryBranchSummary) {
@@ -46,8 +50,8 @@ export class BranchMergeComponent implements OnInit {
   }
 
   testMerge(branch: RepositoryBranchSummary) {
-    this.git.checkMergeStatus(this.repository, this.branchFrom, this.branchTarget)
-    .then(stat => {
+    this.branchService.getMergeStatus(this.repository, this.branchFrom, this.branchTarget)
+    .subscribe(stat => {
       console.log(stat);
     });
   }

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { createInitialState, GitDiffState, GitDiffStore } from './git-diff.store';
+import { createInitialState, diffChangeStatus, GitDiffState, GitDiffStore } from './git-diff.store';
 import { GitDiffQuery } from './git-diff.query';
 import { CodeHighlightService } from '../../../../services/features/code-highlight.service';
 import { Observable } from 'rxjs';
 import { GitDiffResult } from '../../../model/gitDiff.model';
+import { deepEquals } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class GitDiffService {
@@ -18,7 +19,7 @@ export class GitDiffService {
   async setDiff(
     diff: string,
     fileDirectory: string,
-    status: 'change' | 'new' | 'delete' = 'change'
+    status: diffChangeStatus = 'change'
   ) {
     this.store.setLoading(true);
     let diffState: GitDiffResult = null;
@@ -28,12 +29,15 @@ export class GitDiffService {
       diffState = createInitialState().diff;
       status = 'new';
     }
-    this.store.setLoading(false);
-    this.store.update({
-      diff: diffState,
-      directory: fileDirectory,
-      status
-    });
+
+    if (!deepEquals(diffState, this.getDiffSync().diff)) {
+      this.store.setLoading(false);
+      this.store.update({
+        diff: diffState,
+        directory: fileDirectory,
+        status
+      });
+    }
   }
 
   setOversizeFile() {

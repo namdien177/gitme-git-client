@@ -11,7 +11,23 @@ export class LoadingIndicatorService {
   ) {
   }
 
-  loadRepository() {
+  setLoading(note?: string) {
+    this.store.update({
+      load: true,
+      note
+    });
+  }
 
+  setFinish() {
+    this.store.reset();
+  }
+
+  observeLoadState() {
+    return this.query.select();
+  }
+
+  getLoadState() {
+    return this.query.getValue();
   }
 }
+
