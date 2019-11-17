@@ -56,7 +56,6 @@ export class FileWatchesService implements OnDestroy {
         path: string,
         stats?: typeof fsNode.Stats
       ) => {
-        console.log(path);
         this.store.update({
           isChange: true,
           path: path,

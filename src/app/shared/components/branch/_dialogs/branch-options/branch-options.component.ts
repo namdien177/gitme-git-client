@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef, MatDialog } from '@angular/material';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
 import { StatusSummary } from '../../../../model/statusSummary.model';
@@ -11,6 +11,8 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { BranchRenameComponent } from '../branch-rename/branch-rename.component';
 import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
 import { Account, AccountListService } from '../../../../state/DATA/account-list';
+import { ComputedAction, MergeResult } from '../../../../model/merge.interface';
+import { LoadingIndicatorService } from '../../../../state/system/Loading-Indicator';
 
 @Component({
   selector: 'gitme-branch-options',
@@ -19,7 +21,9 @@ import { Account, AccountListService } from '../../../../state/DATA/account-list
 })
 export class BranchOptionsComponent implements OnInit {
 
-  private currentActiveBranch: RepositoryBranchSummary = null;
+  statusMerge: MergeResult = null;
+  mergeStatusLoading = false;
+  private readonly currentActiveBranch: RepositoryBranchSummary = null;
   private currentAccount: Account = null;
 
   constructor(
@@ -32,10 +36,16 @@ export class BranchOptionsComponent implements OnInit {
     private matDialog: MatDialog,
     private repositoryBranchService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
-    private accountService: AccountListService
+    private accountService: AccountListService,
+    private cb: ChangeDetectorRef,
+    private ld: LoadingIndicatorService
   ) {
     this.currentActiveBranch = this.repositoryBranchService.getActive();
     this.currentAccount = this.accountService.getOneSync(this.data.repository.credential.id_credential);
+  }
+
+  get computedAction() {
+    return ComputedAction;
   }
 
   get isMaster() {
@@ -47,6 +57,7 @@ export class BranchOptionsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.checkMergeCondition();
   }
 
   renameBranch() {
@@ -59,12 +70,17 @@ export class BranchOptionsComponent implements OnInit {
         remove: boolean;
         push: boolean;
       }) => {
+        this.ld.setLoading('Renaming branch');
         return this.repositoryBranchService.changeName(
           this.data.repository, this.data.branch, responseRename.name, responseRename.remove, responseRename.push
         );
+      }),
+      switchMap((data: { changeName, pushRemote, removeRemote }) => {
+        return this.repositoryBranchService.updateAll(this.data.repository);
       })
     )
-    .subscribe((data: { changeName, pushRemote, removeRemote }) => {
+    .subscribe(() => {
+      this.ld.setFinish();
       this._bottomSheetRef.dismiss('RELOAD');
     });
   }
@@ -76,7 +92,7 @@ export class BranchOptionsComponent implements OnInit {
       .pipe(
         switchMap((isDelete: boolean) => {
           if (isDelete) {
-            // TODO Loading start
+            this.ld.setLoading('Deleting branch. Please wait');
             return fromPromise(this.repositoryBranchService.deleteBranch(this.data.repository, this.data.branch));
           }
           return of(null);
@@ -85,7 +101,7 @@ export class BranchOptionsComponent implements OnInit {
       );
       this.processAfterDeleteProcess(deleteProcess);
     } else {
-      // TODO Loading start
+      this.ld.setLoading('Deleting branch. Please wait');
       const deleteProcess = fromPromise(this.repositoryBranchService.deleteBranch(this.data.repository, this.data.branch));
       this.processAfterDeleteProcess(deleteProcess);
     }
@@ -114,11 +130,11 @@ export class BranchOptionsComponent implements OnInit {
   processAfterDeleteProcess(deleteStatus: Observable<{ remote, local }>) {
     deleteStatus.pipe(
       switchMap(statusRemove => {
-        // TODO Loading end
+        this.ld.setFinish();
         if (!!statusRemove.remote || !!statusRemove.local) {
           return fromPromise(this.repositoriesService.load()).pipe(map(() => 'Changes'));
         }
-        return of('No Changes');
+        return this.repositoryBranchService.updateAll(this.data.repository);
       })
     ).subscribe(
       () => {
@@ -152,6 +168,20 @@ export class BranchOptionsComponent implements OnInit {
 
     dialogMerge.afterClosed().subscribe(decision => {
       console.log(decision);
+    });
+  }
+
+  checkMergeCondition() {
+    this.mergeStatusLoading = true;
+    this.repositoryBranchService.getMergeStatus(
+      this.data.repository,
+      this.data.branch,
+      this.currentActiveBranch
+    ).pipe()
+    .subscribe(status => {
+      this.mergeStatusLoading = false;
+      this.statusMerge = status;
+      this.cb.detectChanges();
     });
   }
 

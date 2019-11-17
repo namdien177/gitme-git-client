@@ -1,27 +1,52 @@
 <small class="text-muted">
-  On branch:
+  Selected Branch
 </small>
 
 <h2 class="m-0 weight-lighter">
   {{data.branch.name}}
 </h2>
 <hr>
+
 <div (click)="openMerge()"
      *ngIf="!isCurrent"
-     class="card mb-1">
+     class="card mb-1 card-merge">
   <div class="card-body">
     Merge this branch
     <br>
-    <small class="text-muted">Check and merge the changes from this branch to current branch</small>
-  </div>
-</div>
-<div (click)="deleteBranch()"
-     *ngIf="!isMaster"
-     class="card mb-1">
-  <div class="card-body">
-    Delete branch
-    <br>
-    <small class="text-warning">The action cannot be undone</small>
+    <div class="merge-checking">
+      <ng-container *ngIf="mergeStatusLoading">
+        <gitme-small-load></gitme-small-load>
+        <span class="text-muted">
+          Checking merge condition.
+        </span>
+      </ng-container>
+      <ng-container *ngIf="!mergeStatusLoading && !!statusMerge">
+        <ng-container *ngIf="statusMerge.kind === computedAction.Conflicts">
+          <span class="text-warning">
+            There {{statusMerge.conflictedFiles > 0 ? 'is ' + statusMerge.conflictedFiles + 'conflict' :
+              'are ' + statusMerge.conflictedFiles + 'conflicts'}}
+            if merging with this branch
+          </span>
+        </ng-container>
+        <ng-container *ngIf="statusMerge.kind === computedAction.Clean">
+          <ng-container *ngIf="!!statusMerge.entries">
+            <span class="text-success">
+              Merge status clean. Ready to fast-forward.
+            </span>
+          </ng-container>
+          <ng-container *ngIf="!statusMerge.entries">
+            <span class="text-muted">
+              There is nothing to merge
+            </span>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="statusMerge.kind === computedAction.Invalid">
+          <span class="text-danger">
+            Merge is unable with this branch.
+          </span>
+        </ng-container>
+      </ng-container>
+    </div>
   </div>
 </div>
 
@@ -32,5 +57,27 @@
     Rename branch
     <br>
     <small class="text-warning">The action cannot be undone</small>
+  </div>
+</div>
+
+<div *ngIf="!isMaster && !data.status" class="card mb-1">
+  <div class="card-body text-muted">
+    To delete branch, please checkout first
+  </div>
+</div>
+
+<div *ngIf="isMaster" class="card mb-1">
+  <div class="card-body text-muted">
+    Cannot delete master branch
+  </div>
+</div>
+
+<div (click)="deleteBranch()"
+     *ngIf="!isMaster && !!data.status"
+     class="card mb-1">
+  <div class="card-body">
+    Delete branch
+    <br>
+    <small class="text-danger">This will also delete the branch on remote server.</small>
   </div>
 </div>

@@ -4,11 +4,12 @@ import { appNode as app, webContentsNode as webContents } from './shared/types/t
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/repository-branches';
-import { distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
 import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/system/Loading-Indicator';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 
 @Component({
@@ -17,10 +18,10 @@ import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/s
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements AfterViewInit {
+  loadingState: Observable<LoadingIndicatorState>;
+
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
-
-  loadingState: Observable<LoadingIndicatorState>;
 
   constructor(
     public applicationStateService: ApplicationStateService,
@@ -41,17 +42,16 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.observeApplicationState()
     .pipe(
       startWith({ isLosingFocus: false }),
+      filter(value => !value.isLosingFocus),
+      switchMap(() => this.fetch()),
+      debounceTime(500),
+      distinctUntilChanged(),
       switchMap(() => this.watchingRepository()),
-      switchMap(() => this.getActiveBranch()),
       switchMap(() => this.getBranchStatus()),
-      switchMap((status: StatusSummary) => {
-        this.repositoryStatusService.set(status);
-        return this.fetch();
-      }),
     )
     .subscribe(
-      (fetchStatus) => {
-        console.log(fetchStatus);
+      (status: StatusSummary) => {
+        this.repositoryStatusService.set(status);
       }
     );
 
@@ -90,9 +90,9 @@ export class AppComponent implements AfterViewInit {
     .pipe(
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
-        return of(null);
+        return of(selectedRepo);
       }),
-      switchMap(() => this.repositoryBranchesService.updateAll(this.repository)),
+      switchMap(() => fromPromise(this.repositoriesService.load())),
     );
   }
 
@@ -108,18 +108,9 @@ export class AppComponent implements AfterViewInit {
     return of(null);
   }
 
-  private getActiveBranch() {
-    return this.repositoryBranchesService
-    .selectActive().pipe(
-      switchMap(activeBranch => {
-          this.branch = activeBranch;
-          return of(activeBranch);
-        }
-      )
-    );
-  }
-
   private fetch() {
+    this.repository = this.repositoriesService.getActive();
+    this.branch = this.repositoryBranchesService.getActive();
     if (!!this.repository && !!this.branch) {
       return this.repositoriesService.fetch(
         { ...this.repository } as Repository,

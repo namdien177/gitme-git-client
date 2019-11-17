@@ -97,6 +97,13 @@ const blobEntryRe = /^\s{2}(result|our|their|base)\s+(\d{6})\s([0-9a-f]{40})\s(.
  *
  */
 export function parseMergeResult(text: string): MergeResult {
+  if (!text) {
+    return {
+      kind: ComputedAction.Clean,
+      entries: null
+    };
+  }
+
   const entries = new Array<IMergeEntry>();
 
   const lines = text.split('\n');
@@ -231,4 +238,33 @@ export function parseDiffCheckResult(text: string) {
     }
   });
   return returnPathStatus;
+}
+
+export function parseStatusSB(rawText: string) {
+  if (!rawText || rawText.trim().length === 0) {
+    return {
+      branchName: null,
+      trackTo: null
+    };
+  }
+
+  // Tracking remote branch that has upstream will contain:
+  // ## <<branch-name>>...<<remote>>/<<branch-name>> \n ...
+  // local branch with no upstream will be:
+  // ## <<branch-name>> \n
+  const infoTrack = rawText.split(/\n/).filter(s => s.trim().length > 0)[0];
+  const branchTrack = infoTrack.split(/\s/).filter(s => s.trim().length > 0)[1];
+  if (branchTrack.includes('...')) {
+    // might has the upstream
+    const info = branchTrack.split('...').filter(s => s.trim().length > 0);
+    return {
+      branchName: info[0],
+      trackTo: info[1]
+    };
+  } else {
+    return {
+      branchName: branchTrack.trim(),
+      trackTo: null
+    };
+  }
 }

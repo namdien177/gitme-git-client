@@ -3,6 +3,7 @@ import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
 import { CommitOptions } from '../state/DATA/repository-branches';
+import { Account } from '../state/DATA/account-list';
 
 
 @Injectable()
@@ -93,10 +94,11 @@ export class UtilityService {
   }
 
   // TODO: change
-  addOauthTokenToRemote(remoteURL: string, token: string, isHTTPS: boolean = true) {
+  addOauthTokenToRemote(remoteURL: string, credential: Account, isHTTPS: boolean = true) {
+    const { login, oauth_token } = credential;
     if (isHTTPS) {
       const splitStr = remoteURL.split('//');
-      const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(token));
+      const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(oauth_token));
 
       let remoteCredentials = '';
       splitStr.forEach((parts, index) => {
@@ -105,7 +107,7 @@ export class UtilityService {
           remoteCredentials += '//';
         }
         if (index === 0) {
-          remoteCredentials += tokenDecrypted + '@';
+          remoteCredentials += login + ':' + tokenDecrypted + '@';
         }
       });
       return remoteCredentials;
@@ -153,7 +155,6 @@ export class UtilityService {
     files.forEach(file => {
       if (file.path.includes('->')) {
         const extracted = this.extractPathsFromRenamedCase(file);
-        console.log(extracted);
         arrCompleted.push(extracted.deleted, extracted.added);
       } else {
         const safePath = this.directorySafePath(file.path);

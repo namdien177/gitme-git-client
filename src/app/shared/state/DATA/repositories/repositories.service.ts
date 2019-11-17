@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RepositoriesStore } from './repositories.store';
 import { Repository } from './repository.model';
-import { distinctUntilChanged, map, switchMap, takeWhile, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, takeWhile } from 'rxjs/operators';
 import { RepositoriesQuery } from './repositories.query';
 import { GitService } from '../../../../services/features/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
@@ -10,14 +10,14 @@ import { DefineCommon } from '../../../../common/define.common';
 import { LocalStorageService } from '../../../../services/system/localStorage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../repository-branches';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Account, AccountListService } from '../account-list';
 import { SecurityService } from '../../../../services/system/security.service';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { compareBranchesArray, deepEquals } from '../../../utilities/utilityHelper';
+import { compareBranchesArray, deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -93,6 +93,7 @@ export class RepositoriesService {
         if (this.fileService.isDirectoryExist(repos.repository.directory)) {
           const repository: Repository = { ...repos.repository } as Repository;
           const updatedBranch = await this.gitService.getBranchInfo(repository.directory, repository.branches);
+          this.repositoryBranchesService.set(updatedBranch);
           // update local file
           if (!compareBranchesArray(repository.branches, updatedBranch)) {
             await this.dataService.updateRepositoryData(repository, true);
@@ -208,12 +209,7 @@ export class RepositoriesService {
    * @param repository
    */
   gitStatus(repository: Repository) {
-    return fromPromise(this.gitService.branchStatus(repository))
-    .pipe(
-      map(status => {
-        return status;
-      })
-    );
+    return fromPromise(this.gitService.branchStatus(repository));
   }
 
   async addConfig(repository: Repository, configObject: { [configName: string]: string }) {
@@ -259,7 +255,17 @@ export class RepositoriesService {
       takeWhile(shouldValid => !!shouldValid.fetchData),
       distinctUntilChanged(),
       switchMap(res => {
-        return fromPromise(this.updateExistingRepositoryOnLocalDatabase(res.repository));
+        const saveRepo: Repository = deepMutableObject(res.repository);
+        if (!!res.fetchData.remote) {
+          saveRepo.branches.forEach((br, index, self) => {
+            if (br.name === branch.name) {
+              br.has_remote = false;
+              br.tracking.fetch = res.fetchData.remote;
+              self[index] = br;
+            }
+          });
+        }
+        return fromPromise(this.updateExistingRepositoryOnLocalDatabase(saveRepo));
       })
     );
   }

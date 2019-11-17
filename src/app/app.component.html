@@ -1,5 +1,6 @@
 <gitme-windows-frame></gitme-windows-frame>
 <div class="router-ng">
   <router-outlet></router-outlet>
-  <gitme-section-load *ngIf="(loadingState|async).load"></gitme-section-load>
+  <gitme-section-load *ngIf="(loadingState|async).load"
+                      [loadState]="(loadingState|async)"></gitme-section-load>
 </div>

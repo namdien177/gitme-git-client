@@ -83,7 +83,6 @@ export class BranchItemComponent implements OnInit {
       takeWhile(data => !!data),
       switchMap(
         responseType => {
-          console.log(responseType);
           return fromPromise(this.repositoriesService.load());
         }
       )

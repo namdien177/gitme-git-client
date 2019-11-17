@@ -30,6 +30,7 @@ export class RepositoryBranchesService {
    * @param repository
    */
   async updateAll(repository: Repository) {
+    console.log('run');
     const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
     this.set(repoSum);
   }
@@ -112,8 +113,20 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-    const remote = branch.tracking.push;
-    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+
+    let remote, OAuthRemote;
+    if (!branch.tracking) {
+      try {
+        remote = repository.branches.find(b => b.name === 'master').tracking.push;
+        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+      } catch (e) {
+        console.log(e);
+        OAuthRemote = 'origin';
+      }
+    } else {
+      remote = branch.tracking.push;
+      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+    }
 
     if (branch.has_remote) {
       // normal push
@@ -140,8 +153,19 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-    const remote = branch.tracking.fetch;
-    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+    let remote, OAuthRemote;
+    if (!branch.tracking) {
+      try {
+        remote = repository.branches.find(b => b.name === 'master').tracking.fetch;
+        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+      } catch (e) {
+        console.log(e);
+        OAuthRemote = 'origin';
+      }
+    } else {
+      remote = branch.tracking.fetch;
+      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+    }
 
     if (branch.has_remote) {
       // normal push
@@ -167,8 +191,6 @@ export class RepositoryBranchesService {
   async deleteBranch(repository: Repository, branch: RepositoryBranchSummary, force: boolean = true) {
     //  $ git push -d <remote_name> <branch_name>       <---- Delete remotely
     //  $ git branch -d <branch_name>                   <---- Delete locally
-    console.log(branch);
-    console.log(repository);
     const args = force ? '-D' : '-d';
     const argsRemote = { '-d': null };
 
@@ -183,10 +205,22 @@ export class RepositoryBranchesService {
     }
 
     if (branch.has_remote) {
+      // get account
+      const credentials: Account = this.accountService.getOneSync(
+        repository.credential.id_credential
+      );
+
+      let pushRemote = branch.tracking.name;
+      if (credentials) {
+        // Use remote of old branch
+        const remote = branch.tracking.push;
+        pushRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+      }
+
       removeStatus.remote = await this.gitService.push(
         repository.directory,
         branch.name,
-        branch.tracking.name,
+        pushRemote,
         argsRemote
       );
     }
@@ -233,9 +267,19 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-    // Use remote of old branch
-    const remote = branch.tracking.push;
-    const OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials.oauth_token);
+    let remote, OAuthRemote;
+    if (!branch.tracking) {
+      try {
+        remote = repository.branches.find(b => b.name === 'master').tracking.push;
+        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+      } catch (e) {
+        console.log(e);
+        OAuthRemote = 'origin';
+      }
+    } else {
+      remote = branch.tracking.push;
+      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+    }
 
     status.changeName = await this.gitService.branch(repository.directory, ...optionOnLocal);
 
@@ -324,7 +368,15 @@ export class RepositoryBranchesService {
   }
 
   selectActive() {
-    return this.query.selectActive();
+    return this.query.selectActive().pipe(
+      map(res => {
+        if (Array.isArray(res)) {
+          return res[0];
+        }
+
+        return res;
+      })
+    );
   }
 
   getActive() {

@@ -1,6 +1,7 @@
 export interface Account {
   'id': number;
   'node_id': string;
+  'login': string;
   'oauth_token': string;
   'avatar_url': string;
   'url': string;

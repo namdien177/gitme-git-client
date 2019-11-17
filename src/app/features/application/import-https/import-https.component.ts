@@ -140,34 +140,7 @@ export class ImportHttpsComponent implements OnInit, AfterViewInit {
   }
 
   test() {
-    // const safeHTTPS = this.repo_https.value;
-    // const directory = this.utilityService.directorySafePath(this.repo_dir.value);
-    //
-    // if (!safeHTTPS) {
-    //   return;
-    // }
-    // const credentials: GitCredentials = {
-    //   username: 'do.hoangnam9x@gmail.com',
-    // };
-    // this.gitPackService.cloneTo(safeHTTPS, directory, credentials)
-    // .then(data => {
-    //     console.log(data);
-    //   },
-    //   err => {
-    //     console.log(err);
-    //   });
 
-    // console.log('start');
-    // this.fileSystemService.getFileContext(
-    //   'test',
-    //   '/user/'
-    // ).then(resolve => {
-    //   console.log(resolve);
-    // }, error => {
-    //   console.log(error);
-    // }).finally(() => {
-    //   console.log('done');
-    // });
   }
 
 }
