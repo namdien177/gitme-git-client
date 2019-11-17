@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { catchError, distinctUntilChanged, filter, map, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material';
 import { YesNoDialogModel } from '../../shared/model/yesNoDialog.model';
 import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conflict-viewer/conflict-viewer.component';
 import { LoadingIndicatorService } from '../../shared/state/system/Loading-Indicator';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-repositories',
@@ -88,20 +89,23 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
   }
 
   actionOnBranch() {
-    if (!this.statusSummary) {
+    if (!this.statusSummary || !this.activeBranch || !this.repository) {
       return;
     }
-    if (this.statusSummary.ahead > 0 && this.statusSummary.behind === 0) {
-      // Push changes
-      this.pushRemote();
-    } else if (this.statusSummary.ahead >= 0 && this.statusSummary.behind > 0) {
-      // Pull changes
-      this.pullRemote();
-    } else {
-      // Fetch
-      if (this.repository && this.activeBranch) {
+    if (this.activeBranch.has_remote) {
+      if (this.statusSummary.ahead > 0 && this.statusSummary.behind === 0) {
+        // Push changes
+        this.pushRemote();
+      } else if (this.statusSummary.ahead >= 0 && this.statusSummary.behind > 0) {
+        // Pull changes
+        this.pullRemote();
+      } else {
+        // fetch
         this.fetchRemote();
       }
+    } else {
+      // push upstream
+      this.pushRemote();
     }
   }
 
@@ -113,7 +117,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     interval(loopDuration)
     .pipe(
       takeUntil(this.componentDestroyed),
-      takeWhile(() => this.isViewChangeTo === 'changes'),
       switchMap(() => {
         if (!!this.repository && !!this.activeBranch) {
           return this.repositoriesService.fetch(
@@ -123,7 +126,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
         return of(null);
       }),
-      distinctUntilChanged(),
+      switchMap(() => this.repositoriesService.load()),
       switchMap(() => {
         return this.repositoriesService.gitStatus(
           this.repository
@@ -131,7 +134,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       }),
       distinctUntilChanged(),
     ).subscribe((status) => {
-      this.statusSummary = status;
       if (status) {
         this.repositoryStatusService.set(status);
       }
@@ -167,15 +169,11 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    */
   private watchingBranch() {
     this.repositoryBranchesService
-    .select()
+    .selectActive()
     .pipe(
       takeUntil(this.componentDestroyed),
-      switchMap(listBranch => {
-        this.branches = listBranch;
-        return this.repositoryBranchesService.selectActive();
-      })
-    )
-    .subscribe(
+      distinctUntilChanged(),
+    ).subscribe(
       activeBranch => {
         this.activeBranch = activeBranch;
       }
@@ -202,10 +200,14 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       { ...this.repository } as Repository,
       { ...this.activeBranch } as RepositoryBranchSummary
     ).pipe(
-      map(() => this.repositoryBranchesService.updateAll(this.repository)),
+      catchError(error => {
+        // potential unauthorized => not care as we handle in the status state
+        console.log(error);
+        return of(null);
+      }),
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
       switchMap(() => this.repositoriesService.gitStatus(this.repository))
     ).subscribe((status) => {
-      this.statusSummary = status;
       this.repositoryStatusService.set(status);
       this.loading.setFinish();
     });
@@ -213,33 +215,39 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
 
   private pushRemote() {
     this.loading.setLoading('Pushing to remote. Please wait.');
-    this.repositoryBranchesService.push(this.repository, this.activeBranch).subscribe(
-      () => {
-        this.loading.setFinish();
+    this.repositoryBranchesService.push(this.repository, this.activeBranch)
+    .pipe(
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
+      catchError(error => {
+        // potential conflict => not care as we handle in the status state
+        console.log(error);
+        return of(null);
+      }),
+    )
+    .subscribe((status) => {
+      if (!!status) {
+        this.repositoryStatusService.set(status);
       }
-    );
+      this.loading.setFinish();
+    });
   }
 
   private pullRemote() {
     this.loading.setLoading('Pulling from remote.');
     this.repositoryBranchesService.pull(this.repository, this.activeBranch)
     .pipe(
-      filter(pr => !!pr),
-      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
       catchError(error => {
-        // potential conflict
-        return this.repositoriesService.gitStatus(this.repository);
+        // potential conflict => not care as we handle in the status state
+        console.log(error);
+        return of(null);
       }),
-      tap(summary => this.repositoryStatusService.set(summary))
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
     )
     .subscribe(
       (result: StatusSummary) => {
-        if (result.conflicted.length > 0) {
-          // having conflict, display model warning and prepare merge-continue
-          console.log('conflict');
-        } else {
-          console.log('pull complete!');
-        }
+        this.repositoryStatusService.set(result);
         this.loading.setFinish();
       }
     );
@@ -282,7 +290,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     )
     .subscribe(() => {
       this.conflictViewerOpened = false;
-      this.fetchRemote();
     });
   }
 }

@@ -41,11 +41,10 @@
     </div>
 
     <gitme-repo-branches *ngIf="isBranchBoxOpen"
-                         [(branches)]="branches"
                          class="gm--branches-list"></gitme-repo-branches>
   </div>
 
-  <div class="function gm--push" (click)="actionOnBranch()">
+  <div (click)="actionOnBranch()" class="function gm--push">
     <div class="inner-title raw">
       <div class="title-secondary text-muted">
         Action
@@ -53,13 +52,18 @@
       <div class="title">
         <span class="text-nowrap">
           <ng-container *ngIf="statusSummary?.ahead > 0 && statusSummary?.behind === 0">
-            Push the changes
+            Push changes
           </ng-container>
           <ng-container *ngIf="statusSummary?.ahead >= 0 && statusSummary?.behind > 0">
             Pull from remotes
           </ng-container>
           <ng-container *ngIf="statusSummary?.ahead ===0 && statusSummary?.behind ===0">
-            Fetch changes from remote
+            <ng-container *ngIf="activeBranch?.has_remote">
+              Fetch changes
+            </ng-container>
+            <ng-container *ngIf="!activeBranch?.has_remote">
+              Push to remote
+            </ng-container>
           </ng-container>
         </span>
         <div class="status">

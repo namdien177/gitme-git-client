@@ -419,3 +419,32 @@ export function deepEquals(x, y, exceptionName?: string) {
     return true;
   }
 }
+
+export function deepMutableObject(objectImmutable: object) {
+  const retObj: any = {};
+
+  if (objectImmutable === null || objectImmutable === undefined) {
+    return objectImmutable;
+  }
+
+  // foreach every key and reassign for retObject
+  Object.keys(objectImmutable).forEach(prob => {
+    // if not object/array => assign value and continue
+    if (typeof objectImmutable[prob] === 'object') {
+      if (Array.isArray(objectImmutable[prob])) {
+        const arrayImmutable = [];
+        Array.from(objectImmutable[prob]).forEach((member: any) => {
+          const objectInner = deepMutableObject(member);
+          arrayImmutable.push(objectInner);
+        });
+        retObj[prob] = arrayImmutable;
+      } else {
+        retObj[prob] = deepMutableObject(objectImmutable[prob]);
+      }
+    } else {
+      retObj[prob] = objectImmutable[prob];
+    }
+  });
+
+  return retObj;
+}

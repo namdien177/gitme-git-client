@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
@@ -19,7 +19,6 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   repository: Repository = null;
   branch: RepositoryBranchSummary = null;
 
-  @Input()
   branches: RepositoryBranchSummary[] = [];
   @Output()
   branchesChange: EventEmitter<RepositoryBranchSummary[]> = new EventEmitter();
@@ -37,6 +36,9 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
     this.repositoryBranchesService.selectActive().subscribe(
       br => this.branch = br
     );
+    this.repositoryBranchesService.select().subscribe(
+      br => this.branches = br
+    );
     this.repositoriesService.selectActive().subscribe(
       rp => this.repository = rp
     );
@@ -46,7 +48,6 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    console.log(this.branches);
   }
 
   openOptionNewBranch() {
