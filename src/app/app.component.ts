@@ -3,13 +3,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { appNode as app, webContentsNode as webContents } from './shared/types/types.electron';
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
-import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/branches';
 import { debounceTime, distinctUntilChanged, filter, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
-import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/system/Loading-Indicator';
+import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -29,7 +30,9 @@ export class AppComponent implements AfterViewInit {
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
     private translate: TranslateService,
-    private ld: LoadingIndicatorService
+    private ld: LoadingIndicatorService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     translate.setDefaultLang('en');
     this.listenerFocus();
@@ -61,6 +64,9 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
+
+    const currentURL = this.route;
+    this.router.navigateByUrl('/');
   }
 
   listenerFocus() {

@@ -8,7 +8,7 @@ import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { Router } from '@angular/router';
 import { DialogsInformation } from '../../../shared/model/DialogsInformation';
 import { isTypeAccount } from '../../../shared/validate/customFormValidate';
-import { Account } from '../../../shared/state/DATA/account-list';
+import { Account } from '../../../shared/state/DATA/accounts';
 
 @Component({
   selector: 'gitme-import-https',

@@ -1,16 +1,18 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FileStatusSummaryView, RepositoryStatusService } from '../../../state/DATA/repository-status';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../state/DATA/repository-status';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { ArrayLengthShouldLargerThan } from '../../../validate/customFormValidate';
-import { UtilityService } from '../../../utilities/utility.service';
-import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
+import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
+import { UtilityService } from '../../utilities/utility.service';
+import { RepositoriesService, Repository } from '../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
-import { CommitOptionsComponent } from '../_dialogs/commit-options/commit-options.component';
-import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
-import { defaultCommitOptionDialog } from '../../../model/yesNoDialog.model';
+import { CommitOptionsComponent } from '../../components/commit/_dialogs/commit-options/commit-options.component';
+import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../state/DATA/branches';
+import { defaultCommitOptionDialog } from '../../model/yesNoDialog.model';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { GitDiffService } from '../../../state/DATA/git-diff';
+import { GitDiffService } from '../../state/DATA/git-diff';
+import { Router } from '@angular/router';
+import { RepositoriesMenuService } from '../../state/UI/repositories-menu';
 
 @Component({
   selector: 'gitme-commit-menu',
@@ -18,7 +20,6 @@ import { GitDiffService } from '../../../state/DATA/git-diff';
   styleUrls: ['./commit-menu.component.scss']
 })
 export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
-  @Input()
   isViewChangeTo: 'changes' | 'history' = 'changes';
   @Output()
   isViewChangeToChange: EventEmitter<'changes' | 'history'> = new EventEmitter<'changes' | 'history'>();
@@ -37,15 +38,18 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     private repositoryStatusService: RepositoryStatusService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
+    private repositoriesMenuService: RepositoriesMenuService,
     private utilitiesService: UtilityService,
     private gitDiffService: GitDiffService,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private router: Router
   ) {
     this.watchingRepository();
     this.watchingBranch();
     this.watchingSummary();
+    this.watchingUI();
   }
 
   get title() {
@@ -101,11 +105,16 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   switchView(toView: string) {
     switch (toView) {
       case 'changes':
+        this.router.navigateByUrl('/');
+        this.repositoriesMenuService.viewCommitMenu(toView);
+        break;
       case 'history':
-        this.isViewChangeTo = toView;
+        this.router.navigateByUrl('/history');
+        this.repositoriesMenuService.viewCommitMenu(toView);
         break;
       default:
-        this.isViewChangeTo = 'changes';
+        this.router.navigateByUrl('/');
+        this.repositoriesMenuService.viewCommitMenu('changes');
     }
   }
 
@@ -231,5 +240,11 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     );
+  }
+
+  private watchingUI() {
+    this.repositoriesMenuService.select().subscribe(uiState => {
+      this.isViewChangeTo = uiState.commit_view;
+    });
   }
 }

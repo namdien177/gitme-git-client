@@ -7,6 +7,7 @@ export interface RepositoriesMenuState {
   is_repository_clone_open: boolean;
   is_repository_addLocal_open: boolean;
   is_branch_open: boolean;
+  commit_view: 'history' | 'changes';
 }
 
 export function createInitialState(): RepositoriesMenuState {
@@ -15,7 +16,8 @@ export function createInitialState(): RepositoriesMenuState {
     is_repository_open: false,
     is_repository_clone_open: false,
     is_repository_addLocal_open: false,
-    is_branch_open: false
+    is_branch_open: false,
+    commit_view: 'changes'
   };
 }
 

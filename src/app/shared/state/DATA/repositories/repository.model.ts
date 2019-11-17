@@ -1,4 +1,4 @@
-import { RepositoryBranchSummary } from '../repository-branches';
+import { RepositoryBranchSummary } from '../branches';
 
 export interface Repository {
   id: string;

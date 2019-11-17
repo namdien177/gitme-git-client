@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Account } from '../../../state/DATA/account-list';
+import { Account } from '../../../state/DATA/accounts';
 import { SecurityService } from '../../../../services/system/security.service';
 import { GithubApiService } from '../../../../services/features/github-api.service';
 import { catchError, map } from 'rxjs/operators';

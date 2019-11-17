@@ -1,16 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { catchError, distinctUntilChanged, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
 import { RepositoryStatusService } from '../../shared/state/DATA/repository-status';
 import { MatDialog } from '@angular/material';
 import { YesNoDialogModel } from '../../shared/model/yesNoDialog.model';
 import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conflict-viewer/conflict-viewer.component';
-import { LoadingIndicatorService } from '../../shared/state/system/Loading-Indicator';
+import { LoadingIndicatorService } from '../../shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { ApplicationStateService } from '../../shared/state/UI/Application-State';
 
 @Component({
   selector: 'gitme-repositories',
@@ -36,6 +37,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
+    private applicationStateService: ApplicationStateService,
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService
   ) {
@@ -117,6 +119,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     interval(loopDuration)
     .pipe(
       takeUntil(this.componentDestroyed),
+      takeWhile(() => !this.applicationStateService.getApplicationState().isLosingFocus),
       switchMap(() => {
         if (!!this.repository && !!this.activeBranch) {
           return this.repositoriesService.fetch(
@@ -126,7 +129,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
         return of(null);
       }),
-      switchMap(() => this.repositoriesService.load()),
+      switchMap(() => this.repositoryBranchesService.updateAll(this.repository)),
       switchMap(() => {
         return this.repositoriesService.gitStatus(
           this.repository

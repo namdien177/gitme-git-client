@@ -4,7 +4,7 @@ import { Repository } from '../../shared/state/DATA/repositories';
 import { AppRepositories, InitializeRepositoryConfig } from '../../shared/model/App-Repositories';
 import { DefineCommon } from '../../common/define.common';
 import { AppConfig } from '../../shared/model/App-Config';
-import { Account } from '../../shared/state/DATA/account-list';
+import { Account } from '../../shared/state/DATA/accounts';
 import { AppAccounts, InitializeAccountConfig } from '../../shared/model/App-Accounts';
 
 @Injectable({

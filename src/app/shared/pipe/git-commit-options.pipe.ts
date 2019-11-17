@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CommitOptions } from '../state/DATA/repository-branches';
+import { CommitOptions } from '../state/DATA/branches';
 import { UtilityService } from '../utilities/utility.service';
 
 @Pipe({

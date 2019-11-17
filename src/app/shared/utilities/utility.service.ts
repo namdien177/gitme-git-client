@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
-import { CommitOptions } from '../state/DATA/repository-branches';
-import { Account } from '../state/DATA/account-list';
+import { CommitOptions } from '../state/DATA/branches';
+import { Account } from '../state/DATA/accounts';
 
 
 @Injectable()

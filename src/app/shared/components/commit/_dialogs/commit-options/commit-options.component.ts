@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { CommitOptionsDialogs } from '../../../../model/yesNoDialog.model';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { CommitOptions } from '../../../../state/DATA/repository-branches';
+import { CommitOptions } from '../../../../state/DATA/branches';
 
 @Component({
   selector: 'gitme-commit-options',

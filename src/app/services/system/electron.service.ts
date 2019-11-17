@@ -11,7 +11,7 @@ import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
 import { RepositoriesService } from '../../shared/state/DATA/repositories';
-import { AccountListService } from '../../shared/state/DATA/account-list';
+import { AccountListService } from '../../shared/state/DATA/accounts';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, InitializeAppConfig } from '../../shared/model/App-Config';

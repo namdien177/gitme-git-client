@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 import { electronNode } from '../../shared/types/types.electron';
 import { BASE_API, USER_API } from '../../shared/model/GitHub/API';
 import { HttpClient } from '@angular/common/http';
-import { Account } from '../../shared/state/DATA/account-list';
+import { Account } from '../../shared/state/DATA/accounts';
 
 @Injectable({
   providedIn: 'root'

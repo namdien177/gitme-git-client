@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { GitDiffService } from '../../../../shared/state/DATA/git-diff';
-import { GitDiffResult } from '../../../../shared/model/gitDiff.model';
+import { GitDiffService } from '../../../state/DATA/git-diff';
+import { GitDiffResult } from '../../../model/gitDiff.model';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({

@@ -1,4 +1,4 @@
-import { RepositoryBranchSummary } from '../state/DATA/repository-branches';
+import { RepositoryBranchSummary } from '../state/DATA/branches';
 
 const typeCache: { [label: string]: boolean } = {};
 

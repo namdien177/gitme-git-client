@@ -6,12 +6,14 @@ import { RepositoryAddLocalComponent } from './repository-add-local/repository-a
 import { RepositoryCloneComponent } from './repository-add-clone/repository-clone.component';
 import { RepositoryItemComponent } from './repository-item/repository-item.component';
 import { ShareCredentialsComponentsModule } from '../credential/ShareCredentialsComponents.module';
+import { RepoChangesComponent } from './repo-changes/repo-changes.component';
 
 const declareComps = [
   NavigationRepositoriesComponent,
   RepositoryAddLocalComponent,
   RepositoryCloneComponent,
   RepositoryItemComponent,
+  RepoChangesComponent,
 ];
 
 @NgModule({
