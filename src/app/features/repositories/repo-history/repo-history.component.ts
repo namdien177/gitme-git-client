@@ -21,7 +21,7 @@ export class RepoHistoryComponent implements OnInit {
   ) {
     this.repository = this.repositoryService.getActive();
 
-    this.statusService.checkFromCommit(this.repository, '56e4e7ee90c2c4d515302cc0e2a373cb264b94f3').then(res => {
+    this.statusService.checkFromCommit(this.repository, 'c02307e').then(res => {
       console.log(res);
     });
 

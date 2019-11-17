@@ -1,5 +1,5 @@
 import { ComputedAction, IMergeEntry, MergeResult } from '../model/merge.interface';
-import { LogFileStatus } from '../state/DATA/logs-files';
+import { FileChangeStatus, LogFile } from '../state/DATA/logs-files';
 
 interface IBlobSource {
   readonly type: string;
@@ -270,10 +270,23 @@ export function parseStatusSB(rawText: string) {
   }
 }
 
-export function parseShowCommit(rawText: string) {
-  const targetObject: LogFileStatus = null;
+export function parseShowFileHistory(rawText: string) {
+  const fileLogs: LogFile[] = [];
+  if (!rawText || rawText.trim().length === 0) {
+    return fileLogs;
+  }
   const splitRows = rawText.split('\n').filter(emp => emp.trim().length > 0);
-  // first 4 rows is log information
-  const hash = splitRows[0].split('\s')[1];
-  // const message
+  // first 4-5 rows is log information, so splice them away
+  let arrayFileInfo = splitRows.slice(4);
+  // check if the first row is body message
+  if (arrayFileInfo[0].match(/^\s\s\s\s\w+/)) {
+    arrayFileInfo = arrayFileInfo.slice(1);
+  }
+  arrayFileInfo.forEach(file => {
+    fileLogs.push({
+      path: file.slice(2),
+      status: <FileChangeStatus>file.slice(0, 1)
+    });
+  });
+  return fileLogs;
 }

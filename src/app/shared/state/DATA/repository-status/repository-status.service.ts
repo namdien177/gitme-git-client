@@ -4,6 +4,7 @@ import { StatusSummary } from '../../../model/statusSummary.model';
 import { RepositoryStatusQuery } from './repository-status.query';
 import { GitService } from '../../../../services/features/git.service';
 import { Repository } from '../repositories';
+import { parseShowFileHistory } from '../../../utilities/merge-tree-parser';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusService {
@@ -21,8 +22,9 @@ export class RepositoryStatusService {
     return status;
   }
 
-  checkFromCommit(repository: Repository, commitSHA: string) {
-    return this.git.statusCommit(repository, commitSHA);
+  async checkFromCommit(repository: Repository, commitSHA: string) {
+    const rawStatus =  await this.git.statusCommit(repository, commitSHA);
+    return parseShowFileHistory(rawStatus);
   }
 
   set(status: StatusSummary) {
