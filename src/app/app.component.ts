@@ -4,13 +4,14 @@ import { appNode as app, webContentsNode as webContents } from './shared/types/t
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/branches';
-import { debounceTime, distinctUntilChanged, filter, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
 import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ActivatedRoute, Router } from '@angular/router';
+import { deepMutableObject } from './shared/utilities/utilityHelper';
 
 
 @Component({
@@ -46,15 +47,15 @@ export class AppComponent implements AfterViewInit {
     .pipe(
       startWith({ isLosingFocus: false }),
       filter(value => !value.isLosingFocus),
-      switchMap(() => this.fetch()),
       debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(() => this.watchingRepository()),
-      switchMap(() => this.getBranchStatus()),
+      switchMap(() => this.watchingRepository()), // get current repository => set repository
+      switchMap(() => this.watchingBranch()),     // update branches and get current active branches
+      switchMap(() => this.fetch()),              // fetch
+      switchMap(() => this.getBranchStatus()),    // git status
     )
     .subscribe(
       (status: StatusSummary) => {
-        this.repositoryStatusService.set(status);
+        console.log('Repository state is updated');
       }
     );
 
@@ -65,7 +66,8 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    const currentURL = this.route;
+    const currentURL = this.route.snapshot;
+    console.log(currentURL);
     this.router.navigateByUrl('/');
   }
 
@@ -91,14 +93,12 @@ export class AppComponent implements AfterViewInit {
    * => update status of current branch
    */
   private watchingRepository() {
-    return this.repositoriesService
-    .selectActive(true)
-    .pipe(
+    return fromPromise(this.repositoriesService.loadFromDataBase()).pipe(
+      switchMap(() => this.repositoriesService.selectActive()),
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
         return of(selectedRepo);
       }),
-      switchMap(() => fromPromise(this.repositoriesService.load())),
     );
   }
 
@@ -107,9 +107,7 @@ export class AppComponent implements AfterViewInit {
    */
   private getBranchStatus() {
     if (!!this.repository) {
-      return this.repositoriesService.gitStatus(
-        this.repository
-      );
+      return fromPromise(this.repositoryStatusService.check(this.repository));
     }
     return of(null);
   }
@@ -119,9 +117,16 @@ export class AppComponent implements AfterViewInit {
     this.branch = this.repositoryBranchesService.getActive();
     if (!!this.repository && !!this.branch) {
       return this.repositoriesService.fetch(
-        { ...this.repository } as Repository,
-        { ...this.branch } as RepositoryBranchSummary
+        deepMutableObject(this.repository) as Repository,
+        deepMutableObject(this.branch) as RepositoryBranchSummary
       );
+    }
+    return of(null);
+  }
+
+  private watchingBranch() {
+    if (!!this.repository) {
+      return fromPromise(this.repositoryBranchesService.updateAll(this.repository));
     }
     return of(null);
   }

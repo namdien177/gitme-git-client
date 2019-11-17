@@ -1,4 +1,5 @@
 import { ComputedAction, IMergeEntry, MergeResult } from '../model/merge.interface';
+import { LogFileStatus } from '../state/DATA/logs-files';
 
 interface IBlobSource {
   readonly type: string;
@@ -267,4 +268,12 @@ export function parseStatusSB(rawText: string) {
       trackTo: null
     };
   }
+}
+
+export function parseShowCommit(rawText: string) {
+  const targetObject: LogFileStatus = null;
+  const splitRows = rawText.split('\n').filter(emp => emp.trim().length > 0);
+  // first 4 rows is log information
+  const hash = splitRows[0].split('\s')[1];
+  // const message
 }

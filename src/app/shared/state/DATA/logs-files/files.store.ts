@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActiveState, EntityState, EntityStore, StoreConfig } from '@datorama/akita';
-import { Account } from './account-list.model';
+import { LogFile } from './files.model';
 
-export interface AccountListState extends EntityState<Account>, ActiveState {
+export interface LogFileState extends EntityState<LogFile>, ActiveState {
 }
 
 const initialState = {
@@ -10,8 +10,8 @@ const initialState = {
 };
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'accounts', resettable: true })
-export class AccountListStore extends EntityStore<AccountListState, Account> {
+@StoreConfig({ name: 'repositories', resettable: true, idKey: 'path' })
+export class FilesStore extends EntityStore<LogFileState> {
 
   constructor() {
     super(initialState);

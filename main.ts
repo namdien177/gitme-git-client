@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as url from 'url';
 import * as https from 'https';
 import * as querystring from 'querystring';
+import * as os from 'os';
 
 let win, serve;
 const args = process.argv.slice(1);
@@ -53,9 +54,16 @@ function createWindow() {
 
   if (serve) {
     win.webContents.openDevTools();
-    // BrowserWindow.addDevToolsExtension(
-    //   path.join(os.homedir(), '/AppData/Local/Google/Chrome/User Data/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0'),
-    // );
+    try {
+      BrowserWindow.addDevToolsExtension(
+        path.join(
+          os.homedir(),
+          '/AppData/Local/Google/Chrome/User Data/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.17.0_0'
+        ),
+      );
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // Emitted when the window is closed.

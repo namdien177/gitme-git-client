@@ -15,6 +15,8 @@ export class LogsListComponent implements OnInit {
     private logService: GitLogsService
   ) {
     this.logList = this.logService.observeLogs();
+    const a = { ts: 1, tss: [1, 2, 3] };
+    const b = { ts: 2, tss: [1, 2, 3] };
   }
 
   ngOnInit() {

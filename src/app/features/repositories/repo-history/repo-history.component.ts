@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { GitLogsService, ListLogLine } from '../../../shared/state/DATA/logs';
+import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'gitme-repo-history',
@@ -14,11 +16,29 @@ export class RepoHistoryComponent implements OnInit {
 
   constructor(
     private repositoryService: RepositoriesService,
+    private statusService: RepositoryStatusService,
     private logsService: GitLogsService,
   ) {
     this.repository = this.repositoryService.getActive();
+
+    this.statusService.checkFromCommit(this.repository, '56e4e7ee90c2c4d515302cc0e2a373cb264b94f3').then(res => {
+      console.log(res);
+    });
+
+    this.activeViewTracking();
+  }
+
+  ngOnInit() {
+    this.logsService.initialLogs(this.repository);
+  }
+
+  activeViewTracking() {
     this.logsService.observeActive()
-    .subscribe(log => {
+    .pipe(
+      filter((commit) => !!commit),
+      distinctUntilChanged(),
+    )
+    .subscribe((log: any) => {
       this.viewLogs = log;
       console.log(log);
     }, error => {
@@ -26,9 +46,4 @@ export class RepoHistoryComponent implements OnInit {
       this.viewLogs = null;
     });
   }
-
-  ngOnInit() {
-    this.logsService.initialLogs(this.repository);
-  }
-
 }

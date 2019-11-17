@@ -30,9 +30,9 @@ export class RepositoryBranchesService {
    * @param repository
    */
   async updateAll(repository: Repository) {
-    console.log('run');
     const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
     this.set(repoSum);
+    return repoSum;
   }
 
   /**
@@ -41,13 +41,8 @@ export class RepositoryBranchesService {
    * @param repo
    * @param branch
    */
-  checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
-    return fromPromise(this.gitService.switchBranch(repo, branch.name))
-    .pipe(
-      map(status => {
-        return status;
-      })
-    );
+  async checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
+    return this.gitService.switchBranch(repo, branch.name);
   }
 
   /**
@@ -55,9 +50,9 @@ export class RepositoryBranchesService {
    * @param repository
    * @param files
    */
-  revertFiles(repository: Repository, files: FileStatusSummaryView[]) {
+  async revertFiles(repository: Repository, files: FileStatusSummaryView[]) {
     const dirList = files.map(file => file.path);
-    return fromPromise(this.gitService.revert(repository, dirList));
+    return this.gitService.revert(repository, dirList);
   }
 
   /**
@@ -65,9 +60,9 @@ export class RepositoryBranchesService {
    * @param repository
    * @param files
    */
-  ignoreFiles(repository: Repository, ...files: FileStatusSummaryView[]) {
+  async ignoreFiles(repository: Repository, ...files: FileStatusSummaryView[]) {
     const dir = files.map(file => file.path);
-    return fromPromise(this.gitService.addFilesToIgnore(repository, ...dir));
+    return this.gitService.addFilesToIgnore(repository, ...dir);
   }
 
   /**
@@ -75,9 +70,9 @@ export class RepositoryBranchesService {
    * @param repository
    * @param files
    */
-  ignoreExtension(repository: Repository, ...files: FileStatusSummaryView[]) {
+  async ignoreExtension(repository: Repository, ...files: FileStatusSummaryView[]) {
     const dir = files.map(file => file.path);
-    return fromPromise(this.gitService.addExtensionToIgnore(repository, ...dir));
+    return this.gitService.addExtensionToIgnore(repository, ...dir);
   }
 
   /**
@@ -113,30 +108,15 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-
-    let remote, OAuthRemote;
-    if (!branch.tracking) {
-      try {
-        remote = repository.branches.find(b => b.name === 'master').tracking.push;
-        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-      } catch (e) {
-        console.log(e);
-        OAuthRemote = 'origin';
-      }
-    } else {
-      remote = branch.tracking.push;
-      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-    }
-
     if (branch.has_remote) {
       // normal push
       return fromPromise(
-        this.gitService.push(repository.directory, branch.name, OAuthRemote)
+        this.gitService.push(repository, branch, credentials)
       );
     } else {
       // perform upstream
       return fromPromise(
-        this.gitService.pushUpStream(repository.directory, branch.name, OAuthRemote)
+        this.gitService.pushUpStream(repository.directory, branch.name)
       );
     }
   }
@@ -153,24 +133,10 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-    let remote, OAuthRemote;
-    if (!branch.tracking) {
-      try {
-        remote = repository.branches.find(b => b.name === 'master').tracking.fetch;
-        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-      } catch (e) {
-        console.log(e);
-        OAuthRemote = 'origin';
-      }
-    } else {
-      remote = branch.tracking.fetch;
-      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-    }
-
     if (branch.has_remote) {
       // normal push
       return fromPromise(
-        this.gitService.pull(repository.directory, branch.name, OAuthRemote, options)
+        this.gitService.pull(repository, branch, credentials, options)
       );
     } else {
       return of(null);
@@ -210,17 +176,10 @@ export class RepositoryBranchesService {
         repository.credential.id_credential
       );
 
-      let pushRemote = branch.tracking.name;
-      if (credentials) {
-        // Use remote of old branch
-        const remote = branch.tracking.push;
-        pushRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-      }
-
       removeStatus.remote = await this.gitService.push(
-        repository.directory,
-        branch.name,
-        pushRemote,
+        repository,
+        branch,
+        credentials,
         argsRemote
       );
     }
@@ -267,20 +226,6 @@ export class RepositoryBranchesService {
       repository.credential.id_credential
     );
 
-    let remote, OAuthRemote;
-    if (!branch.tracking) {
-      try {
-        remote = repository.branches.find(b => b.name === 'master').tracking.push;
-        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-      } catch (e) {
-        console.log(e);
-        OAuthRemote = 'origin';
-      }
-    } else {
-      remote = branch.tracking.push;
-      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-    }
-
     status.changeName = await this.gitService.branch(repository.directory, ...optionOnLocal);
 
     if (branch.has_remote) {
@@ -288,9 +233,9 @@ export class RepositoryBranchesService {
       if (removeOnRemote) {
         // Delete remote branch then push new branch
         status.removeRemote = await this.gitService.push(
-          repository.directory,
-          branch.name,
-          OAuthRemote,
+          repository,
+          branch,
+          credentials,
           ['-d']
         );
       }
@@ -298,8 +243,7 @@ export class RepositoryBranchesService {
       if (pushToRemote) {
         status.pushRemote = await this.gitService.pushUpStream(
           repository.directory,
-          newName,
-          OAuthRemote
+          newName
         );
       }
     }
@@ -339,16 +283,16 @@ export class RepositoryBranchesService {
   }
 
   set(listBranch: RepositoryBranchSummary[]) {
-    listBranch.sort(
-      (branchA, branchB) => {
-        if (branchA.current) {
-          return -1;
-        } else if (branchB.current) {
-          return 1;
-        }
-        return 0;
-      }
-    );
+    // listBranch.sort(
+    //   (branchA, branchB) => {
+    //     if (branchA.current) {
+    //       return -1;
+    //     } else if (branchB.current) {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   }
+    // );
     listBranch.every(branch => {
       if (branch.current) {
         this.setActive(branch);

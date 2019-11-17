@@ -51,7 +51,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.repositoriesService.selectActive(false).pipe(
+    this.repositoriesService.selectActive().pipe(
       switchMap(repository => {
         this.repository = repository;
         return this.repositoryStatusService.select();

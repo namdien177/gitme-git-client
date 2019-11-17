@@ -3,10 +3,9 @@ import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
 import { Account } from '../../shared/state/DATA/accounts';
 import { BranchTracking, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
-import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositories';
+import { Repository } from '../../shared/state/DATA/repositories';
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
-import { RemoteWithRefs } from 'simple-git/typings/response';
 import { FileSystemService } from '../system/fileSystem.service';
 import { pathNode } from '../../shared/types/types.electron';
 import { PullResult } from '../../shared/model/PullResult';
@@ -163,63 +162,7 @@ export class GitService {
   }
 
   branch(directory: string, ...options: string[]) {
-    return this.gitInstance(directory)
-    .branch(options);
-  }
-
-  async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
-    let urlRemote = cloneURL;
-    directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);
-    if (credentials) {
-      urlRemote = this.utilities.addOauthTokenToRemote(cloneURL, credentials);
-    }
-    return git().clone(urlRemote, directory);
-  }
-
-  async getRemotes(repository: Repository) {
-    return await this.gitInstance(repository.directory).getRemotes(true);
-  }
-
-  async updateRemotesRepository(repository: Repository, branches: RepositoryBranchSummary[]) {
-    const remoteList: RemoteWithRefs[] = await this.getRemotes(repository);
-    const updateRepository = { ...repository };
-    const remoteRepositoryReturn: RepositoryRemotes[] = [];
-    const remoteBranchesReturn: RepositoryBranchSummary[] = [];
-    if (!repository.remote) {
-      updateRepository.remote = [];
-    }
-
-    let activeBranchRetrieve = null;
-
-    remoteList.forEach(remote => {
-      const branchExisted = branches.find(branch => branch.name === remote.name);
-      const id: string = !!branchExisted ? branchExisted.id : this.securityService.randomID;
-      const newRemote = {
-        id,
-        name: remote.name,
-        fetch: remote.refs.fetch,
-        push: remote.refs.push,
-      };
-      remoteRepositoryReturn.push(newRemote);
-      remoteBranchesReturn.push({
-        id,
-        commit: branchExisted ? branchExisted.commit : null,
-        label: branchExisted ? branchExisted.label : null,
-        name: branchExisted ? branchExisted.name : remote.name,
-        current: branchExisted ? branchExisted.current : false
-      });
-
-      if (!!branchExisted && branchExisted.current) {
-        activeBranchRetrieve = branchExisted.id;
-      }
-    });
-
-    updateRepository.remote = remoteRepositoryReturn;
-    return {
-      repository: updateRepository,
-      branches: remoteBranchesReturn,
-      activeBranch: !!activeBranchRetrieve ? activeBranchRetrieve : remoteBranchesReturn[0].id,
-    };
+    return this.gitInstance(directory).branch(options);
   }
 
   async fetchInfo(repository: Repository, credentials: Account, branch: RepositoryBranchSummary) {
@@ -231,22 +174,8 @@ export class GitService {
     }
     // retrieve the directory for gitInstance to execute
     const { directory } = repository;
-
-    let remote, OAuthRemote;
-    if (!branch.tracking) {
-      try {
-        remote = repository.branches.find(b => b.name === 'master').tracking.fetch;
-        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-      } catch (e) {
-        console.log(e);
-        OAuthRemote = 'origin';
-      }
-    } else {
-      remote = branch.tracking.fetch;
-      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
-    }
-
-    const data = await this.gitInstance(directory).fetch(OAuthRemote);
+    const remoteFetch = this.getOathURL(branch, repository, credentials, 'fetch');
+    const data = await this.gitInstance(directory).fetch(remoteFetch);
     return {
       fetchData: data,
       repository
@@ -272,8 +201,15 @@ export class GitService {
     return this.retrieveBranchTrackingArray(remoteArray);
   }
 
-  async branchStatus(repository: Repository) {
+  async status(repository: Repository) {
     return this.gitInstance(repository.directory).status();
+  }
+
+  async statusCommit(repository: Repository, commitSHA: string) {
+    return this.gitInstance(repository.directory).show([
+      '--name-status',
+      commitSHA
+    ]);
   }
 
   async isGitProject(directory: string) {
@@ -283,15 +219,21 @@ export class GitService {
 
   /**
    * TODO: might need to check more condition
-   * @param directory
-   * @param branchName
-   * @param remoteType
+   * @param repository
+   * @param branch
+   * @param credentials
    * @param options
    */
-  push(directory, branchName, remoteType = 'origin', options?: { [key: string]: null | string | any }) {
-    return this.gitInstance(directory).push(
-      remoteType,
-      branchName,
+  push(
+    repository: Repository,
+    branch: RepositoryBranchSummary,
+    credentials: Account,
+    options?: { [key: string]: null | string | any }
+  ) {
+    const remote = this.getOathURL(branch, repository, credentials, 'push');
+    return this.gitInstance(repository.directory).push(
+      remote,
+      branch.name,
       options
     );
   }
@@ -301,15 +243,13 @@ export class GitService {
    * For pushing new branch to remote
    * @param directory
    * @param branchName
-   * @param remoteType
    * @param options
    */
-  pushUpStream(directory: string, branchName: string, remoteType = 'origin', ...options: string[]) {
+  pushUpStream(directory: string, branchName: string, ...options: string[]) {
     const defaultOptions = ['--set-upstream'];
     if (options && options.length > 0) {
       defaultOptions.concat(options);
     }
-
     return this.gitInstance(directory)
     .push(
       'origin', // should be remoteType but idk why it's not work...
@@ -319,25 +259,34 @@ export class GitService {
   }
 
   pull(
-    directory: string, branchName: string, remoteType = 'origin',
-    options?: { [key: string]: null | string | any }
+    repository: Repository, branch: RepositoryBranchSummary,
+    credentials: Account, options?: { [key: string]: null | string | any }
   ): Promise<PullResult> {
-    return this.gitInstance(directory).pull(
-      remoteType, branchName,
+    const remote = this.getOathURL(branch, repository, credentials, 'fetch');
+    return this.gitInstance(repository.directory).pull(
+      remote, branch.name,
       options
     );
+  }
+
+  async cloneTo(cloneURL: string, directory: string, credentials?: Account) {
+    let urlRemote = cloneURL;
+    directory = directory + this.utilities.repositoryNameFromHTTPS(cloneURL);
+    if (credentials) {
+      urlRemote = this.utilities.addOauthTokenToRemote(cloneURL, credentials);
+    }
+    return git().clone(urlRemote, directory);
   }
 
   /**
    * STATUS: DONE
    * Commit changes
    * @param repository    Current active repository
-   * @param account       Credentials from repository config (or any source)
    * @param message       Message title when commit
    * @param fileList      List directory of changed files, relative to repo directory
    * @param option        additional option.
    */
-  async commit(repository: Repository, account: Account, message: string, fileList: string[], option?: {
+  async commit(repository: Repository, message: string, fileList: string[], option?: {
     [properties: string]: string
   }) {
     const instanceGit = await this.gitInstance(repository.directory);
@@ -401,8 +350,8 @@ export class GitService {
     } else {
       message = 'Resolve conflict';
     }
-    await this.commit(repository, account, message, files, { '-i': null });
-    return this.branchStatus(repository);
+    await this.commit(repository, message, files, { '-i': null });
+    return this.status(repository);
   }
 
   async getMergeBase(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
@@ -545,7 +494,6 @@ export class GitService {
       const ext = pathNode.extname(fileNode);
       return `*${ ext }`;
     });
-    console.log(extractedExtension);
     const extensionJoin: string = '\n' + extractedExtension.join('\n');
     let ignoreStatus: boolean;
     if (!this.fileSystem.isFileExist(rootIgnore)) {
@@ -558,35 +506,6 @@ export class GitService {
     }
 
     return ignoreStatus;
-  }
-
-  isFetchRemoteAvailable(repository: Repository) {
-    if (!repository || !repository.remote || repository.remote.length === 0) {
-      return false;
-    }
-    return !!repository.remote.find(any => any.fetch != null);
-  }
-
-  isPullRemoteAvailable(repository: Repository) {
-    if (!repository || !repository.remote || repository.remote.length === 0) {
-      return false;
-    }
-    return !!repository.remote.find(any => any.push != null);
-  }
-
-  private findBranchFromListBranch(branchToFind: RepositoryBranchSummary, listBranch: RepositoryBranchSummary[]) {
-    return listBranch.find(remoteBranch => {
-      // remote type, has origin/
-      const extractedNameOutput = remoteBranch.has_local ? remoteBranch.name : () => {
-        const slidedSlashOutput = remoteBranch.name.split('/');
-        return slidedSlashOutput.slice(1).join('/');   // remove origin/
-      };
-      const extractedNameOld = branchToFind.has_local ? branchToFind.name : () => {
-        const slidedSlashOld = branchToFind.name.split('/');
-        return slidedSlashOld.slice(1).join('/');   // remove origin/
-      };
-      return extractedNameOld === extractedNameOutput;
-    });
   }
 
   /**
@@ -652,5 +571,22 @@ export class GitService {
       }
       callback(dataEnd);
     });
+  }
+
+  private getOathURL(branch: RepositoryBranchSummary, repository: Repository, credentials: Account, mode: 'fetch' | 'push') {
+    let remote, OAuthRemote;
+    if (!branch.tracking) {
+      try {
+        remote = repository.branches.find(b => b.name === 'master').tracking[mode];
+        OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+      } catch (e) {
+        console.log(e);
+        OAuthRemote = 'origin';
+      }
+    } else {
+      remote = branch.tracking[mode];
+      OAuthRemote = this.utilities.addOauthTokenToRemote(remote, credentials);
+    }
+    return OAuthRemote;
   }
 }

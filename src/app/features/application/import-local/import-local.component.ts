@@ -136,7 +136,7 @@ export class ImportLocalComponent implements OnInit {
      * * Update working repository
      * * Fetching new repository => reassign main branch.
      */
-    fromPromise(this.repositoryService.insertNewRepository(
+    fromPromise(this.repositoryService.createNew(
       repositoryInstance,
       credentialsInstance,
       !isExistedOnDB

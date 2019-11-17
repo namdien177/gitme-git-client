@@ -129,17 +129,10 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         }
         return of(null);
       }),
-      switchMap(() => this.repositoryBranchesService.updateAll(this.repository)),
-      switchMap(() => {
-        return this.repositoriesService.gitStatus(
-          this.repository
-        );
-      }),
-      distinctUntilChanged(),
-    ).subscribe((status) => {
-      if (status) {
-        this.repositoryStatusService.set(status);
-      }
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
+    ).subscribe(() => {
+      console.log('Sequential loop finished');
     });
   }
 
@@ -209,9 +202,9 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => this.repositoriesService.gitStatus(this.repository))
+      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository)))
     ).subscribe((status) => {
-      this.repositoryStatusService.set(status);
+      console.log('Fetch completed');
       this.loading.setFinish();
     });
   }
@@ -220,18 +213,16 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     this.loading.setLoading('Pushing to remote. Please wait.');
     this.repositoryBranchesService.push(this.repository, this.activeBranch)
     .pipe(
-      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
       catchError(error => {
         // potential conflict => not care as we handle in the status state
         console.log(error);
         return of(null);
       }),
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
     )
     .subscribe((status) => {
-      if (!!status) {
-        this.repositoryStatusService.set(status);
-      }
+      console.log('Push completed');
       this.loading.setFinish();
     });
   }
@@ -246,11 +237,11 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => this.repositoriesService.gitStatus(this.repository)),
+      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
     )
     .subscribe(
       (result: StatusSummary) => {
-        this.repositoryStatusService.set(result);
+        console.log('Pull completed');
         this.loading.setFinish();
       }
     );

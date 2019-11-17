@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { GitLogsStore } from './git-logs.store';
 import { GitLogsQuery } from './git-logs.query';
-import { Repository } from '../repositories';
 import { GitService } from '../../../../services/features/git.service';
+import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { deepMutableObject } from '../../../utilities/utilityHelper';
-import { ListLogLine } from './git-logs.model';
+import { Observable } from 'rxjs';
+import { ListLogLine, ListLogSummary } from './git-logs.model';
 import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
@@ -21,8 +22,8 @@ export class GitLogsService {
   initialLogs(repository: Repository) {
     fromPromise(this.git.logs(repository)).subscribe(
       log => {
-        const mutable = deepMutableObject(log.all);
-        this.store.set(mutable);
+        const mutable: ListLogSummary = deepMutableObject(log);
+        this.store.set(mutable.all);
         this.setActive(log.latest);
       }
     );
@@ -40,8 +41,9 @@ export class GitLogsService {
     return this.query.selectAll();
   }
 
-  observeActive() {
-    return this.query.selectActive().pipe(
+  observeActive(): Observable<ListLogLine> {
+    return this.query.selectActive()
+    .pipe(
       // @ts-ignore
       map(logs => {
         if (Array.isArray(logs)) {
