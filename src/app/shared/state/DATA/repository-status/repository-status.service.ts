@@ -2,18 +2,33 @@ import { Injectable } from '@angular/core';
 import { createInitialState, FileStatusSummaryView, RepositoryStatusStore } from './repository-status.store';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { RepositoryStatusQuery } from './repository-status.query';
+import { GitService } from '../../../../services/features/git.service';
+import { Repository } from '../repositories';
+import { parseShowFileHistory } from '../../../utilities/merge-tree-parser';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusService {
 
   constructor(
-    private repositoryStatusStore: RepositoryStatusStore,
-    private repositoryStatusQuery: RepositoryStatusQuery,
+    private store: RepositoryStatusStore,
+    private query: RepositoryStatusQuery,
+    private git: GitService,
   ) {
   }
 
+  async check(repository: Repository) {
+    const status: StatusSummary = await this.git.status(repository);
+    this.set(status);
+    return status;
+  }
+
+  async checkFromCommit(repository: Repository, commitSHA: string) {
+    const rawStatus =  await this.git.statusCommit(repository, commitSHA);
+    return parseShowFileHistory(rawStatus);
+  }
+
   set(status: StatusSummary) {
-    const currentArr = this.repositoryStatusQuery.getValue().files;
+    const currentArr = this.query.getValue().files;
     const convertedFileStatus: FileStatusSummaryView[] = status.files.map<FileStatusSummaryView>(
       file => {
         const isCached = this.retrieveExistedCacheFile(currentArr, file.path);
@@ -24,72 +39,72 @@ export class RepositoryStatusService {
         };
       }
     );
-    this.repositoryStatusStore.update(
+    this.store.update(
       Object.assign(status, { files: convertedFileStatus })
     );
   }
 
   reset() {
-    this.repositoryStatusStore.update(createInitialState());
+    this.store.update(createInitialState());
   }
 
   select() {
-    return this.repositoryStatusQuery.select();
+    return this.query.select();
   }
 
   get() {
-    return this.repositoryStatusQuery.getValue();
+    return this.query.getValue();
   }
 
   toggleCheckbox(indexState: number) {
     const updateState = this.retrieveToggledCheckedArray(indexState);
-    this.repositoryStatusStore.update({
+    this.store.update({
       files: updateState.newArrayState
     });
     return updateState;
   }
 
   setActive(indexState: number) {
-    this.repositoryStatusStore.update({
+    this.store.update({
       files: this.retrieveToggledActivatedArray(indexState)
     });
   }
 
   resetActiveState() {
-    const mutableArrayState = [...this.repositoryStatusQuery.getValue().files];
+    const mutableArrayState = [...this.query.getValue().files];
     const newMutable = mutableArrayState.map(
       file => <FileStatusSummaryView>Object.assign(
         { ...file },
         { active: false }
       )
     );
-    this.repositoryStatusStore.update({
+    this.store.update({
       files: newMutable
     });
   }
 
   checkAllCheckboxState() {
-    const mutableArrayState = [...this.repositoryStatusQuery.getValue().files];
+    const mutableArrayState = [...this.query.getValue().files];
     const newMutable = mutableArrayState.map(
       file => <FileStatusSummaryView>Object.assign(
         { ...file },
         { checked: true }
       )
     );
-    this.repositoryStatusStore.update({
+    this.store.update({
       files: newMutable
     });
   }
 
   uncheckAllCheckboxState() {
-    const mutableArrayState = [...this.repositoryStatusQuery.getValue().files];
+    const mutableArrayState = [...this.query.getValue().files];
     const newMutable = mutableArrayState.map(
       file => <FileStatusSummaryView>Object.assign(
         { ...file },
         { checked: false }
       )
     );
-    this.repositoryStatusStore.update({
+    this.store.update({
       files: newMutable
     });
   }
@@ -107,7 +122,7 @@ export class RepositoryStatusService {
   }
 
   private retrieveToggledCheckedArray(index: number) {
-    const immutableState = this.repositoryStatusQuery.getValue().files;
+    const immutableState = this.query.getValue().files;
     const mutableState = [...immutableState];
     const newState = Object.assign({
       ...mutableState[index],
@@ -123,7 +138,7 @@ export class RepositoryStatusService {
   }
 
   private retrieveToggledActivatedArray(index: number) {
-    const mutableState = [...this.repositoryStatusQuery.getValue().files];
+    const mutableState = [...this.query.getValue().files];
     mutableState.forEach((file, i, allFiles) => {
       allFiles[i] = Object.assign({
         ...file,

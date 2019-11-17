@@ -210,7 +210,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private watchingRepository() {
-    this.repositoriesService.selectActive(false)
+    this.repositoriesService.selectActive()
     .subscribe(repoActive => {
       this.repository = repoActive;
     });

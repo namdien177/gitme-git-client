@@ -6,8 +6,8 @@ import { StatusSummary } from '../../../model/statusSummary.model';
 import { MatBottomSheet } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
 import { switchMap, takeWhile } from 'rxjs/operators';
-import { fromPromise } from 'rxjs/internal-compatibility';
 import { LoadingIndicatorService } from '../../../state/UI/Loading-Indicator';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-branch-item',
@@ -28,7 +28,7 @@ export class BranchItemComponent implements OnInit {
     private matBottomSheet: MatBottomSheet,
     private loading: LoadingIndicatorService
   ) {
-    this.repositoriesService.selectActive(false)
+    this.repositoriesService.selectActive()
     .subscribe(repo => {
       this.repository = { ...repo } as Repository;
     });
@@ -48,12 +48,13 @@ export class BranchItemComponent implements OnInit {
     if (!this.branchSummary.current) {
       if (this.repository && this.branchSummary && this.status.files.length === 0) {
         this.loading.setLoading(`Checkout branch ${ this.branchSummary.name }`);
-        this.repositoryBranchService.checkoutBranch(
+        fromPromise(this.repositoryBranchService.checkoutBranch(
           this.repository,
           this.branchSummary
-        )
+        ))
         .pipe(
-          switchMap(() => this.repositoryBranchService.updateAll(this.repository))
+          switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.repository))),
+          switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.repository, branches))),
         )
         .subscribe(
           () => {
@@ -81,15 +82,9 @@ export class BranchItemComponent implements OnInit {
       data: dataPassing
     }).afterDismissed().pipe(
       takeWhile(data => !!data),
-      switchMap(
-        responseType => {
-          return fromPromise(this.repositoriesService.load());
-        }
-      )
     ).subscribe(
-      branchReload => {
-        console.log(branchReload);
-        this.repositoryBranchService.updateAll(this.repository);
+      actionPerformed => {
+        console.log(actionPerformed);
       }
     );
   }

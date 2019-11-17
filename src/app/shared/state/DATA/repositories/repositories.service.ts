@@ -9,7 +9,7 @@ import { AppConfig } from '../../../model/App-Config';
 import { DefineCommon } from '../../../../common/define.common';
 import { LocalStorageService } from '../../../../services/system/localStorage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../branches';
+import { RepositoryBranchSummary } from '../branches';
 import { Observable } from 'rxjs';
 import { Account, AccountListService } from '../accounts';
 import { SecurityService } from '../../../../services/system/security.service';
@@ -17,7 +17,7 @@ import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
 import { DataService } from '../../../../services/features/data.service';
 import { SystemResponse } from '../../../model/system.response';
-import { compareBranchesArray, deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
+import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -30,7 +30,6 @@ export class RepositoriesService {
     private fileService: FileSystemService,
     private localStorageService: LocalStorageService,
     private accountListService: AccountListService,
-    private repositoryBranchesService: RepositoryBranchesService,
     private securityService: SecurityService,
   ) {
   }
@@ -42,7 +41,7 @@ export class RepositoriesService {
    * @param credentials
    * @param isNewAccount
    */
-  async insertNewRepository(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
+  async createNew(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
     const systemDefaultName = this.securityService.appUUID;
     if (isNewAccount) {
       // Save the new credential to file store;
@@ -51,17 +50,26 @@ export class RepositoriesService {
         return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
       }
     } else {
-      // just update the info for sure
-      const updatedAccount = await this.dataService.updateAccountData(credentials);
-      if (!updatedAccount) {
-        return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
+      const existedData = await this.dataService.getAccountsConfigData(credentials.id);
+      if (existedData && !deepEquals(existedData, credentials)) {
+        // update the account as the info was changed
+        const updatedAccount = await this.dataService.updateAccountData(credentials);
+        if (!updatedAccount) {
+          return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
+        }
+      } else if (!existedData) {
+        // somehow was deleted?
+        const storeNewAccount = await this.dataService.createAccountData(credentials, systemDefaultName);
+        if (!storeNewAccount) {
+          return { status: false, message: 'Unable to update new account information', value: null } as SystemResponse;
+        }
       }
     }
 
     const statusSave = await this.saveToDatabase(newRepository);
 
     if (statusSave.status) {
-      await this.load();
+      await this.loadFromDataBase();
 
       // adding config to the system
       const config = {
@@ -78,7 +86,7 @@ export class RepositoriesService {
    * STATUS: DONE
    * Load all the repository configs in all local json file
    */
-  async load() {
+  async loadFromDataBase() {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
     if (!!!configFile) {
@@ -92,13 +100,6 @@ export class RepositoriesService {
       if (!!repos && !!repos.repository) {
         if (this.fileService.isDirectoryExist(repos.repository.directory)) {
           const repository: Repository = { ...repos.repository } as Repository;
-          const updatedBranch = await this.gitService.getBranchInfo(repository.directory, repository.branches);
-          this.repositoryBranchesService.set(updatedBranch);
-          // update local file
-          if (!compareBranchesArray(repository.branches, updatedBranch)) {
-            await this.dataService.updateRepositoryData(repository, true);
-          }
-          repository.branches = updatedBranch;
           repositories.push(repository);
         }
       }
@@ -121,6 +122,21 @@ export class RepositoriesService {
       this.setActive(findCached);
     }
     this.set(repositories);
+  }
+
+  async updateToDataBase(
+    repository: Repository,
+    newBranches: RepositoryBranchSummary[]
+  ) {
+    const mutableData: Repository = deepMutableObject(repository);
+    const existingBranchesData = mutableData.branches;
+
+    if (!deepEquals(existingBranchesData, newBranches)) {
+      mutableData.branches = newBranches;
+    }
+
+    const status = await this.dataService.updateRepositoryData(mutableData, true);
+    return status ? mutableData : null;
   }
 
   /**
@@ -148,6 +164,8 @@ export class RepositoriesService {
    * @param activeRepository
    */
   setActive(activeRepository: Repository) {
+    const currentActive = this.query.getActive();
+    this.store.removeActive(currentActive);
     this.store.setActive(activeRepository.id);
     this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
   }
@@ -158,22 +176,8 @@ export class RepositoriesService {
    * @param initLoad If set to True (default), it will load from disk first.
    * Should set this to false to save disk performance.
    */
-  selectActive(initLoad: boolean = true): Observable<Repository> {
-    if (!initLoad) {
-      return this.query.selectActive().pipe(
-        map(active => {
-          if (Array.isArray(active)) {
-            return active[0];
-          } else {
-            return active;
-          }
-        })
-      );
-    }
-    return fromPromise(
-      this.load()
-    ).pipe(
-      switchMap(() => this.query.selectActive()),
+  selectActive(): Observable<Repository> {
+    return this.query.selectActive().pipe(
       map(active => {
         if (Array.isArray(active)) {
           return active[0];
@@ -204,14 +208,6 @@ export class RepositoriesService {
     this.store.setActive(null);
   }
 
-  /**
-   * STATUS: DONE
-   * @param repository
-   */
-  gitStatus(repository: Repository) {
-    return fromPromise(this.gitService.branchStatus(repository));
-  }
-
   async addConfig(repository: Repository, configObject: { [configName: string]: string }) {
     const gitConfig = this.gitService.gitInstance(repository.directory);
     Object.keys(configObject).forEach(configName => {
@@ -229,10 +225,8 @@ export class RepositoriesService {
    * @param option
    */
   commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
-    const { id_credential } = repository.credential;
-    const authorDB = this.accountListService.getSync().find(account => account.id === id_credential);
     return fromPromise(
-      this.gitService.commit(repository, authorDB, title, files, option)
+      this.gitService.commit(repository, title, files, option)
     );
   }
 
@@ -256,7 +250,7 @@ export class RepositoriesService {
       distinctUntilChanged(),
       switchMap(res => {
         const saveRepo: Repository = deepMutableObject(res.repository);
-        if (!!res.fetchData.remote) {
+        if (!!res.fetchData.remote && res.fetchData.remote.trim().length > 0) {
           saveRepo.branches.forEach((br, index, self) => {
             if (br.name === branch.name) {
               br.has_remote = false;
@@ -267,12 +261,6 @@ export class RepositoriesService {
         }
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(saveRepo));
       })
-    );
-  }
-
-  getRemotes(repository: Repository) {
-    return fromPromise(
-      this.gitService.getRemotes(repository)
     );
   }
 

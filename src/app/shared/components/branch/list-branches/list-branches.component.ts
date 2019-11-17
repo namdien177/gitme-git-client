@@ -8,6 +8,8 @@ import { defaultCommitOptionDialog, YesNoDialogModel } from '../../../model/yesN
 import { of } from 'rxjs';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { BranchCheckoutStashComponent } from '../_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { RepositoryStatusService } from '../../../state/DATA/repository-status';
 
 @Component({
   selector: 'gitme-repo-branches',
@@ -31,6 +33,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   constructor(
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
+    private statusService: RepositoryStatusService,
     private matDialog: MatDialog
   ) {
     this.repositoryBranchesService.selectActive().subscribe(
@@ -78,7 +81,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       takeWhile(fromStatus => !!fromStatus),
       switchMap(newBranch => {
         this._temporaryBranchInfo = newBranch;
-        return this.repositoriesService.gitStatus(this.repository);
+        return fromPromise(this.statusService.check(this.repository));
       }),
       map((
         // Have changes => stash or bring?
@@ -101,6 +104,8 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
           return this.createBranchMethod(final);
         }
       ),
+      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.repository, branches)))
     ).subscribe(
       action => {
         console.log(action);

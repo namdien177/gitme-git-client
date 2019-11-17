@@ -5,7 +5,7 @@ import { StatusSummary } from '../../../../model/statusSummary.model';
 import { RepositoriesService, Repository } from '../../../../state/DATA/repositories';
 import { YesNoDecisionComponent } from '../../../UI/dialogs/yes-no-decision/yes-no-decision.component';
 import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
-import { map, switchMap, takeWhile } from 'rxjs/operators';
+import { switchMap, takeWhile } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { BranchRenameComponent } from '../branch-rename/branch-rename.component';
@@ -71,13 +71,14 @@ export class BranchOptionsComponent implements OnInit {
         push: boolean;
       }) => {
         this.ld.setLoading('Renaming branch');
-        return this.repositoryBranchService.changeName(
-          this.data.repository, this.data.branch, responseRename.name, responseRename.remove, responseRename.push
+        return fromPromise(
+          this.repositoryBranchService.changeName(
+            this.data.repository, this.data.branch, responseRename.name, responseRename.remove, responseRename.push
+          )
         );
       }),
-      switchMap((data: { changeName, pushRemote, removeRemote }) => {
-        return this.repositoryBranchService.updateAll(this.data.repository);
-      })
+      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches))),
     )
     .subscribe(() => {
       this.ld.setFinish();
@@ -129,15 +130,12 @@ export class BranchOptionsComponent implements OnInit {
 
   processAfterDeleteProcess(deleteStatus: Observable<{ remote, local }>) {
     deleteStatus.pipe(
-      switchMap(statusRemove => {
-        this.ld.setFinish();
-        if (!!statusRemove.remote || !!statusRemove.local) {
-          return fromPromise(this.repositoriesService.load()).pipe(map(() => 'Changes'));
-        }
-        return this.repositoryBranchService.updateAll(this.data.repository);
-      })
+      takeWhile((statusRemove) => !!statusRemove.remote || !!statusRemove.local),
+      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches)))
     ).subscribe(
       () => {
+        this.ld.setFinish();
         this._bottomSheetRef.dismiss('RELOAD');
       }
     );
