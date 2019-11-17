@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { createInitialState, LoadingIndicatorState } from '../../../state/system/Loading-Indicator';
+import { createInitialState, LoadingIndicatorState } from '../../../state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-section-load',

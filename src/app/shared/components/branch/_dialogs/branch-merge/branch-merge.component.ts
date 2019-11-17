@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
 import { Repository } from '../../../../state/DATA/repositories';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/branches';
 import { RepositoryStatusService, RepositoryStatusState } from '../../../../state/DATA/repository-status';
 import { GitService } from '../../../../../services/features/git.service';
 

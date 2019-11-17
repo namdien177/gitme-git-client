@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
 import { Repository } from '../../../../state/DATA/repositories';
-import { RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
+import { RepositoryBranchSummary } from '../../../../state/DATA/branches';
 import { StatusSummary } from '../../../../model/statusSummary.model';
 import { RepositoryStatusService } from '../../../../state/DATA/repository-status';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';

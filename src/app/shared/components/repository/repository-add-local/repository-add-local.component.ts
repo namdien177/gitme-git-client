@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 import { DialogsInformation } from '../../../model/DialogsInformation';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { SecurityService } from '../../../../services/system/security.service';
-import { Account, AccountListService } from '../../../state/DATA/account-list';
+import { Account, AccountListService } from '../../../state/DATA/accounts';
 import { Router } from '@angular/router';
 
 @Component({

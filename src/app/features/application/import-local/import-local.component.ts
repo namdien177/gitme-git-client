@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Account, AccountListService } from '../../../shared/state/DATA/account-list';
+import { Account, AccountListService } from '../../../shared/state/DATA/accounts';
 import { electronNode, osNode } from '../../../shared/types/types.electron';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { UtilityService } from '../../../shared/utilities/utility.service';

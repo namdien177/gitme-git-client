@@ -6,20 +6,26 @@ import { RepositoriesMenuQuery } from './repositories-menu.query';
 export class RepositoriesMenuService {
 
   constructor(
-    private repositoriesMenuStore: RepositoriesMenuStore,
-    private repositoryMenuQuery: RepositoriesMenuQuery
+    private store: RepositoriesMenuStore,
+    private query: RepositoriesMenuQuery
   ) {
   }
 
+  viewCommitMenu(value: 'history' | 'changes') {
+    this.store.update({
+      commit_view: value
+    });
+  }
+
   openRepoMenu() {
-    this.repositoriesMenuStore.update({
+    this.store.update({
       is_repository_open: true,
       is_branch_open: false
     });
   }
 
   closeRepoMenu() {
-    this.repositoriesMenuStore.update({
+    this.store.update({
       is_repository_open: false,
       is_branch_open: false
     });
@@ -34,14 +40,14 @@ export class RepositoriesMenuService {
   }
 
   openBranchMenu() {
-    this.repositoriesMenuStore.update({
+    this.store.update({
       is_branch_open: true,
       is_repository_open: false,
     });
   }
 
   closeBranchMenu() {
-    this.repositoriesMenuStore.update({
+    this.store.update({
       is_branch_open: false,
       is_repository_open: false,
     });
@@ -56,44 +62,44 @@ export class RepositoriesMenuService {
   }
 
   openRepositoryCloneDialog() {
-    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+    const currentRepoOpen = this.query.getValue().is_repository_open;
     if (currentRepoOpen) {
-      this.repositoriesMenuStore.update({
+      this.store.update({
         is_repository_clone_open: true
       });
     }
   }
 
   closeRepositoryCloneDialog() {
-    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+    const currentRepoOpen = this.query.getValue().is_repository_open;
     if (currentRepoOpen) {
-      this.repositoriesMenuStore.update({
+      this.store.update({
         is_repository_clone_open: false
       });
     }
   }
 
   openRepositoryAddLocalDialog() {
-    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+    const currentRepoOpen = this.query.getValue().is_repository_open;
 
     if (currentRepoOpen) {
-      this.repositoriesMenuStore.update({
+      this.store.update({
         is_repository_addLocal_open: true
       });
     }
   }
 
   closeRepositoryAddLocalDialog() {
-    const currentRepoOpen = this.repositoryMenuQuery.getValue().is_repository_open;
+    const currentRepoOpen = this.query.getValue().is_repository_open;
 
     if (currentRepoOpen) {
-      this.repositoriesMenuStore.update({
+      this.store.update({
         is_repository_addLocal_open: false
       });
     }
   }
 
   select() {
-    return this.repositoryMenuQuery.select();
+    return this.query.select();
   }
 }

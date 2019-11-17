@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
 import { FileStatusSummaryView } from '../../../../../state/DATA/repository-status';
-import { RepositoryBranchesService } from '../../../../../state/DATA/repository-branches';
+import { RepositoryBranchesService } from '../../../../../state/DATA/branches';
 import { Repository } from '../../../../../state/DATA/repositories';
 import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
 

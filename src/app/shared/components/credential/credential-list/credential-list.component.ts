@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Account, AccountListService } from '../../../state/DATA/account-list';
+import { Account, AccountListService } from '../../../state/DATA/accounts';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({

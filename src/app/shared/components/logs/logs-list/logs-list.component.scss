@@ -1,0 +1,61 @@
+@import "src/styles/theme";
+
+:host {
+  width: 100%;
+  height: inherit;
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.line-log {
+  width: 100%;
+  display: grid;
+  grid-template-areas: 'name name name' 'avatar user time';
+  grid-template-rows: 1rem 1rem;
+  grid-template-columns: 1rem auto 130px;
+  grid-gap: 0.5rem;
+  padding: 0.55rem;
+  margin-bottom: 0.15rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $primary-black-lighter;
+  }
+
+
+  .log-title {
+    grid-area: name;
+    font-size: 1rem;
+    line-height: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .log-user-avatar {
+    grid-area: avatar;
+    width: 1rem;
+    height: 1rem;
+    display: grid;
+    place-content: center;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .log-user-name {
+    grid-area: user;
+    font-size: 0.8rem;
+    line-height: 1rem;
+    color: grey;
+  }
+
+  .time {
+    grid-area: time;
+    font-size: 0.8rem;
+    line-height: 1rem;
+    color: grey;
+    text-align: right;
+  }
+}

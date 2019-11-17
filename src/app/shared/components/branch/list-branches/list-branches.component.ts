@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/branches';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
 import { BranchNewOptionComponent } from '../_dialogs/branch-new/branch-new-option/branch-new-option.component';

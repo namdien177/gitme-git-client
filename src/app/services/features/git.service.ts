@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import { UtilityService } from '../../shared/utilities/utility.service';
-import { Account } from '../../shared/state/DATA/account-list';
-import { BranchTracking, RepositoryBranchSummary } from '../../shared/state/DATA/repository-branches';
+import { Account } from '../../shared/state/DATA/accounts';
+import { BranchTracking, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
 import { Repository, RepositoryRemotes } from '../../shared/state/DATA/repositories';
 import { SecurityService } from '../system/security.service';
 import * as moment from 'moment';
@@ -13,6 +13,7 @@ import { PullResult } from '../../shared/model/PullResult';
 import * as util from 'util';
 import * as child_process from 'child_process';
 import { parseDiffCheckResult, parseMergeResult, parseStatusSB } from '../../shared/utilities/merge-tree-parser';
+import { DefaultLogFields } from '../../shared/state/DATA/logs';
 
 @Injectable()
 export class GitService {
@@ -60,14 +61,11 @@ export class GitService {
    * @param arrayPath
    */
   async getRepositoryName(arrayPath: string[]): Promise<string> {
-
     if (arrayPath.length === 0) {
       return null;
     }
-
     const joinPath = arrayPath.slice(0, arrayPath.length - 1).join('/');
     const isGitRepository = await this.gitInstance(joinPath).checkIsRepo();
-
     if (isGitRepository) {
       return await this.getRepositoryName(arrayPath.slice(0, arrayPath.length - 1));
     } else {
@@ -429,6 +427,19 @@ export class GitService {
     return parseMergeResult(mergePreviewRawText);
   }
 
+  async logs(repository: Repository, after?: string, options?: { [key: string]: string | null | any }) {
+    const optionDefault = { '-20': null };
+    if (options) {
+      Object.assign(optionDefault, options);
+    }
+
+    if (after) {
+      Object.assign(optionDefault, { '--after': after });
+    }
+
+    return this.gitInstance(repository.directory).log<DefaultLogFields>(optionDefault);
+  }
+
   /**
    * STATUS: DONE
    * @param repository
@@ -497,7 +508,6 @@ export class GitService {
    */
   async addFilesToIgnore(repository: Repository, ...relativeFilePath: string[]) {
     const rootIgnore = pathNode.join(repository.directory, '.gitignore');
-
     // Check if file is already in ignore
     const statusIgnore = await this.isFileIgnored(repository, ...relativeFilePath);
     const addIgnore = [];

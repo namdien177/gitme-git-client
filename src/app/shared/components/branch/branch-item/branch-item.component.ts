@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../state/DATA/branches';
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { StatusSummary } from '../../../model/statusSummary.model';
@@ -7,7 +7,7 @@ import { MatBottomSheet } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { LoadingIndicatorService } from '../../../state/system/Loading-Indicator';
+import { LoadingIndicatorService } from '../../../state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-branch-item',

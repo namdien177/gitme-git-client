@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { YesNoDialogModel } from '../../../../../model/yesNoDialog.model';
 import { Repository } from '../../../../../state/DATA/repositories';
 import { FileStatusSummaryView, RepositoryStatusService } from '../../../../../state/DATA/repository-status';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../../state/DATA/branches';
 import { shouldNotExistInArray } from '../../../../../validate/customFormValidate';
 import { SecurityService } from '../../../../../../services/system/security.service';
 import { distinctUntilChanged } from 'rxjs/operators';

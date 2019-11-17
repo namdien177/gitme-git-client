@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef, MatDialog } from '@angular/material';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/branches';
 import { StatusSummary } from '../../../../model/statusSummary.model';
 import { RepositoriesService, Repository } from '../../../../state/DATA/repositories';
 import { YesNoDecisionComponent } from '../../../UI/dialogs/yes-no-decision/yes-no-decision.component';
@@ -10,9 +10,9 @@ import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { BranchRenameComponent } from '../branch-rename/branch-rename.component';
 import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
-import { Account, AccountListService } from '../../../../state/DATA/account-list';
+import { Account, AccountListService } from '../../../../state/DATA/accounts';
 import { ComputedAction, MergeResult } from '../../../../model/merge.interface';
-import { LoadingIndicatorService } from '../../../../state/system/Loading-Indicator';
+import { LoadingIndicatorService } from '../../../../state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-branch-options',

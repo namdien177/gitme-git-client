@@ -8,7 +8,7 @@ import { map } from 'rxjs/operators';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileStatusSummaryView } from '../repository-status';
-import { Account, AccountListService } from '../account-list';
+import { Account, AccountListService } from '../accounts';
 import { UtilityService } from '../../../utilities/utility.service';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
 

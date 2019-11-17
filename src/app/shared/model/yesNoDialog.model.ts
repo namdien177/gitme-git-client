@@ -1,4 +1,4 @@
-import { CommitOptions } from '../state/DATA/repository-branches';
+import { CommitOptions } from '../state/DATA/branches';
 
 export interface YesNoDialogModel<type = any> {
   title: string;

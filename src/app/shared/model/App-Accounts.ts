@@ -1,4 +1,4 @@
-import { Account } from '../state/DATA/account-list';
+import { Account } from '../state/DATA/accounts';
 
 export interface AppAccounts {
   account: Account;

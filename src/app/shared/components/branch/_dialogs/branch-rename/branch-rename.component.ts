@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/repository-branches';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/branches';
 import { shouldNotExistInArray } from '../../../../validate/customFormValidate';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { isValidNameGitBranch } from '../../../../utilities/utilityHelper';
