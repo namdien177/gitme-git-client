@@ -1,4 +1,7 @@
-<div *ngFor="let log of (logList | async)" class="line-log">
+<div (click)="viewLog(log.hash)"
+     *ngFor="let log of (logList | async)"
+     [class.active]="log.hash === (activeHash | async).hash"
+     class="line-log">
   <div class="log-title">
     {{log.message}}
   </div>

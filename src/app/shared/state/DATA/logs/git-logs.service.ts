@@ -23,8 +23,9 @@ export class GitLogsService {
     fromPromise(this.git.logs(repository)).subscribe(
       log => {
         const mutable: ListLogSummary = deepMutableObject(log);
+        console.log(mutable.all);
         this.store.set(mutable.all);
-        this.setActive(log.latest);
+        this.setActive(mutable.latest.hash);
       }
     );
   }
@@ -44,7 +45,6 @@ export class GitLogsService {
   observeActive(): Observable<ListLogLine> {
     return this.query.selectActive()
     .pipe(
-      // @ts-ignore
       map(logs => {
         if (Array.isArray(logs)) {
           return logs[0];
@@ -54,11 +54,11 @@ export class GitLogsService {
     );
   }
 
-  setActive(logs: ListLogLine) {
+  setActive(logsHash: string) {
     const currentActive = this.query.getActive();
     if (!!currentActive || (Array.isArray(currentActive) && currentActive.length > 0)) {
       this.store.removeActive(this.query.getActive());
     }
-    this.store.setActive(logs);
+    this.store.setActive(logsHash);
   }
 }

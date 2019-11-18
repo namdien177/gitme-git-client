@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { GitLogsService, ListLogLine } from '../../../shared/state/DATA/logs';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-repo-history',
@@ -20,11 +21,6 @@ export class RepoHistoryComponent implements OnInit {
     private logsService: GitLogsService,
   ) {
     this.repository = this.repositoryService.getActive();
-
-    this.statusService.checkFromCommit(this.repository, 'c02307e').then(res => {
-      console.log(res);
-    });
-
     this.activeViewTracking();
   }
 
@@ -37,13 +33,21 @@ export class RepoHistoryComponent implements OnInit {
     .pipe(
       filter((commit) => !!commit),
       distinctUntilChanged(),
+      catchError(err => {
+        console.log(err);
+        return null;
+      }),
+      switchMap((log: ListLogLine) => {
+        this.viewLogs = log;
+        return fromPromise(this.statusService.checkFromCommit(this.repository, log.hash));
+      }),
     )
-    .subscribe((log: any) => {
-      this.viewLogs = log;
-      console.log(log);
-    }, error => {
-      console.log(error);
-      this.viewLogs = null;
+    .subscribe(res => {
+      console.log(res);
     });
+  }
+
+  openDirectory() {
+
   }
 }
