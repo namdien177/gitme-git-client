@@ -1,3 +1,33 @@
-<p>
-  repo-history works!
-</p>
+<ng-container *ngIf="!!viewLogs && viewLogs.hash">
+  <div class="commit-title">
+    <div class="icon">
+      <div (click)="openDirectory()" class="circle">
+        <i class="fas fa-file-alt"></i>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="directory-status text-muted">
+        <div class="directory">Hash: {{viewLogs.hash}}</div>
+      </div>
+      <div class="name">
+        {{viewLogs.message}}
+      </div>
+    </div>
+
+    <div class="features">
+      <button color="primary"
+              mat-icon-button>
+        <i class="fas fa-folder-open"></i>
+      </button>
+      <button color="primary"
+              mat-icon-button>
+        <i class="fas fa-edit"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="commit-content">
+<!--    <gitme-repo-changes></gitme-repo-changes>-->
+  </div>
+</ng-container>

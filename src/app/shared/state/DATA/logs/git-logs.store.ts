@@ -1,24 +1,20 @@
-import { EntityState, EntityStore, StoreConfig } from '@datorama/akita';
-import { ListLogLine, ListLogSummary } from './git-logs.model';
+import { ActiveState, EntityState, EntityStore, StoreConfig } from '@datorama/akita';
+import { ListLogLine } from './git-logs.model';
 import { Injectable } from '@angular/core';
 
-export interface LogsState extends EntityState<ListLogLine> {
+export interface LogsState extends EntityState<ListLogLine>, ActiveState {
 }
 
-export function createInitialState(): ListLogSummary {
-  return {
-    all: [],
-    latest: null,
-    total: 20,
-  };
-}
+const initialState = {
+  active: null
+};
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'git-logs', resettable: true })
+@StoreConfig({ name: 'git-logs', resettable: true, idKey: 'hash' })
 export class GitLogsStore extends EntityStore<LogsState> {
 
   constructor() {
-    super();
+    super(initialState);
   }
 
 }

@@ -20,7 +20,7 @@
   margin-bottom: 0.15rem;
   cursor: pointer;
 
-  &:hover {
+  &:hover, &.active {
     background-color: $primary-black-lighter;
   }
 
