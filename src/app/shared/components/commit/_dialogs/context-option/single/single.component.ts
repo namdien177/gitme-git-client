@@ -1,11 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
-import { FileStatusSummaryView } from '../../../../../state/DATA/repository-status';
-import { RepositoryBranchesService } from '../../../../../state/DATA/branches';
-import { RepositoriesService, Repository } from '../../../../../state/DATA/repositories';
-import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
-import { fromPromise } from 'rxjs/internal-compatibility';
-import { switchMap } from 'rxjs/operators';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material';
+import {FileStatusSummaryView} from '../../../../../state/DATA/repository-status';
+import {RepositoryBranchesService} from '../../../../../state/DATA/branches';
+import {RepositoriesService, Repository} from '../../../../../state/DATA/repositories';
+import {FileSystemService} from '../../../../../../services/system/fileSystem.service';
+import {fromPromise} from 'rxjs/internal-compatibility';
+import {switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'gitme-single',
@@ -15,7 +15,7 @@ import { switchMap } from 'rxjs/operators';
 export class SingleComponent implements OnInit {
 
   extension = '';
-  private readonly file: FileStatusSummaryView;
+  private readonly file: FileStatusSummaryView[];
   private readonly repository: Repository;
 
   constructor(
@@ -24,8 +24,9 @@ export class SingleComponent implements OnInit {
     private repositoryServices: RepositoriesService,
     private _bottomSheetRef: MatBottomSheetRef<SingleComponent>,
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: {
-      file: FileStatusSummaryView,
-      repository: Repository
+      file: FileStatusSummaryView[],
+      repository: Repository,
+      mode: string
     },
   ) {
     this.file = data.file;
@@ -37,12 +38,21 @@ export class SingleComponent implements OnInit {
 
   get ignoreStatus(): boolean {
     const forbidden = /[\/\\]*\.gitignore$/g;
-    return !this.file.path.match(forbidden);
+    if (this.data.mode === 'single') {
+      const watchFile = this.file[0];
+      return !watchFile.path.match(forbidden);
+    }
+    return false;
   }
 
   ngOnInit() {
-    const splitPath = this.data.file.path.split('.');
-    this.extension = splitPath[splitPath.length - 1];
+    if (this.data.mode === 'single') {
+      const watchFile = this.file[0];
+      const splitPath = watchFile.path.split('.');
+      this.extension = splitPath[splitPath.length - 1];
+    } else {
+      this.extension = null;
+    }
   }
 
   dismissed(action: ACTION_ON_FILE = 'CANCEL') {
@@ -50,52 +60,60 @@ export class SingleComponent implements OnInit {
   }
 
   revertChanges() {
-    const singleFileArr: FileStatusSummaryView[] = [this.file];
+    const singleFileArr: FileStatusSummaryView[] = this.file;
     fromPromise(this.branchServices.revertFiles(this.repository, singleFileArr))
-    .pipe(
-      switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-    )
-    .subscribe(
-      () => {
-        this.dismissed('REVERT');
-      }
-    );
+      .pipe(
+        switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+      )
+      .subscribe(
+        () => {
+          this.dismissed('REVERT');
+        }
+      );
   }
 
   openFileLocation() {
-    this.fileSystemService.openFolderOf(this.repository.directory, this.file.path);
-    this.dismissed('OPEN_FOLDER');
+    if (this.data.mode === 'single') {
+      this.fileSystemService.openFolderOf(this.repository.directory, this.file[0].path);
+      this.dismissed('OPEN_FOLDER');
+    }
   }
 
   copyPath(relative: boolean = false) {
-    if (relative) {
-      this.fileSystemService.copyPath(relative, this.file.path);
-    } else {
-      this.fileSystemService.copyPath(relative, this.repository.directory, this.file.path);
+    if (this.data.mode === 'single') {
+      if (relative) {
+        this.fileSystemService.copyPath(relative, this.file[0].path);
+      } else {
+        this.fileSystemService.copyPath(relative, this.repository.directory, this.file[0].path);
+      }
     }
   }
 
   ignoreThisFile() {
-    fromPromise(this.branchServices.ignoreFiles(this.repository, this.file))
-    .pipe(
-      switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-    )
-    .subscribe(() => {
-      this.dismissed('IGNORED');
-    });
+    if (this.data.mode === 'single') {
+      fromPromise(this.branchServices.ignoreFiles(this.repository, this.file[0]))
+        .pipe(
+          switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+          switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+        )
+        .subscribe(() => {
+          this.dismissed('IGNORED');
+        });
+    }
   }
 
   ignoreThisExtension() {
-    fromPromise(this.branchServices.ignoreExtension(this.repository, this.file))
-    .pipe(
-      switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-    )
-    .subscribe(() => {
-      this.dismissed('IGNORED');
-    });
+    if (this.data.mode === 'single') {
+      fromPromise(this.branchServices.ignoreExtension(this.repository, this.file[0]))
+        .pipe(
+          switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+          switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+        )
+        .subscribe(() => {
+          this.dismissed('IGNORED');
+        });
+    }
   }
 }
 

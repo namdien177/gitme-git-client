@@ -1,16 +1,16 @@
 <div (click)="revertChanges()" class="card mb-1">
   <div class="card-body">
-    Revert changes
+    Revert {{data.mode === 'single' ? '' : 'all'}} changes
   </div>
 </div>
 
-<div (click)="openFileLocation()" class="card mb-1">
+<div (click)="openFileLocation()" *ngIf="data.mode === 'single'" class="card mb-1">
   <div class="card-body">
     Open file location
   </div>
 </div>
 
-<div (click)="copyPath()" class="card mb-1">
+<div (click)="copyPath()" *ngIf="data.mode === 'single'" class="card mb-1">
   <div class="card-body">
     Copy file location
   </div>

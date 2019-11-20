@@ -145,13 +145,11 @@ export class ElectronService implements OnDestroy {
 
   private setupUUID() {
     if (!this.localStorage.isAvailable(DefineCommon.ELECTRON_APPS_UUID_KEYNAME)) {
-      // warning first time access
       console.warn('First time accessing application!');
       console.warn('Automatically retrieve UUID machine');
       this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);
     } else {
       if (this.localStorage.get(DefineCommon.ELECTRON_APPS_UUID_KEYNAME) !== this.machine_id) {
-        // warning sign in from unknown machine
         console.warn('Detecting unknown machine!');
         console.warn('Automatically retrieve and replace current UUID machine');
         this.localStorage.set(DefineCommon.ELECTRON_APPS_UUID_KEYNAME, this.machine_id);

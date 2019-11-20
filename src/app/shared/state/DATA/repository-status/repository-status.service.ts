@@ -5,6 +5,7 @@ import { RepositoryStatusQuery } from './repository-status.query';
 import { GitService } from '../../../../services/features/git.service';
 import { Repository } from '../repositories';
 import { parseShowFileHistory } from '../../../utilities/merge-tree-parser';
+import {deepMutableObject} from '../../../utilities/utilityHelper';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusService {
@@ -84,10 +85,11 @@ export class RepositoryStatusService {
   }
 
   checkAllCheckboxState() {
-    const mutableArrayState = [...this.query.getValue().files];
-    const newMutable = mutableArrayState.map(
+    const mutableState = deepMutableObject(this.query.getValue());
+    const files = mutableState.files;
+    const newMutable = files.map(
       file => <FileStatusSummaryView>Object.assign(
-        { ...file },
+        file,
         { checked: true }
       )
     );
@@ -97,10 +99,11 @@ export class RepositoryStatusService {
   }
 
   uncheckAllCheckboxState() {
-    const mutableArrayState = [...this.query.getValue().files];
-    const newMutable = mutableArrayState.map(
+    const mutableState = deepMutableObject(this.query.getValue());
+    const files = mutableState.files;
+    const newMutable = files.map(
       file => <FileStatusSummaryView>Object.assign(
-        { ...file },
+        file,
         { checked: false }
       )
     );
