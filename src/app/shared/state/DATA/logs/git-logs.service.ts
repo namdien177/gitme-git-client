@@ -5,9 +5,9 @@ import { GitService } from '../../../../services/features/git.service';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { deepMutableObject } from '../../../utilities/utilityHelper';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ListLogLine, ListLogSummary } from './git-logs.model';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class GitLogsService {
@@ -20,13 +20,31 @@ export class GitLogsService {
   }
 
   initialLogs(repository: Repository) {
-    fromPromise(this.git.logs(repository)).subscribe(
-      log => {
+    return fromPromise(this.git.logs(repository)).pipe(
+      switchMap(log => {
         const mutable: ListLogSummary = deepMutableObject(log);
-        console.log(mutable.all);
         this.store.set(mutable.all);
         this.setActive(mutable.latest.hash);
-      }
+        return of(mutable);
+      })
+    );
+  }
+
+  getMoreLogs(repository: Repository, beforeDate: string) {
+    return fromPromise(this.git.logs(repository, beforeDate)).pipe(
+      switchMap(log => {
+        const mutable: ListLogSummary = deepMutableObject(log);
+        this.store.add(mutable.all);
+        return of(mutable);
+      }),
+    );
+  }
+
+  getLastLog(repository: Repository) {
+    return fromPromise(this.git.originalCommitLog(repository)).pipe(
+      map(re => {
+        return re.all[0];
+      })
     );
   }
 

@@ -205,10 +205,20 @@ export class GitService {
     return this.gitInstance(repository.directory).status();
   }
 
-  async statusCommit(repository: Repository, commitSHA: string) {
-    return this.gitInstance(repository.directory).show([
-      '--name-status',
-      commitSHA
+  async statusFromCommit(repository: Repository, ...options: string[]) {
+    const optionsPassed: string[] = ['--name-status'];
+    if (options && options.length > 0) {
+      optionsPassed.push(...options);
+    }
+    return this.gitInstance(repository.directory).show(optionsPassed);
+  }
+
+  async fileFromCommit(repository: Repository, filePath: string, commitSHA: string) {
+    return this.gitInstance(repository.directory).diff([
+      `${ commitSHA }^1`,
+      `${ commitSHA }`,
+      '--',
+      `${ filePath }`
     ]);
   }
 
@@ -248,7 +258,7 @@ export class GitService {
   pushUpStream(directory: string, branchName: string, ...options: string[]) {
     const defaultOptions = ['--set-upstream'];
     if (options && options.length > 0) {
-      defaultOptions.concat(options);
+      defaultOptions.push(...options);
     }
     return this.gitInstance(directory)
     .push(
@@ -316,7 +326,7 @@ export class GitService {
   async checkConflict(repository: Repository, ...filePath: string[]) {
     const options = ['--check'];
     if (filePath.length > 0) {
-      options.concat(filePath);
+      options.push(...filePath);
     }
     const stringCheck = await this.gitInstance(repository.directory).diff(options);
     return parseDiffCheckResult(stringCheck);
@@ -376,17 +386,21 @@ export class GitService {
     return parseMergeResult(mergePreviewRawText);
   }
 
-  async logs(repository: Repository, after?: string, options?: { [key: string]: string | null | any }) {
+  async logs(repository: Repository, before?: string, options?: { [key: string]: string | null | any }) {
     const optionDefault = { '-20': null };
     if (options) {
       Object.assign(optionDefault, options);
     }
 
-    if (after) {
-      Object.assign(optionDefault, { '--after': after });
+    if (before) {
+      Object.assign(optionDefault, { '--before': before });
     }
 
     return this.gitInstance(repository.directory).log<DefaultLogFields>(optionDefault);
+  }
+
+  async originalCommitLog(repository: Repository) {
+    return this.gitInstance(repository.directory).log(['--reverse', '-1']);
   }
 
   /**

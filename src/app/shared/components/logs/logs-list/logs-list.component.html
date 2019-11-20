@@ -1,17 +1,25 @@
-<div (click)="viewLog(log.hash)"
-     *ngFor="let log of (logList | async)"
-     [class.active]="log.hash === (activeHash | async).hash"
-     class="line-log">
-  <div class="log-title">
-    {{log.message}}
+<div class="scrollDetection">
+  <div (click)="viewLog(log.hash)"
+       *ngFor="let log of (logList | async)"
+       [class.active]="log.hash === (activeHash | async).hash"
+       class="line-log">
+    <div class="log-title">
+      {{log.message}}
+    </div>
+    <div class="log-user-avatar">
+      <i class="fa fa-user-circle"></i>
+    </div>
+    <div class="log-user-name">
+      {{log.author_name}}
+    </div>
+    <div class="time">
+      {{log.date | date:'dd/M/yyyy HH:mm:ss'}}
+    </div>
   </div>
-  <div class="log-user-avatar">
 
-  </div>
-  <div class="log-user-name">
-    {{log.author_name}}
-  </div>
-  <div class="time">
-    {{log.date | date:'dd/M/yyyy HH:mm:ss'}}
-  </div>
+  <button (click)="viewMore()"
+          *ngIf="!allCommitConfirmed"
+          class="w-100 bg-transparent" mat-flat-button>
+    Load more
+  </button>
 </div>

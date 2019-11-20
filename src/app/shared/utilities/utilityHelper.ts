@@ -426,7 +426,6 @@ export function deepMutableObject(objectImmutable: object) {
   if (objectImmutable === null || objectImmutable === undefined) {
     return objectImmutable;
   }
-
   // foreach every key and reassign for retObject
   Object.keys(objectImmutable).forEach(prob => {
     // if not object/array => assign value and continue

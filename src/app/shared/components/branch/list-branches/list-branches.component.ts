@@ -81,7 +81,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       takeWhile(fromStatus => !!fromStatus),
       switchMap(newBranch => {
         this._temporaryBranchInfo = newBranch;
-        return fromPromise(this.statusService.check(this.repository));
+        return fromPromise(this.statusService.status(this.repository));
       }),
       map((
         // Have changes => stash or bring?
