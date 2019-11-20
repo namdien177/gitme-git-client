@@ -25,7 +25,7 @@ export class LocalStorageService {
   remove(keyName: string) {
     const isExisted = this.isSet(keyName);
     if (isExisted) {
-      localStorage.removeItem(keyName);
+      localStorage.removeItem(this.prefix + '-' + keyName);
       return isExisted && !this.isSet(keyName);
     }
     return false;
