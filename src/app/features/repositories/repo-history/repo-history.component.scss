@@ -89,13 +89,96 @@
   }
 }
 
-.wait-file-option {
-  width: 500px;
-  height: max-content;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+.commit-content {
+  display: grid;
+  grid-template-columns: 250px auto;
+  grid-template-rows: 100%;
+  grid-gap: 0;
+  grid-template-areas: 'list diffs';
+
+  .file-list {
+    grid-area: list;
+    display: block;
+    width: inherit;
+    padding: 0.25rem;
+    overflow: auto;
+    box-shadow: $shadow-light;
+
+    .files {
+      display: flex;
+      align-items: center;
+      height: 2.5rem;
+      width: 100%;
+      margin-bottom: 0.25rem;
+      padding-left: 0.25rem;
+
+      &:hover {
+        background: $primary-black-lighter;
+      }
+
+      &.active {
+        background: $primary-black !important;
+        box-shadow: $shadow-light;
+      }
+
+      .added {
+        span {
+          &:first-child {
+            position: relative;
+            width: 14px;
+            height: 14px;
+
+            svg {
+              top: 1px;
+              left: 0;
+            }
+          }
+        }
+      }
+
+      .directory {
+        overflow: hidden;
+        display: grid;
+        grid-template-areas: 'directory name type';
+        grid-template-columns: auto minmax(max-content, 1fr) 2rem;
+        grid-template-rows: 1fr;
+        grid-gap: 0;
+        width: 100%;
+        font-size: 0.85rem;
+        line-height: 0.85rem;
+        align-items: center;
+        user-select: none;
+
+        .directory-path {
+          grid-area: directory;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+        .file-name {
+          grid-area: name;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          line-height: 1rem;
+        }
+
+        .type-action {
+          grid-area: type;
+          display: grid;
+          place-content: center;
+
+          i {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .file-diffs {
+    grid-area: diffs;
+    position: relative;
+  }
 }

@@ -3,10 +3,12 @@
 :host {
   width: 100%;
   height: inherit;
-  overflow: auto;
+}
 
-  display: flex;
-  flex-direction: column;
+.scrollDetection {
+  width: 100%;
+  height: inherit;
+  overflow: scroll;
 }
 
 .line-log {
@@ -38,6 +40,7 @@
     grid-area: avatar;
     width: 1rem;
     height: 1rem;
+    font-size: 0.8rem;
     display: grid;
     place-content: center;
     border-radius: 2px;

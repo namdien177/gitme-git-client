@@ -73,14 +73,11 @@ export class AppComponent implements AfterViewInit {
 
   listenerFocus() {
     app.on('browser-window-focus', (event, window) => {
-      console.log('browser-window-focus', window.webContents.id);
       this.applicationStateService.setFocus();
     });
     app.on('browser-window-blur', (event, window) => {
       if (webContents.isDevToolsFocused()) {
-        console.log('Ignore this case');
       } else {
-        console.log('browser-window-blur', window.webContents.id);
         this.applicationStateService.setBlur();
       }
     });
@@ -107,7 +104,7 @@ export class AppComponent implements AfterViewInit {
    */
   private getBranchStatus() {
     if (!!this.repository) {
-      return fromPromise(this.repositoryStatusService.check(this.repository));
+      return fromPromise(this.repositoryStatusService.status(this.repository));
     }
     return of(null);
   }

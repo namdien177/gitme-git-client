@@ -130,7 +130,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
+      switchMap(() => fromPromise(this.repositoryStatusService.status(this.repository))),
     ).subscribe(() => {
       console.log('Sequential loop finished');
     });
@@ -202,7 +202,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository)))
+      switchMap(() => fromPromise(this.repositoryStatusService.status(this.repository)))
     ).subscribe((status) => {
       console.log('Fetch completed');
       this.loading.setFinish();
@@ -219,7 +219,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
+      switchMap(() => fromPromise(this.repositoryStatusService.status(this.repository))),
     )
     .subscribe((status) => {
       console.log('Push completed');
@@ -237,7 +237,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.repositoryStatusService.check(this.repository))),
+      switchMap(() => fromPromise(this.repositoryStatusService.status(this.repository))),
     )
     .subscribe(
       (result: StatusSummary) => {

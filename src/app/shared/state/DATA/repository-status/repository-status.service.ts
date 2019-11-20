@@ -5,7 +5,8 @@ import { RepositoryStatusQuery } from './repository-status.query';
 import { GitService } from '../../../../services/features/git.service';
 import { Repository } from '../repositories';
 import { parseShowFileHistory } from '../../../utilities/merge-tree-parser';
-import {deepMutableObject} from '../../../utilities/utilityHelper';
+import { deepMutableObject } from '../../../utilities/utilityHelper';
+import { diffChangeStatus, GitDiffService } from '../git-diff';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryStatusService {
@@ -14,18 +15,24 @@ export class RepositoryStatusService {
     private store: RepositoryStatusStore,
     private query: RepositoryStatusQuery,
     private git: GitService,
+    private diffService: GitDiffService
   ) {
   }
 
-  async check(repository: Repository) {
+  async status(repository: Repository) {
     const status: StatusSummary = await this.git.status(repository);
     this.set(status);
     return status;
   }
 
-  async checkFromCommit(repository: Repository, commitSHA: string) {
-    const rawStatus =  await this.git.statusCommit(repository, commitSHA);
+  async filesFromCommit(repository: Repository, commitSHA: string) {
+    const rawStatus = await this.git.statusFromCommit(repository, commitSHA);
     return parseShowFileHistory(rawStatus);
+  }
+
+  async diffOfFileFromCommit(repository: Repository, path: string, modificationType: diffChangeStatus, commitSHA: string) {
+    const rawFileDiff = await this.git.fileFromCommit(repository, path, commitSHA);
+    return await this.diffService.setDiff(rawFileDiff, path, modificationType);
   }
 
   set(status: StatusSummary) {

@@ -2,7 +2,7 @@
   <div class="commit-title">
     <div class="icon">
       <div (click)="openDirectory()" class="circle">
-        <i class="fas fa-file-alt"></i>
+        <i class="fas fa-hashtag"></i>
       </div>
     </div>
 
@@ -16,18 +16,45 @@
     </div>
 
     <div class="features">
-      <button color="primary"
-              mat-icon-button>
-        <i class="fas fa-folder-open"></i>
-      </button>
-      <button color="primary"
-              mat-icon-button>
-        <i class="fas fa-edit"></i>
-      </button>
+
     </div>
   </div>
 
   <div class="commit-content">
-<!--    <gitme-repo-changes></gitme-repo-changes>-->
+    <div class="file-list">
+      <div (click)="viewDiffFile(record.file)"
+           *ngFor="let record of commitmentFiles; let i = index"
+           [class.active]="record.active"
+           class="files">
+        <div [title]="record.file.path" class="directory">
+          <div class="directory-path text-muted">
+            {{utilities.extractFrontPath(record.file.path).front}}
+          </div>
+          <div class="file-name">
+            {{utilities.extractFrontPath(record.file.path).end}}
+          </div>
+          <div class="type-action">
+            <ng-container *ngIf="record.file.status === 'A'">
+                <span class="created text-success">
+                  <i class="far fa-plus-square"></i>
+                </span>
+            </ng-container>
+            <ng-container *ngIf="record.file.status === 'D'">
+                <span class="deleted text-danger">
+                  <i class="far fa-minus-square"></i>
+                </span>
+            </ng-container>
+            <ng-container *ngIf="record.file.status === 'M'">
+                <span class="modified text-warning">
+                  <i class="fas fa-pen-square"></i>
+                </span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="file-diffs">
+      <gitme-repo-changes></gitme-repo-changes>
+    </div>
   </div>
 </ng-container>

@@ -248,7 +248,6 @@ export function parseStatusSB(rawText: string) {
       trackTo: null
     };
   }
-
   // Tracking remote branch that has upstream will contain:
   // ## <<branch-name>>...<<remote>>/<<branch-name>> \n ...
   // local branch with no upstream will be:
