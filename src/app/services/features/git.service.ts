@@ -20,7 +20,7 @@ export class GitService {
   constructor(
     private utilities: UtilityService,
     private securityService: SecurityService,
-    private fileSystem: FileSystemService
+    private fileSystem: FileSystemService,
   ) {
   }
 
@@ -31,7 +31,7 @@ export class GitService {
     option,
     trackingOn: BranchTracking,
     isRemote: boolean,
-    isLocal: boolean
+    isLocal: boolean,
   ): RepositoryBranchSummary {
     return Object.assign(
       {},
@@ -41,7 +41,7 @@ export class GitService {
       { options: option },
       { tracking: trackingOn },
       { has_remote: isRemote },
-      { has_local: isLocal }
+      { has_local: isLocal },
     );
   }
 
@@ -102,7 +102,7 @@ export class GitService {
       const branchName = slidedSlash.slice(1).join('/');
       // If exist local, copy the current and change the local/remote status
       const existInstanceLocal = branchLocalRaw.all.find(
-        nameLocalBranch => nameLocalBranch === branchName
+        nameLocalBranch => nameLocalBranch === branchName,
       );
       let isRemote = true;
       if (trackingStatus.branchName === branchName) {
@@ -114,7 +114,7 @@ export class GitService {
         const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
           branchRemoteRaw.branches[branchRemoteName],
           branchName,
-          current, null, trackingOn, isRemote, true
+          current, null, trackingOn, isRemote, true,
         );
         branchesOutPut.push(branchItem);
       } else {
@@ -122,7 +122,7 @@ export class GitService {
         const branchItem: RepositoryBranchSummary = GitService.repositoryBranchBuilder(
           branchRemoteRaw.branches[branchRemoteName],
           branchName,
-          current, null, trackingOn, isRemote, false
+          current, null, trackingOn, isRemote, false,
         );
         branchesOutPut.push(branchItem);
       }
@@ -139,7 +139,7 @@ export class GitService {
           branchLocalRaw.branches[branchLocalName],
           branchLocalName,
           branchLocalRaw.branches[branchLocalName].current,
-          null, null, false, true
+          null, null, false, true,
         );
         branchesOutPut.push(branchItem);
       }
@@ -169,7 +169,7 @@ export class GitService {
     if (!branch.tracking || !branch.tracking.fetch) {
       return {
         fetchData: null,
-        repository
+        repository,
       };
     }
     // retrieve the directory for gitInstance to execute
@@ -178,7 +178,7 @@ export class GitService {
     const data = await this.gitInstance(directory).fetch(remoteFetch);
     return {
       fetchData: data,
-      repository
+      repository,
     };
   }
 
@@ -187,7 +187,7 @@ export class GitService {
    */
   async getBranchTracking(directory: string) {
     const stringRemotes: string = await this.gitInstance(directory).remote(['-v']).then(
-      res => !!res ? res : ''
+      res => !!res ? res : '',
     );
     if (stringRemotes.length < 1) {
       return false;
@@ -215,10 +215,10 @@ export class GitService {
 
   async fileFromCommit(repository: Repository, filePath: string, commitSHA: string) {
     return this.gitInstance(repository.directory).diff([
-      `${ commitSHA }^1`,
-      `${ commitSHA }`,
+      `${commitSHA}^1`,
+      `${commitSHA}`,
       '--',
-      `${ filePath }`
+      `${filePath}`,
     ]);
   }
 
@@ -238,13 +238,13 @@ export class GitService {
     repository: Repository,
     branch: RepositoryBranchSummary,
     credentials: Account,
-    options?: { [key: string]: null | string | any }
+    options?: { [key: string]: null | string | any },
   ) {
     const remote = this.getOathURL(branch, repository, credentials, 'push');
     return this.gitInstance(repository.directory).push(
       remote,
       branch.name,
-      options
+      options,
     );
   }
 
@@ -261,21 +261,21 @@ export class GitService {
       defaultOptions.push(...options);
     }
     return this.gitInstance(directory)
-    .push(
-      'origin', // should be remoteType but idk why it's not work...
-      branchName,
-      defaultOptions
-    );
+      .push(
+        'origin', // should be remoteType but idk why it's not work...
+        branchName,
+        defaultOptions,
+      );
   }
 
   pull(
     repository: Repository, branch: RepositoryBranchSummary,
-    credentials: Account, options?: { [key: string]: null | string | any }
+    credentials: Account, options?: { [key: string]: null | string | any },
   ): Promise<PullResult> {
     const remote = this.getOathURL(branch, repository, credentials, 'fetch');
     return this.gitInstance(repository.directory).pull(
       remote, branch.name,
-      options
+      options,
     );
   }
 
@@ -299,9 +299,10 @@ export class GitService {
   async commit(repository: Repository, message: string, fileList: string[], option?: {
     [properties: string]: string
   }) {
-    const instanceGit = await this.gitInstance(repository.directory);
-    await instanceGit.add(fileList);
-    return instanceGit.commit(message, fileList, option);
+    debugger
+    await this.gitInstance(repository.directory).raw(['add', '.']);
+    debugger
+    return this.gitInstance(repository.directory).commit(message, fileList, option);
   }
 
   /**
@@ -316,11 +317,11 @@ export class GitService {
     }
 
     return await this.gitInstance(repository.directory).checkout(branchName)
-    .then(() => true)
-    .catch(err => {
-      console.log(err);
-      return false;
-    });
+      .then(() => true)
+      .catch(err => {
+        console.log(err);
+        return false;
+      });
   }
 
   async checkConflict(repository: Repository, ...filePath: string[]) {
@@ -349,14 +350,14 @@ export class GitService {
    */
   async mergeContinue(
     repository: Repository, files: string[], account: Account,
-    mergeInfo?: { branchFromName: string, branchToName: string }
+    mergeInfo?: { branchFromName: string, branchToName: string },
   ) {
     // Actually this will resolve the conflicts by a new commit and push to remote.
     // Yes. The concept is just outstanding!
     let message = '';
     if (!!mergeInfo) {
       const { branchFromName, branchToName } = mergeInfo;
-      message = `Resolve conflict for merge request from branch ${ branchFromName } to ${ branchToName }`;
+      message = `Resolve conflict for merge request from branch ${branchFromName} to ${branchToName}`;
     } else {
       message = 'Resolve conflict';
     }
@@ -368,20 +369,20 @@ export class GitService {
     return this.gitInstance(repository.directory).raw([
       'merge-base',
       branchFrom.name,
-      branchTo.name
+      branchTo.name,
     ]);
   }
 
   async mergePreview(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
     const baseTree = await this.getMergeBase(repository, branchFrom, branchTo);
-    let executeCommand = `git merge-tree ${ baseTree } ${ branchTo.name } ${ branchFrom.name }`;
+    let executeCommand = `git merge-tree ${baseTree} ${branchTo.name} ${branchFrom.name}`;
     if (executeCommand.includes('\n')) {
       executeCommand = executeCommand.replace(/\n/g, '');
     }
     const promisifyScript = util.promisify(this.run_script);
     const mergePreviewRawText = await promisifyScript({
       command: executeCommand,
-      directory: repository.directory
+      directory: repository.directory,
     }).then(text => text, error => error.toString());
     return parseMergeResult(mergePreviewRawText);
   }
@@ -414,7 +415,7 @@ export class GitService {
       return this.gitInstance(repository.directory).reset('hard');
     } else {
       return this.gitInstance(repository.directory)
-      .checkout(['--', ...files]).then(() => null);
+        .checkout(['--', ...files]).then(() => null);
     }
   }
 
@@ -429,7 +430,7 @@ export class GitService {
    */
   async getDiffOfFile(repository: Repository, filePath: string) {
     return await this.gitInstance(repository.directory).diff(
-      ['--', filePath]
+      ['--', filePath],
     );
   }
 
@@ -439,7 +440,7 @@ export class GitService {
 
   async addStash(repository: Repository, message?: string) {
     if (!message) {
-      message = `Stashed at ${ moment().format('YYYY/MM/DD - HH:mm:ss') }`;
+      message = `Stashed at ${moment().format('YYYY/MM/DD - HH:mm:ss')}`;
     }
     return await this.gitInstance(repository.directory).stash(['-m', message]);
   }
@@ -450,7 +451,7 @@ export class GitService {
 
   async getStash(repository: Repository) {
     return await this.gitInstance(repository.directory).stash([
-      'pop'
+      'pop',
     ]);
   }
 
@@ -461,7 +462,7 @@ export class GitService {
    */
   async isFileIgnored(repository: Repository, ...filePath: string[]) {
     return this.gitInstance(repository.directory)
-    .checkIgnore([...filePath]);
+      .checkIgnore([...filePath]);
   }
 
   /**
@@ -506,14 +507,14 @@ export class GitService {
     const extractedExtension: string[] = filePaths.map(path => {
       const fileNode = pathNode.join(repository.directory, path);
       const ext = pathNode.extname(fileNode);
-      return `*${ ext }`;
+      return `*${ext}`;
     });
     const extensionJoin: string = '\n' + extractedExtension.join('\n');
     let ignoreStatus: boolean;
     if (!this.fileSystem.isFileExist(rootIgnore)) {
       // File already exist => write to file
       ignoreStatus = (await this.fileSystem.createFile(
-        '.gitignore', extensionJoin, repository.directory, '', false
+        '.gitignore', extensionJoin, repository.directory, '', false,
       )).status;
     } else {
       ignoreStatus = await this.fileSystem.quickAppendStringTo(rootIgnore, '', extensionJoin);
@@ -544,7 +545,7 @@ export class GitService {
           branchTracking.push({
             name: components[0],
             fetch: action === 'fetch' ? components[1] : null,
-            push: action === 'push' ? components[1] : null
+            push: action === 'push' ? components[1] : null,
           });
         }
       }

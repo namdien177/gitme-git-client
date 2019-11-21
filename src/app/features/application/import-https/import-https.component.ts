@@ -14,8 +14,8 @@ import {
   isValidCloneURL,
   shouldNotExistInArray,
 } from '../../../shared/validate/customFormValidate';
-import { debounceTime } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { catchError, debounceTime, switchMap, takeWhile } from 'rxjs/operators';
+import { merge, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
@@ -153,7 +153,7 @@ export class ImportHttpsComponent implements OnInit {
     const repositoryInstance: Repository = {
       id: this.securityService.randomID,
       name: this.repo_name.value,
-      directory: this.directory.value,
+      directory: this.display_directory,
       credential: {
         id_credential: credentialsInstance.id,
         name: credentialsInstance.name,
@@ -165,11 +165,29 @@ export class ImportHttpsComponent implements OnInit {
       .find(account => account.id === credentialsInstance.id);
 
     // fetch to check the remote first
-    fromPromise(this.gitPackService.cloneTo(this.http.value, repositoryInstance.directory, credentialsInstance))
-      .pipe()
-      .subscribe(
-        res => {
-          console.log(res);
+    fromPromise(this.gitPackService.cloneTo(this.http.value, this.directory.value + '/', credentialsInstance))
+      .pipe(
+        catchError(err => {
+          // unauthorized or not exist
+          console.log(err);
+          return of('error');
+        }),
+        takeWhile((res) => res !== undefined && res.length === 0),
+        switchMap(() => {
+          return fromPromise(this.repositoryService.createNew(
+            repositoryInstance,
+            credentialsInstance,
+            !isExistedOnDB,
+          ));
+        }),
+      )
+      .subscribe(addStatus => {
+          console.log(addStatus);
+          this.repository_register_error = null;
+          this.cancel();
+        }, error => {
+          this.repository_register_error = 'Register a new repository failed, please try again!';
+          console.log(error);
         },
       );
     /**
@@ -178,20 +196,6 @@ export class ImportHttpsComponent implements OnInit {
      * * Update working repository
      * * Fetching new repository => reassign main branch.
      */
-    // fromPromise(this.repositoryService.createNew(
-    //   repositoryInstance,
-    //   credentialsInstance,
-    //   !isExistedOnDB,
-    //   // !this.isListAccountTab
-    // )).subscribe(
-    //   addStatus => {
-    //     this.repository_register_error = null;
-    //     this.cancel();
-    //   }, error => {
-    //     this.repository_register_error = 'Register a new repository failed, please try again!';
-    //     console.log(error);
-    //   },
-    // );
   }
 
   switchAccountChooseMode(value: boolean) {
@@ -213,24 +217,28 @@ export class ImportHttpsComponent implements OnInit {
     const observeDirectory = this.directory.valueChanges;
     merge(observeDirectory, observeHTTP).subscribe(
       () => {
-        const http = <string>this.http.value;
-        const directory = <string>this.directory.value;
-        this.display_directory = directory;
-
-        if (this.http.valid && this.directory.valid) {
-          const nameRepo = this.utilityService.repositoryNameFromHTTPS(http);
-          if (nameRepo) {
-            this.repo_name.setValue(nameRepo);
-          }
-
-          if (directory && this.http.valid) {
-            if (this.http.valid && nameRepo) {
-              this.display_directory = pathNode.join(directory, nameRepo);
-            }
-          }
-        }
+        this.setDirectoryAndName();
       },
     );
+  }
+
+  private setDirectoryAndName() {
+    const http = <string>this.http.value;
+    const directory = <string>this.directory.value;
+    this.display_directory = directory;
+
+    if (this.http.valid && this.directory.valid) {
+      const nameRepo = this.utilityService.repositoryNameFromHTTPS(http);
+      if (nameRepo) {
+        this.repo_name.setValue(nameRepo);
+      }
+
+      if (directory && this.http.valid) {
+        if (this.http.valid && nameRepo) {
+          this.display_directory = pathNode.join(directory, nameRepo);
+        }
+      }
+    }
   }
 
 }
