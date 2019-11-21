@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { RepositoriesMenuQuery, RepositoriesMenuService } from '../../../state/UI/repositories-menu';
-import { RepositoriesQuery, Repository } from '../../../state/DATA/repositories';
+import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'gitme-navigation-repositories',
   templateUrl: './navigation-repositories.component.html',
-  styleUrls: ['./navigation-repositories.component.scss']
+  styleUrls: ['./navigation-repositories.component.scss'],
 })
 export class NavigationRepositoriesComponent implements OnInit {
 
@@ -15,39 +15,26 @@ export class NavigationRepositoriesComponent implements OnInit {
    */
   repositories: Observable<Repository[]>;
   isAddRepositoryActionOn = false;
-  isCloneRepositoryDialogOn: Observable<boolean>;
-  isAddRepositoryDialogOn: Observable<boolean>;
 
   constructor(
-    private repositoriesQuery: RepositoriesQuery,
-    private repositoriesMenuQuery: RepositoriesMenuQuery,
-    private repositoriesMenuService: RepositoriesMenuService,
+    private repositoriesService: RepositoriesService,
+    private router: Router,
   ) {
   }
 
   ngOnInit() {
     // Retrieve all repositories on local
-    this.repositories = this.repositoriesQuery.selectAll();
-    // get state of cloning dialog
-    this.isCloneRepositoryDialogOn = this.repositoriesMenuQuery.select(
-      status => status.is_repository_clone_open
-    );
-    // get state of adding dialog
-    this.isAddRepositoryDialogOn = this.repositoriesMenuQuery.select(
-      status => status.is_repository_addLocal_open
-    );
-
-
+    this.repositories = this.repositoriesService.selectAll();
   }
 
   cloneRepositoryDialogOn() {
     this.isAddRepositoryActionOn = false;
-    this.repositoriesMenuService.openRepositoryCloneDialog();
+    this.router.navigateByUrl('application/import-https');
   }
 
   addRepositoryDialog() {
     this.isAddRepositoryActionOn = false;
-    this.repositoriesMenuService.openRepositoryAddLocalDialog();
+    this.router.navigateByUrl('application/import-local');
   }
 
   trackBy(index, item: Repository) {

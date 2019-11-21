@@ -1,24 +1,24 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import {FileStatusSummaryView, RepositoryStatusService} from '../../state/DATA/repository-status';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Subject} from 'rxjs';
-import {ArrayLengthShouldLargerThan} from '../../validate/customFormValidate';
-import {UtilityService} from '../../utilities/utility.service';
-import {RepositoriesService, Repository} from '../../state/DATA/repositories';
-import {MatBottomSheet, MatDialog} from '@angular/material';
-import {CommitOptionsComponent} from '../../components/commit/_dialogs/commit-options/commit-options.component';
-import {CommitOptions, RepositoryBranchesService, RepositoryBranchSummary} from '../../state/DATA/branches';
-import {defaultCommitOptionDialog} from '../../model/yesNoDialog.model';
-import {distinctUntilChanged, map, switchMap} from 'rxjs/operators';
-import {GitDiffService} from '../../state/DATA/git-diff';
-import {Router} from '@angular/router';
-import {RepositoriesMenuService} from '../../state/UI/repositories-menu';
-import {SingleComponent} from '../../components/commit/_dialogs/context-option/single/single.component';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../state/DATA/repository-status';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { ArrayLengthShouldLargerThan } from '../../validate/customFormValidate';
+import { UtilityService } from '../../utilities/utility.service';
+import { RepositoriesService, Repository } from '../../state/DATA/repositories';
+import { MatBottomSheet, MatDialog } from '@angular/material';
+import { CommitOptionsComponent } from '../../components/commit/_dialogs/commit-options/commit-options.component';
+import { CommitOptions, RepositoryBranchesService, RepositoryBranchSummary } from '../../state/DATA/branches';
+import { defaultCommitOptionDialog } from '../../model/yesNoDialog.model';
+import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { GitDiffService } from '../../state/DATA/git-diff';
+import { Router } from '@angular/router';
+import { RepositoriesMenuService } from '../../state/UI/repositories-menu';
+import { SingleComponent } from '../../components/commit/_dialogs/context-option/single/single.component';
 
 @Component({
   selector: 'gitme-commit-menu',
   templateUrl: './commit-menu.component.html',
-  styleUrls: ['./commit-menu.component.scss']
+  styleUrls: ['./commit-menu.component.scss'],
 })
 export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   isViewChangeTo: 'changes' | 'history' = 'changes';
@@ -48,12 +48,8 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
     private router: Router,
-    private matBottomSheet: MatBottomSheet
+    private matBottomSheet: MatBottomSheet,
   ) {
-    this.watchingRepository();
-    this.watchingBranch();
-    this.watchingSummary();
-    this.watchingUI();
   }
 
   get title() {
@@ -69,6 +65,10 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.watchingRepository();
+    this.watchingBranch();
+    this.watchingSummary();
+    this.watchingUI();
   }
 
   ngOnInit() {
@@ -90,7 +90,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         if (file.checked) {
           newFileList.push(file);
         }
-      }
+      },
     );
 
     // Update the formData
@@ -130,7 +130,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  commitSelected() {
+  commitChanges() {
     if (this.formCommitment.invalid) {
       return;
     }
@@ -148,22 +148,22 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
       activeRepository,
       this.title.value,
       paths,
-      optionCommits
+      optionCommits,
     )
       .pipe(
         switchMap(result => {
           this.formCommitment.reset();
           this.gitDiffService.reset();
           return this.repositoriesService.fetch(
-            {...this.repository} as Repository,
-            this.activeBranch
+            { ...this.repository } as Repository,
+            this.activeBranch,
           );
-        })
+        }),
       )
       .subscribe(
         fetchStatus => {
           console.log(fetchStatus);
-        }
+        },
       );
   }
 
@@ -176,7 +176,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         height: '400px',
         data: defaultDataCommit,
         panelClass: 'bg-primary-black-mat-dialog',
-      }
+      },
     );
 
     commitOptionResult.afterClosed().subscribe(res => {
@@ -209,7 +209,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     this.formCommitment = this.fb.group({
       title: ['', [Validators.required]],
       files: [[], [ArrayLengthShouldLargerThan(0)]],
-      optional: [null, []]
+      optional: [null, []],
     });
   }
 
@@ -227,7 +227,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         map(summary => {
           this.filesChanges = summary.files;
           return summary.files.length;
-        })
+        }),
       ).subscribe(changes => {
       this.statusSummaryFileLength = changes;
       this.cd.markForCheck();
@@ -245,7 +245,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
           if (this.activeBranch) {
             this.optional.setValue(this.activeBranch.options);
           }
-        }
+        },
       );
   }
 
@@ -260,7 +260,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     const dataTransfer = {
       file,
       repository: this.repository,
-      mode: 'all'
+      mode: 'all',
     };
     const contextOpen = this.matBottomSheet.open(SingleComponent, {
       panelClass: ['bg-primary-black', 'p-2-option'],

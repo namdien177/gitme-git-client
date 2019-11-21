@@ -23,6 +23,10 @@ import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { CoreModule } from './shared/modules/core.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogsModule } from './shared/modules/dialogs.module';
+import { ImportLocalComponent } from './features/application/import-local/import-local.component';
+import { CreateLocalComponent } from './features/application/create-local/create-local.component';
+import { ImportHttpsComponent } from './features/application/import-https/import-https.component';
+import { ShareCredentialsComponentsModule } from './shared/components/credential/ShareCredentialsComponents.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -33,6 +37,9 @@ const declareComps = [
   AppComponent,
   WindowsFrameComponent,
   WebviewDirective,
+  ImportLocalComponent,
+  CreateLocalComponent,
+  ImportHttpsComponent,
 ];
 
 @NgModule({
@@ -54,6 +61,7 @@ const declareComps = [
     AppConfig.production ? [] : AkitaNgDevtools.forRoot(),
     AkitaNgRouterStoreModule.forRoot(),
     BrowserAnimationsModule,
+    ShareCredentialsComponentsModule,
     // Dialogs
     DialogsModule,
   ],

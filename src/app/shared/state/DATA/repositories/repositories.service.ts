@@ -74,7 +74,7 @@ export class RepositoriesService {
       // adding config to the system
       const config = {
         'user.email': credentials.email,
-        'user.name': credentials.name
+        'user.name': credentials.name,
       };
       await this.addConfig(newRepository, config);
     }
@@ -126,7 +126,7 @@ export class RepositoriesService {
 
   async updateToDataBase(
     repository: Repository,
-    newBranches: RepositoryBranchSummary[]
+    newBranches: RepositoryBranchSummary[],
   ) {
     const mutableData: Repository = deepMutableObject(repository);
     const existingBranchesData = mutableData.branches;
@@ -184,8 +184,12 @@ export class RepositoriesService {
         } else {
           return active;
         }
-      })
+      }),
     );
+  }
+
+  selectAll() {
+    return this.query.selectAll();
   }
 
   /**
@@ -226,7 +230,7 @@ export class RepositoriesService {
    */
   commit(repository: Repository, title: string, files: string[], option?: { [git: string]: string }) {
     return fromPromise(
-      this.gitService.commit(repository, title, files, option)
+      this.gitService.commit(repository, title, files, option),
     );
   }
 
@@ -239,12 +243,12 @@ export class RepositoriesService {
   fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
     // get account
     const credential: Account = this.accountListService.getOneSync(
-      repository.credential.id_credential
+      repository.credential.id_credential,
     );
     // update timestamp
     repository.timestamp = moment().valueOf();
     return fromPromise(
-      this.gitService.fetchInfo(repository, credential, branch)
+      this.gitService.fetchInfo(repository, credential, branch),
     ).pipe(
       takeWhile(shouldValid => !!shouldValid.fetchData),
       distinctUntilChanged(),
@@ -260,7 +264,7 @@ export class RepositoriesService {
           });
         }
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(saveRepo));
-      })
+      }),
     );
   }
 
@@ -282,7 +286,7 @@ export class RepositoriesService {
     return {
       value: repositoryUpdate,
       message: '',
-      status: statusUpdate
+      status: statusUpdate,
     } as SystemResponse;
   }
 
@@ -304,8 +308,8 @@ export class RepositoriesService {
           {
             status: status,
             repository: repositoryUpdate,
-            directory: DefineCommon.DIR_REPOSITORIES() + repository.id + '.json'
-          }
+            directory: DefineCommon.DIR_REPOSITORIES() + repository.id + '.json',
+          },
         );
       }
     }
