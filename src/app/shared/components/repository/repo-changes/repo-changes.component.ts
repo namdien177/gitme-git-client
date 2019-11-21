@@ -27,7 +27,6 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
       diffStatus => {
         if (!!diffStatus && !!diffStatus.diff) {
           this.outputHTML = diffStatus.diff;
-          this.cd.detectChanges();
         } else {
           this.outputHTML = null;
         }
