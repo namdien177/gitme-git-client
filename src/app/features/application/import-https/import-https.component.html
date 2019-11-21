@@ -1,94 +1,113 @@
-<form [formGroup]="formRegisterRepository" class="main-form">
-  <h2 class="text-white title-section weight-lighter m-0">
+<form [formGroup]="formCloneRepository"
+      class="main-form">
+  <div class="text-white title-section weight-lighter m-0">
     Cloning from Remote
+    <br>
     <span>HTTPS</span>
-  </h2>
+  </div>
 
-  <div *ngIf="infoDialogs.type !== null"
-       [class.bg-danger]="infoDialogs.type == 'ERROR'"
-       [class.bg-info]="infoDialogs.type == 'INFO'"
-       [class.bg-warning]="infoDialogs.type == 'WARNING'"
-       class="info-dialog card">
-    <div [class.text-black]="infoDialogs.type == 'WARNING'"
-         [class.text-white]="infoDialogs.type == 'ERROR' || infoDialogs.type == 'INFO'"
-         class="card-body">
-      {{infoDialogs.message}}
+  <div *ngIf="!!repository_register_error"
+       class="info-dialog card bg-danger">
+    <div class="card-body text-white">
+      {{repository_register_error}}
     </div>
   </div>
 
-  <div class="repository-information">
-    <h2 class="weight-lighter mb-0">Local Repository</h2>
-    <div class="block-secondary-title">
-      <label class="m-0" for="repo_https">
-        Repository HTTPS
-      </label>
-    </div>
-    <div class="wrap--ng">
-      <input class="form-control form-control-dark form-control-float"
-             formControlName="repo_https"
-             id="repo_https"
-             placeholder="http://github.com/namdien177/gitme-git-client..."
-             type="text">
-      <small class="text-muted mt-2">SSH coming soon</small>
-    </div>
-    <div class="block-secondary-title">
-      <label class="m-0">
-        Directory
-      </label>
-    </div>
-    <div (click)="chooseDirectory()" class="wrap--ng">
-      <div [class.text-muted]="!!repo_dir.value"
-           class="form-control form-control-dark form-control-float">
-        {{illuminateValue_dir}}
+  <ng-container *ngIf="directory.dirty && directory.invalid">
+    <div *ngIf="directory.hasError('directory')"
+         class="info-dialog card bg-danger">
+      <div class="card-body text-white">
+        {{directory.getError('directory')}}
       </div>
+    </div>
 
-      <div class="icon-folder--container">
-        <em class="fas fa-folder"></em>
+    <div *ngIf="directory.hasError('repository')"
+         class="info-dialog card bg-warning">
+      <div class="card-body text-black">
+        {{directory.getError('repository')}}
       </div>
     </div>
-    <small *ngIf="repo_name.valid" class="text-muted">
-      Repository will be added to manage list as "{{repo_name.value}}"
-    </small>
+  </ng-container>
+
+  <div class="repository-information">
+    <h2 class="weight-lighter mb-0">Remote Information</h2>
+
+    <div class="clone-url">
+      <div class="block-secondary-title">
+        <span class="m-0">
+          Clone URL
+        </span>
+      </div>
+      <label class="wrap--ng">
+        <input class="form-control form-control-dark form-control-float"
+               formControlName="http" id="http"
+               placeholder="https://github.com/onaya/repo.git">
+      </label>
+      <small class="text-muted">
+        Cloning with SSH will be coming soon.
+      </small>
+    </div>
+
+    <div class="store-directory">
+      <div class="block-secondary-title">
+        <span class="m-0">
+          Repository directory
+        </span>
+      </div>
+      <div (click)="chooseDirectory()" class="wrap--ng">
+        <input [value]="display_directory"
+               class="form-control form-control-dark form-control-float cursor-pointer"
+               id="directory" readonly>
+
+        <div class="icon-folder--container">
+          <em class="fas fa-folder"></em>
+        </div>
+      </div>
+      <small *ngIf="repo_name.valid" class="text-muted">
+        Repository will be managed as "{{repo_name.value}}"
+      </small>
+    </div>
   </div>
 
   <div class="repository-credentials">
     <h2 class="weight-lighter">Repository Repository</h2>
     <div class="btn--section">
-      <button (click)="isExistingAccount = true"
-              [class.bg-success]="isExistingAccount"
-              [class.bg-transparent]="!isExistingAccount"
+      <button (click)="switchAccountChooseMode(true)"
+              [class.bg-success]="isListAccountTab"
+              [class.bg-transparent]="!isListAccountTab"
               class="text-white"
-              mat-flat-button>
+              mat-flat-button
+              type="button">
         Saved Account
       </button>
-      <button (click)="isExistingAccount = false"
-              [class.bg-success]="!isExistingAccount"
-              [class.bg-transparent]="isExistingAccount"
+      <button (click)="switchAccountChooseMode(false)"
+              [class.bg-success]="!isListAccountTab"
+              [class.bg-transparent]="isListAccountTab"
               class="text-white"
-              mat-flat-button>
+              mat-flat-button
+              type="button">
         New Account
       </button>
     </div>
-    <ng-container *ngIf="isExistingAccount">
-      <gitme-credential-list (accountSelectedChange)="accountListener($event)">
+    <ng-container *ngIf="isListAccountTab">
+      <gitme-credential-list (accountSelectedChange)="listenAccount($event)">
       </gitme-credential-list>
     </ng-container>
 
-    <ng-container *ngIf="!isExistingAccount">
-      <gitme-credential-input (accountNewChange)="accountListener($event)">
+    <ng-container *ngIf="!isListAccountTab">
+      <gitme-credential-input (accountNewChange)="listenAccount($event)">
       </gitme-credential-input>
     </ng-container>
   </div>
 
   <div class="confirmation-action">
-    <button (click)="cancelAdding()" class="bg-transparent" mat-flat-button>
+    <button (click)="cancel()" class="bg-transparent" mat-flat-button type="button">
       Cancel
     </button>
-    <button [disabled]="!directoryVerified"
-            class="btn-info"
-            mat-raised-button>
-      Clone
+    <button (click)="submitNewRepository()"
+            [disabled]="formCloneRepository.invalid || needCreateNewGitDirectory || formCloneRepository.pending"
+            color="primary" mat-raised-button type="button">
+      Confirm
     </button>
   </div>
-
 </form>

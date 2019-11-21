@@ -14,11 +14,22 @@ export function ArrayLengthShouldLargerThan(length: number): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     if (!Array.isArray(control.value)) {
       return {
-        type: 'The value was not array'
+        type: 'The value was not array',
       };
     }
     const validateArray = control.value.length > length;
-    return validateArray ? null : { length: `The array length was sorter or equal ${ length }` };
+    return validateArray ? null : { length: `The array length was sorter or equal ${length}` };
+  };
+}
+
+export function isValidCloneURL(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const matcher = /^((git|ssh|http(s)?)|(git@[\w.]+))(:(\/\/)?)([\w.@:\/\-~]+)(\.git)$/;
+    if ((<string>control.value).match(matcher)) {
+      return null;
+    }
+
+    return { http: 'Invalid clone URL' };
   };
 }
 
@@ -26,7 +37,7 @@ export function isTypeAccount(account: object): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     if (!account || !isAccountType(account)) {
       return {
-        type: 'The value was not array'
+        type: 'The value was not array',
       };
     }
     return null;
@@ -40,7 +51,7 @@ export function shouldNotExistInArray(array: string[], sourceName: string = 'arr
       return value === toCheck;
     });
 
-    return !isMatch ? null : { match: `${ value } is existed in the ${ sourceName }` };
+    return !isMatch ? null : { match: `${value} is existed in the ${sourceName}` };
   };
 }
 
@@ -49,7 +60,17 @@ export function IsRepository(gitService: GitService) {
     return fromPromise(gitService.isGitProject(control.value)).pipe(
       map(res => {
         return res ? null : { repository: 'This is not a valid repository' };
-      })
+      }),
+    );
+  };
+}
+
+export function IsNotRepository(gitService: GitService) {
+  return (control: AbstractControl) => {
+    return fromPromise(gitService.isGitProject(control.value)).pipe(
+      map(res => {
+        return !res ? null : { repository: 'The directory is already a repository' };
+      }),
     );
   };
 }
