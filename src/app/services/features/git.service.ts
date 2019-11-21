@@ -299,9 +299,7 @@ export class GitService {
   async commit(repository: Repository, message: string, fileList: string[], option?: {
     [properties: string]: string
   }) {
-    debugger
     await this.gitInstance(repository.directory).raw(['add', '.']);
-    debugger
     return this.gitInstance(repository.directory).commit(message, fileList, option);
   }
 

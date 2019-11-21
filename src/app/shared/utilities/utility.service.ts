@@ -151,7 +151,6 @@ export class UtilityService {
   }
 
   extractFilePathFromGitStatus(files: FileStatusSummaryView[] | FileStatusSummary[]) {
-    debugger
     const arrCompleted: string[] = [];
     files.forEach(file => {
       if (file.path.includes('->')) {
