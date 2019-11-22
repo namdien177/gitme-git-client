@@ -1,10 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
-import { Repository } from '../../../../state/DATA/repositories';
-import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/branches';
-import { RepositoryStatusService, RepositoryStatusState } from '../../../../state/DATA/repository-status';
-import { GitService } from '../../../../../services/features/git.service';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {YesNoDialogModel} from '../../../../model/yesNoDialog.model';
+import {Repository} from '../../../../state/DATA/repositories';
+import {RepositoryBranchesService, RepositoryBranchSummary} from '../../../../state/DATA/branches';
+import {RepositoryStatusService, RepositoryStatusState} from '../../../../state/DATA/repository-status';
+import {GitService} from '../../../../../services/features/git.service';
+import {ComputedAction} from '../../../../model/merge.interface';
+import {fromPromise} from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-branch-merge',
@@ -17,6 +19,11 @@ export class BranchMergeComponent implements OnInit {
   repository: Repository = null;
   branchFrom: RepositoryBranchSummary = null;
   branchTarget: RepositoryBranchSummary = null;
+
+  infoMerge: string = null;
+  disableMerge = false;
+
+  checkMergeStatus = true;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: YesNoDialogModel<{
@@ -38,26 +45,32 @@ export class BranchMergeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.git.mergePreview(this.repository, this.branchFrom, this.branchTarget).then(
+    this.branchService.getMergeStatus(this.repository, this.branchFrom, this.branchTarget).subscribe(
       res => {
+        this.checkMergeStatus = false;
+        if (res.kind === ComputedAction.Conflicts) {
+          this.infoMerge = 'This merge will create conflicts, do you wish to continue?';
+        } else if (res.kind === ComputedAction.Invalid) {
+          this.infoMerge = 'This merge action is unavailable!';
+          this.disableMerge = true;
+        } else {
+          this.infoMerge = 'Ok to proceed!';
+        }
         console.log(res);
       }
     );
   }
 
-  trackBranchID(index: number, item: RepositoryBranchSummary) {
-    return item.id;
-  }
-
-  testMerge(branch: RepositoryBranchSummary) {
-    this.branchService.getMergeStatus(this.repository, this.branchFrom, this.branchTarget)
-    .subscribe(stat => {
-      console.log(stat);
-    });
+  merge() {
+    fromPromise(this.branchService.merge(this.repository, this.branchFrom))
+      .subscribe(stat => {
+        console.log(stat);
+        this.dialogRef.close(undefined);
+      });
   }
 
   abortMerge() {
-    this.branchService.abortMerge(this.repository);
+    // this.branchService.abortMerge(this.repository);
     this.dialogRef.close(undefined);
   }
 }

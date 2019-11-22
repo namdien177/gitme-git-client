@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as git from 'simple-git/promise';
-import { UtilityService } from '../../shared/utilities/utility.service';
-import { Account } from '../../shared/state/DATA/accounts';
-import { BranchTracking, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
-import { Repository } from '../../shared/state/DATA/repositories';
-import { SecurityService } from '../system/security.service';
+import {UtilityService} from '../../shared/utilities/utility.service';
+import {Account} from '../../shared/state/DATA/accounts';
+import {BranchTracking, RepositoryBranchSummary} from '../../shared/state/DATA/branches';
+import {Repository} from '../../shared/state/DATA/repositories';
+import {SecurityService} from '../system/security.service';
 import * as moment from 'moment';
-import { FileSystemService } from '../system/fileSystem.service';
-import { pathNode } from '../../shared/types/types.electron';
-import { PullResult } from '../../shared/model/PullResult';
+import {FileSystemService} from '../system/fileSystem.service';
+import {pathNode} from '../../shared/types/types.electron';
+import {PullResult} from '../../shared/model/PullResult';
 import * as util from 'util';
 import * as child_process from 'child_process';
-import { parseDiffCheckResult, parseMergeResult, parseStatusSB } from '../../shared/utilities/merge-tree-parser';
-import { DefaultLogFields } from '../../shared/state/DATA/logs';
+import {parseDiffCheckResult, parseMergeResult, parseStatusSB} from '../../shared/utilities/merge-tree-parser';
+import {DefaultLogFields} from '../../shared/state/DATA/logs';
 
 @Injectable()
 export class GitService {
@@ -36,12 +36,12 @@ export class GitService {
     return Object.assign(
       {},
       oldBranchInstance,
-      { name: name },
-      { current: isCurrent },
-      { options: option },
-      { tracking: trackingOn },
-      { has_remote: isRemote },
-      { has_local: isLocal },
+      {name: name},
+      {current: isCurrent},
+      {options: option},
+      {tracking: trackingOn},
+      {has_remote: isRemote},
+      {has_local: isLocal},
     );
   }
 
@@ -173,7 +173,7 @@ export class GitService {
       };
     }
     // retrieve the directory for gitInstance to execute
-    const { directory } = repository;
+    const {directory} = repository;
     const remoteFetch = this.getOathURL(branch, repository, credentials, 'fetch');
     const data = await this.gitInstance(directory).fetch(remoteFetch);
     return {
@@ -331,6 +331,21 @@ export class GitService {
     return parseDiffCheckResult(stringCheck);
   }
 
+  async merge(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary, isConflict = false) {
+    const defaultMessage = `Merge branch ${branchFrom.name} to ${branchTo.name}`;
+    if (isConflict) {
+      // merge with --no-ff and --no-commit
+      return await this.gitInstance(repository.directory).merge([
+        '--no-ff',
+        '-no-commit'
+      ]);
+    }
+    return await this.gitInstance(repository.directory).merge([
+      '-m',
+      defaultMessage
+    ]);
+  }
+
   /**
    * STATUS: DONE
    * @param repository
@@ -354,12 +369,12 @@ export class GitService {
     // Yes. The concept is just outstanding!
     let message = '';
     if (!!mergeInfo) {
-      const { branchFromName, branchToName } = mergeInfo;
+      const {branchFromName, branchToName} = mergeInfo;
       message = `Resolve conflict for merge request from branch ${branchFromName} to ${branchToName}`;
     } else {
       message = 'Resolve conflict';
     }
-    await this.commit(repository, message, files, { '-i': null });
+    await this.commit(repository, message, files, {'-i': null});
     return this.status(repository);
   }
 
@@ -386,13 +401,13 @@ export class GitService {
   }
 
   async logs(repository: Repository, before?: string, options?: { [key: string]: string | null | any }) {
-    const optionDefault = { '-20': null };
+    const optionDefault = {'-20': null};
     if (options) {
       Object.assign(optionDefault, options);
     }
 
     if (before) {
-      Object.assign(optionDefault, { '--before': before });
+      Object.assign(optionDefault, {'--before': before});
     }
 
     return this.gitInstance(repository.directory).log<DefaultLogFields>(optionDefault);
@@ -557,7 +572,7 @@ export class GitService {
   // as well as exit code when it's done (using the callback).
   // Modified to 2 params for easier in promisify
   private run_script(dataExecute: { command: string, directory: string }, callback) {
-    const { command, directory } = dataExecute;
+    const {command, directory} = dataExecute;
     const child = child_process.spawn(command, undefined, {
       shell: true, cwd: directory,
     });
