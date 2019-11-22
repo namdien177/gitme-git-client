@@ -31,7 +31,7 @@ export class RepositoryBranchesService {
    * @param repository
    */
   async updateAll(repository: Repository) {
-    const repoSum = await this.gitService.getBranchInfo(repository.directory, repository.branches);
+    const repoSum = await this.gitService.getBranches(repository.directory, repository.branches);
     this.set(repoSum);
     return repoSum;
   }
@@ -43,7 +43,7 @@ export class RepositoryBranchesService {
    * @param branch
    */
   async checkoutBranch(repo: Repository, branch: RepositoryBranchSummary) {
-    return this.gitService.switchBranch(repo, branch.name);
+    return this.gitService.checkoutBranch(repo, branch.name);
   }
 
   /**
@@ -63,7 +63,7 @@ export class RepositoryBranchesService {
    */
   async ignoreFiles(repository: Repository, ...files: FileStatusSummaryView[]) {
     const dir = files.map(file => file.path);
-    return this.gitService.addFilesToIgnore(repository, ...dir);
+    return this.gitService.addToIgnore(repository, ...dir);
   }
 
   /**
@@ -188,7 +188,7 @@ export class RepositoryBranchesService {
     if (branch.has_local) {
       // delete on local
       // Require to checkout first => default checkout to master
-      const switchBranchStatus = await this.gitService.switchBranch(repository, masterBranch.name);
+      const switchBranchStatus = await this.gitService.checkoutBranch(repository, masterBranch.name);
       if (!switchBranchStatus) {
         return removeStatus;
       }
@@ -292,7 +292,7 @@ export class RepositoryBranchesService {
      * TODO: need refresh
      */
     return fromPromise(
-      this.gitService.abortCheckMerge(repository)
+      this.gitService.mergeAbort(repository)
     );
   }
 

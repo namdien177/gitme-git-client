@@ -20,7 +20,7 @@ export class GitLogsService {
   }
 
   initialLogs(repository: Repository) {
-    return fromPromise(this.git.logs(repository)).pipe(
+    return fromPromise(this.git.getLogs(repository)).pipe(
       switchMap(log => {
         const mutable: ListLogSummary = deepMutableObject(log);
         this.store.set(mutable.all);
@@ -31,7 +31,7 @@ export class GitLogsService {
   }
 
   getMoreLogs(repository: Repository, beforeDate: string) {
-    return fromPromise(this.git.logs(repository, beforeDate)).pipe(
+    return fromPromise(this.git.getLogs(repository, beforeDate)).pipe(
       switchMap(log => {
         const mutable: ListLogSummary = deepMutableObject(log);
         this.store.add(mutable.all);
@@ -41,7 +41,7 @@ export class GitLogsService {
   }
 
   getLastLog(repository: Repository) {
-    return fromPromise(this.git.originalCommitLog(repository)).pipe(
+    return fromPromise(this.git.getFirstLog(repository)).pipe(
       map(re => {
         return re.all[0];
       })

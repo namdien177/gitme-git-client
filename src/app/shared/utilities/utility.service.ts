@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { SecurityService } from '../../services/system/security.service';
 import { FileStatusSummaryView } from '../state/DATA/repository-status';
 import { FileStatusSummary } from '../model/FileStatusSummary';
-import { CommitOptions } from '../state/DATA/branches';
+import { CommitOptions, RepositoryBranchSummary } from '../state/DATA/branches';
 import { Account } from '../state/DATA/accounts';
-
+import { Repository } from '../state/DATA/repositories';
+import * as child_process from 'child_process';
 
 @Injectable()
 export class UtilityService {
@@ -50,7 +51,6 @@ export class UtilityService {
 
     return +strUnit.substr(0, strUnit.length - 1);
   }
-
   /**
    * Get the string that parsed all unicode characters to safe characters to include in terminal git command
    * @param dangerString
@@ -72,15 +72,6 @@ export class UtilityService {
     return finalString;
   }
 
-  /**
-   * Retrieve the safe directory string to use in terminal
-   * @param rawPath
-   */
-  directorySafePath(rawPath: string) {
-    const fixedRawPath = this.slashFixer(rawPath);
-    return decodeURIComponent(fixedRawPath);
-  }
-
   repositoryNameFromHTTPS(rawHTTP: string) {
     if (!rawHTTP.match(/^((git|ssh|http(s)?)|(git@[\w.]+))(:(\/\/)?)([\w.@:\/\-~]+)(\.git)$/)) {
       return false;
@@ -93,7 +84,6 @@ export class UtilityService {
     return nameWithDotGit.slice(0, nameWithDotGit.length - 4);
   }
 
-  // TODO: change
   addOauthTokenToRemote(remoteURL: string, credential: Account, isHTTPS: boolean = true) {
     const { login, oauth_token } = credential;
     if (isHTTPS) {
@@ -112,6 +102,32 @@ export class UtilityService {
       });
       return remoteCredentials;
     }
+  }
+
+  getOAuthRemote(branch: RepositoryBranchSummary, repository: Repository, credentials: Account, mode: 'fetch' | 'push') {
+    let remote, OAuthRemote;
+    if (!branch.tracking) {
+      try {
+        remote = repository.branches.find(b => b.name === 'master').tracking[mode];
+        OAuthRemote = this.addOauthTokenToRemote(remote, credentials);
+      } catch (e) {
+        console.log(e);
+        OAuthRemote = 'origin';
+      }
+    } else {
+      remote = branch.tracking[mode];
+      OAuthRemote = this.addOauthTokenToRemote(remote, credentials);
+    }
+    return OAuthRemote;
+  }
+
+  /**
+   * Retrieve the safe directory string to use in terminal
+   * @param rawPath
+   */
+  directorySafePath(rawPath: string) {
+    const fixedRawPath = this.slashFixer(rawPath);
+    return decodeURIComponent(fixedRawPath);
   }
 
   isStringExistIn(stringToCheck: string, inWhatArray: any[], propertiesInArray?: string) {
@@ -182,5 +198,35 @@ export class UtilityService {
       stringFinal += (!!objOptions[argu] ? objOptions[argu].trim() : '') + ' ';
     });
     return stringFinal.length > 0 ? stringFinal : 'none';
+  }
+
+  execScript(dataExecute: { command: string, directory: string }, callback) {
+    const { command, directory } = dataExecute;
+    const child = child_process.spawn(command, undefined, {
+      shell: true, cwd: directory,
+    });
+    let dataEnd = '';
+    // You can also use a variable to save the output for when the script closes later
+    child.on('error', (error) => {
+      console.log(error);
+    });
+
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (data) => {
+      // Here is the output
+      data = data.toString();
+      dataEnd = data;
+    });
+
+    child.stderr.setEncoding('utf8');
+    child.on('close', (code) => {
+      // Here you can get the exit code of the script
+      switch (code) {
+        case 0:
+          console.log('end');
+          break;
+      }
+      callback(dataEnd);
+    });
   }
 }

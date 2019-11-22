@@ -25,8 +25,9 @@
       <div (click)="viewDiffFile(record.file)"
            *ngFor="let record of commitmentFiles; let i = index"
            [class.active]="record.active"
+           [title]="record.file.path"
            class="files">
-        <div [title]="record.file.path" class="directory">
+        <div class="directory">
           <div class="directory-path text-muted">
             {{utilities.extractFrontPath(record.file.path).front}}
           </div>

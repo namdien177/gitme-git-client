@@ -248,7 +248,7 @@ export class RepositoriesService {
     // update timestamp
     repository.timestamp = moment().valueOf();
     return fromPromise(
-      this.gitService.fetchInfo(repository, credential, branch),
+      this.gitService.fetch(repository, credential, branch),
     ).pipe(
       takeWhile(shouldValid => !!shouldValid.fetchData),
       distinctUntilChanged(),
@@ -281,7 +281,7 @@ export class RepositoriesService {
   }
 
   async saveToDatabase(repositoryUpdate: Repository) {
-    repositoryUpdate.branches = await this.gitService.getBranchInfo(repositoryUpdate.directory);
+    repositoryUpdate.branches = await this.gitService.getBranches(repositoryUpdate.directory);
     const statusUpdate = await this.dataService.createRepositoryData(repositoryUpdate, this.securityService.appUUID);
     return {
       value: repositoryUpdate,
@@ -333,6 +333,6 @@ export class RepositoriesService {
   }
 
   async getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
-    return await this.gitService.getDiffOfFile(repository, fileStatusSummary.path);
+    return await this.gitService.diffs(repository, fileStatusSummary.path);
   }
 }

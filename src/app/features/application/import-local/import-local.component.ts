@@ -174,7 +174,7 @@ export class ImportLocalComponent implements OnInit {
   private async setupNameRepository(viewingDirectory: string) {
     const safeString = this.utilityService.slashFixer(viewingDirectory);
     const arrPaths = safeString.split('/');
-    let nameExpected = await this.gitPackService.getRepositoryName(arrPaths);
+    let nameExpected = await this.gitPackService.getName(arrPaths);
     if (!nameExpected) {
       nameExpected = arrPaths[arrPaths.length - 1];
     }

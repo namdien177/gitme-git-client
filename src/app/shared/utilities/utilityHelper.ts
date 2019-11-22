@@ -1,4 +1,4 @@
-import { RepositoryBranchSummary } from '../state/DATA/branches';
+import { BranchTracking, RepositoryBranchSummary } from '../state/DATA/branches';
 
 const typeCache: { [label: string]: boolean } = {};
 
@@ -446,4 +446,43 @@ export function deepMutableObject(objectImmutable: object) {
   });
 
   return retObj;
+}
+
+export function parseCurrentStatus(currentUnparsed: string | boolean): boolean {
+  let current: boolean;
+  if (typeof currentUnparsed === 'string') {
+    current = currentUnparsed === 'true';
+  } else {
+    current = !!currentUnparsed;
+  }
+  return current;
+}
+
+/**
+ * Splitting raw string of remotes to branchTracking object array.
+ * @param arrayStringRemote
+ */
+export function parseBranchRemotes(arrayStringRemote: string[]) {
+  const branchTracking: BranchTracking[] = [];
+  arrayStringRemote.forEach(remoteRaw => {
+    if (remoteRaw.trim().length > 0) {
+      const components = remoteRaw.split(/[\s\t]/g);
+      const existedData = branchTracking.find(track => track.name === components[0]);
+      const action = components[2].slice(1, components[2].length - 1);
+      if (existedData) {
+        if (action === 'push') {
+          existedData.push = components[1];
+        } else {
+          existedData.fetch = components[1];
+        }
+      } else {
+        branchTracking.push({
+          name: components[0],
+          fetch: action === 'fetch' ? components[1] : null,
+          push: action === 'push' ? components[1] : null,
+        });
+      }
+    }
+  });
+  return branchTracking;
 }

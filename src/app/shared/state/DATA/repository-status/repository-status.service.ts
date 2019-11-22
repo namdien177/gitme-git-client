@@ -26,12 +26,12 @@ export class RepositoryStatusService {
   }
 
   async filesFromCommit(repository: Repository, commitSHA: string) {
-    const rawStatus = await this.git.statusFromCommit(repository, commitSHA);
+    const rawStatus = await this.git.showCommit(repository, commitSHA);
     return parseShowFileHistory(rawStatus);
   }
 
   async diffOfFileFromCommit(repository: Repository, path: string, modificationType: diffChangeStatus, commitSHA: string) {
-    const rawFileDiff = await this.git.fileFromCommit(repository, path, commitSHA);
+    const rawFileDiff = await this.git.diffsFromCommit(repository, path, commitSHA);
     return await this.diffService.setDiff(rawFileDiff, path, modificationType);
   }
 
