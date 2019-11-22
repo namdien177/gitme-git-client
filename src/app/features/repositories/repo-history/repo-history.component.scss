@@ -91,24 +91,26 @@
 
 .commit-content {
   display: grid;
-  grid-template-columns: 250px auto;
-  grid-template-rows: 100%;
+  grid-template-columns: 300px auto;
+  grid-template-rows: 1fr;
   grid-gap: 0;
   grid-template-areas: 'list diffs';
+  height: calc(100vh - 80px - 5.5rem);
 
   .file-list {
     grid-area: list;
     display: block;
-    width: inherit;
+    height: inherit;
     padding: 0.25rem;
     overflow: auto;
     box-shadow: $shadow-light;
+    width: 300px;
 
     .files {
       display: flex;
       align-items: center;
       height: 2.5rem;
-      width: 100%;
+      width: calc(300px - 0.5rem);
       margin-bottom: 0.25rem;
       padding-left: 0.25rem;
 
@@ -140,10 +142,10 @@
         overflow: hidden;
         display: grid;
         grid-template-areas: 'directory name type';
-        grid-template-columns: auto minmax(max-content, 1fr) 2rem;
+        grid-template-columns: auto max-content 2rem;
         grid-template-rows: 1fr;
         grid-gap: 0;
-        width: 100%;
+        width: calc(300px - 0.75rem);
         font-size: 0.85rem;
         line-height: 0.85rem;
         align-items: center;
@@ -154,6 +156,7 @@
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
+          max-width: calc(300px - 0.75rem);
         }
 
         .file-name {
@@ -180,5 +183,6 @@
   .file-diffs {
     grid-area: diffs;
     position: relative;
+    overflow: auto;
   }
 }
