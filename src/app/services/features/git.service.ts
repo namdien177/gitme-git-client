@@ -333,14 +333,22 @@ export class GitService {
 
   async merge(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary, isConflict = false) {
     const defaultMessage = `Merge branch ${branchFrom.name} to ${branchTo.name}`;
+
+    let nameFrom = branchFrom.name;
+    if (!branchFrom.has_local) {
+      nameFrom = `${branchFrom.tracking.name}/${nameFrom}`;
+    }
+
     if (isConflict) {
       // merge with --no-ff and --no-commit
       return await this.gitInstance(repository.directory).merge([
+        nameFrom,
         '--no-ff',
         '-no-commit'
       ]);
     }
     return await this.gitInstance(repository.directory).merge([
+      nameFrom,
       '-m',
       defaultMessage
     ]);
@@ -379,16 +387,28 @@ export class GitService {
   }
 
   async getMergeBase(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
+
+    let nameFrom = branchFrom.name;
+    if (!branchFrom.has_local) {
+      nameFrom = `${branchFrom.tracking.name}/${nameFrom}`;
+    }
+
     return this.gitInstance(repository.directory).raw([
       'merge-base',
-      branchFrom.name,
+      nameFrom,
       branchTo.name,
     ]);
   }
 
   async mergePreview(repository: Repository, branchFrom: RepositoryBranchSummary, branchTo: RepositoryBranchSummary) {
     const baseTree = await this.getMergeBase(repository, branchFrom, branchTo);
-    let executeCommand = `git merge-tree ${baseTree} ${branchTo.name} ${branchFrom.name}`;
+
+    let nameFrom = branchFrom.name;
+    if (!branchFrom.has_local) {
+      nameFrom = `${branchFrom.tracking.name}/${nameFrom}`;
+    }
+
+    let executeCommand = `git merge-tree ${baseTree} ${branchTo.name} ${nameFrom}`;
     if (executeCommand.includes('\n')) {
       executeCommand = executeCommand.replace(/\n/g, '');
     }

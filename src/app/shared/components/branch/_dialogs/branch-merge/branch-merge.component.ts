@@ -4,7 +4,6 @@ import {YesNoDialogModel} from '../../../../model/yesNoDialog.model';
 import {Repository} from '../../../../state/DATA/repositories';
 import {RepositoryBranchesService, RepositoryBranchSummary} from '../../../../state/DATA/branches';
 import {RepositoryStatusService, RepositoryStatusState} from '../../../../state/DATA/repository-status';
-import {GitService} from '../../../../../services/features/git.service';
 import {ComputedAction} from '../../../../model/merge.interface';
 import {fromPromise} from 'rxjs/internal-compatibility';
 
@@ -34,8 +33,6 @@ export class BranchMergeComponent implements OnInit {
     public dialogRef: MatDialogRef<BranchMergeComponent>,
     private branchService: RepositoryBranchesService,
     private statusService: RepositoryStatusService,
-    // debug
-    private git: GitService
   ) {
     dialogRef.disableClose = true;
     this.branchStatus = this.statusService.get();
