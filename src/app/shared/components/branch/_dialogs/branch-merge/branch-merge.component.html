@@ -6,15 +6,18 @@
 </p>
 
 <div class="check-status">
-
+  {{infoMerge ? infoMerge : 'Checking status...'}}
 </div>
 
 <div class="form-actions">
-  <button color="warn"
+  <button (click)="abortMerge()"
+          color="warn"
           mat-flat-button>
     {{data.decision.noText}}
   </button>
-  <button color="primary"
+  <button (click)="merge()"
+          [disabled]="disableMerge || checkMergeStatus || !infoMerge"
+          color="primary"
           mat-raised-button>
     {{data.decision.yesText}}
   </button>
