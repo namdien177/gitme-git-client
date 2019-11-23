@@ -151,13 +151,12 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     .selectActive()
     .pipe(
       takeUntil(this.componentDestroyed),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      tap((selectedRepo) => this.repository = selectedRepo)
     )
-    .subscribe(
-      (selectedRepo: Repository) => {
-        this.repository = selectedRepo;
-      }
-    );
+    .subscribe((selectedRepo: Repository) => {
+      this.statusService.status(selectedRepo);
+    });
   }
 
   /**

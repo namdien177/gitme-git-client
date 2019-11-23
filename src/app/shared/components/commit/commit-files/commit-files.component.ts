@@ -1,20 +1,20 @@
-import {AfterViewInit, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {UtilityService} from '../../../utilities/utility.service';
-import {RepositoriesService, Repository} from '../../../state/DATA/repositories';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { UtilityService } from '../../../utilities/utility.service';
+import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import {
   createInitialState,
   FileStatusSummaryView,
   RepositoryStatusService,
   RepositoryStatusState
 } from '../../../state/DATA/repository-status';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {distinctUntilChanged, skipWhile} from 'rxjs/operators';
-import {diffChangeStatus, GitDiffService} from '../../../state/DATA/git-diff';
-import {MatBottomSheet} from '@angular/material';
-import {SingleComponent} from '../_dialogs/context-option/single/single.component';
-import {pathNode} from '../../../types/types.electron';
-import {FileSystemService} from '../../../../services/system/fileSystem.service';
-import {deepEquals} from '../../../utilities/utilityHelper';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { distinctUntilChanged, skipWhile, tap } from 'rxjs/operators';
+import { diffChangeStatus, GitDiffService } from '../../../state/DATA/git-diff';
+import { MatBottomSheet } from '@angular/material';
+import { SingleComponent } from '../_dialogs/context-option/single/single.component';
+import { pathNode } from '../../../types/types.electron';
+import { FileSystemService } from '../../../../services/system/fileSystem.service';
+import { deepEquals } from '../../../utilities/utilityHelper';
 
 @Component({
   selector: 'gitme-commit-files',
@@ -105,33 +105,33 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
     }
 
     fromPromise(this.repositoriesService.getDiffOfFile(this.repository, fileSummary))
-      .pipe(
-        distinctUntilChanged(),
-      )
-      .subscribe((diff) => {
-        let status: diffChangeStatus = 'new';
-        if (
-          this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created) ||
-          this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
-        ) {
-          status = 'new';
-        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted)) {
-          status = 'delete';
-        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.conflicted)) {
-          status = 'conflicted';
-        } else {
-          status = 'change';
-        }
+    .pipe(
+      distinctUntilChanged(),
+    )
+    .subscribe((diff) => {
+      let status: diffChangeStatus = 'new';
+      if (
+        this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created) ||
+        this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
+      ) {
+        status = 'new';
+      } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted)) {
+        status = 'delete';
+      } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.conflicted)) {
+        status = 'conflicted';
+      } else {
+        status = 'change';
+      }
 
-        this.gitDiffService.setDiff(
-          diff,
-          fileSummary.path,
-          status
-        );
+      this.gitDiffService.setDiff(
+        diff,
+        fileSummary.path,
+        status
+      );
 
-        this._fileActivated = fileSummary;
-        this.repositoryStatusService.setActive(index);
-      });
+      this._fileActivated = fileSummary;
+      this.repositoryStatusService.setActive(index);
+    });
   }
 
   openContextDialog(file: FileStatusSummaryView) {

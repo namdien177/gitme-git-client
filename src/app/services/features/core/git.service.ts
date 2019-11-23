@@ -98,15 +98,15 @@ export class GitService {
    * TODO: might need to check more condition
    * For pushing new branch to remote
    */
-  async pushUpStream(directory: string, branchName: string, ...options: string[]) {
-    const defaultOptions = ['--set-upstream'];
-    if (options && options.length > 0) {
-      defaultOptions.push(...options);
+  async pushUpStream(directory: string, branch: BranchModel, options?: { [k: string]: null | string | any }) {
+    let defaultOptions = { '-u': null };
+    if (options) {
+      defaultOptions = Object.assign(defaultOptions, options);
     }
-    return this.gitInstance(directory)
-    .push(
-      'origin', // should be remoteType but idk why it's not work...
-      branchName,
+    const trackName = branch.tracking ? branch.tracking.name : 'origin';
+    return this.gitInstance(directory).push(
+      trackName ? trackName : 'origin',
+      branch.name,
       defaultOptions,
     );
   }
