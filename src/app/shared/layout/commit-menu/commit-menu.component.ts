@@ -14,6 +14,7 @@ import { GitDiffService } from '../../state/DATA/git-diff';
 import { Router } from '@angular/router';
 import { RepositoriesMenuService } from '../../state/UI/repositories-menu';
 import { SingleComponent } from '../../components/commit/_dialogs/context-option/single/single.component';
+import { LoadingIndicatorService } from '../../state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-commit-menu',
@@ -38,13 +39,14 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   private componentDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
-    private repositoryStatusService: RepositoryStatusService,
-    private repositoryBranchesService: RepositoryBranchesService,
-    private repositoriesService: RepositoriesService,
-    private repositoriesMenuService: RepositoriesMenuService,
+    private gitStatus: RepositoryStatusService,
+    private gitBranch: RepositoryBranchesService,
+    private gitRepository: RepositoriesService,
+    private gitDiffs: GitDiffService,
+    private appMenu: RepositoriesMenuService,
     private utilitiesService: UtilityService,
-    private gitDiffService: GitDiffService,
     public dialog: MatDialog,
+    private ld: LoadingIndicatorService,
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
     private router: Router,
@@ -110,23 +112,23 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     switch (toView) {
       case 'changes':
         this.router.navigateByUrl('/');
-        this.repositoriesMenuService.viewCommitMenu(toView);
+        this.appMenu.viewCommitMenu(toView);
         break;
       case 'history':
         this.router.navigateByUrl('/history');
-        this.repositoriesMenuService.viewCommitMenu(toView);
+        this.appMenu.viewCommitMenu(toView);
         break;
       default:
         this.router.navigateByUrl('/');
-        this.repositoriesMenuService.viewCommitMenu('changes');
+        this.appMenu.viewCommitMenu('changes');
     }
   }
 
   toggleCheckboxAllFile(value: boolean) {
     if (!value) {
-      this.repositoryStatusService.uncheckAllCheckboxState();
+      this.gitStatus.uncheckAllCheckboxState();
     } else {
-      this.repositoryStatusService.checkAllCheckboxState();
+      this.gitStatus.checkAllCheckboxState();
     }
   }
 
@@ -137,30 +139,26 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const listFilesCommit: FileStatusSummaryView[] = this.files.value;
     const paths: string[] = this.utilitiesService.extractFilePathFromGitStatus(listFilesCommit);
-    const activeRepository: Repository = this.repositoriesService.getActive();
+    const activeRepository: Repository = this.gitRepository.getActive();
     let optionCommits = null;
     if (this.customOptionCommit) {
       // having custom option when commit
       optionCommits = this.optional.value;
     }
-
-    this.repositoriesService.commit(
+    this.ld.setLoading('Committing');
+    this.gitRepository.commit(
       activeRepository,
       this.title.value,
       paths,
       optionCommits,
     ).pipe(
-      switchMap(result => {
+      switchMap(() => {
         this.formCommitment.reset();
-        this.gitDiffService.reset();
-        return this.repositoryStatusService.status(this.repository);
-        // return this.repositoriesService.fetch(
-        //   { ...this.repository } as Repository,
-        //   this.activeBranch,
-        // );
+        this.gitDiffs.reset();
+        return this.gitStatus.status(this.repository);
       }),
     ).subscribe(status => {
-      console.log(status);
+      this.ld.setFinish();
     });
   }
 
@@ -228,14 +226,14 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private watchingRepository() {
-    this.repositoriesService.selectActive()
+    this.gitRepository.selectActive()
     .subscribe(repoActive => {
       this.repository = repoActive;
     });
   }
 
   private watchingSummary() {
-    this.repositoryStatusService.select()
+    this.gitStatus.select()
     .pipe(
       distinctUntilChanged(),
       map(summary => {
@@ -249,7 +247,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private watchingBranch() {
-    this.repositoryBranchesService.select()
+    this.gitBranch.select()
     .subscribe(
       listBranch => {
         this.activeBranch = listBranch.find(branch => {
@@ -264,7 +262,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private watchingUI() {
-    this.repositoriesMenuService.select().subscribe(uiState => {
+    this.appMenu.select().subscribe(uiState => {
       this.isViewChangeTo = uiState.commit_view;
     });
   }
