@@ -100,7 +100,7 @@ export class UtilityService {
         // This must be checked more carefully
         // return remoteURL.replace(new RegExp(`^https://.{${appendedToken.length},}`), `https://${appendedToken}@`);
       }
-      return remoteURL.replace(/^https:\/\//, `https://${appendedToken}@`);
+      return remoteURL.replace(/^https:\/\//, `https://${appendedToken}`);
     }
   }
 
