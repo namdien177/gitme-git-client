@@ -4,7 +4,7 @@ import { Account, AccountListService } from '../../../shared/state/DATA/accounts
 import { electronNode, osNode } from '../../../shared/types/types.electron';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { GitService } from '../../../services/features/git.service';
+import { GitService } from '../../../services/features/core/git.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { SecurityService } from '../../../services/system/security.service';
 import { fromPromise } from 'rxjs/internal-compatibility';

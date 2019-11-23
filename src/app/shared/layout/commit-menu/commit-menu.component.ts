@@ -149,22 +149,19 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
       this.title.value,
       paths,
       optionCommits,
-    )
-      .pipe(
-        switchMap(result => {
-          this.formCommitment.reset();
-          this.gitDiffService.reset();
-          return this.repositoriesService.fetch(
-            { ...this.repository } as Repository,
-            this.activeBranch,
-          );
-        }),
-      )
-      .subscribe(
-        fetchStatus => {
-          console.log(fetchStatus);
-        },
-      );
+    ).pipe(
+      switchMap(result => {
+        this.formCommitment.reset();
+        this.gitDiffService.reset();
+        return this.repositoryStatusService.status(this.repository);
+        // return this.repositoriesService.fetch(
+        //   { ...this.repository } as Repository,
+        //   this.activeBranch,
+        // );
+      }),
+    ).subscribe(status => {
+      console.log(status);
+    });
   }
 
   openCommitOptions() {
@@ -205,56 +202,6 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     return finalOption;
   }
 
-  private setupFormCommitment() {
-    this.formCommitment = this.fb.group({
-      title: ['', [Validators.required]],
-      files: [[], [ArrayLengthShouldLargerThan(0)]],
-      optional: [null, []],
-    });
-  }
-
-  private watchingRepository() {
-    this.repositoriesService.selectActive()
-      .subscribe(repoActive => {
-        this.repository = repoActive;
-      });
-  }
-
-  private watchingSummary() {
-    this.repositoryStatusService.select()
-      .pipe(
-        distinctUntilChanged(),
-        map(summary => {
-          this.filesChanges = summary.files;
-          return summary.files.length;
-        }),
-      ).subscribe(changes => {
-      this.statusSummaryFileLength = changes;
-      this.cd.markForCheck();
-    });
-  }
-
-  private watchingBranch() {
-    this.repositoryBranchesService.select()
-      .subscribe(
-        listBranch => {
-          this.activeBranch = listBranch.find(branch => {
-            return branch.current;
-          });
-
-          if (this.activeBranch) {
-            this.optional.setValue(this.activeBranch.options);
-          }
-        },
-      );
-  }
-
-  private watchingUI() {
-    this.repositoriesMenuService.select().subscribe(uiState => {
-      this.isViewChangeTo = uiState.commit_view;
-    });
-  }
-
   toggleContextCheckbox() {
     const file = this.filesChanges;
     const dataTransfer = {
@@ -269,6 +216,56 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
 
     contextOpen.afterDismissed().subscribe(data => {
       console.log(data);
+    });
+  }
+
+  private setupFormCommitment() {
+    this.formCommitment = this.fb.group({
+      title: ['', [Validators.required]],
+      files: [[], [ArrayLengthShouldLargerThan(0)]],
+      optional: [null, []],
+    });
+  }
+
+  private watchingRepository() {
+    this.repositoriesService.selectActive()
+    .subscribe(repoActive => {
+      this.repository = repoActive;
+    });
+  }
+
+  private watchingSummary() {
+    this.repositoryStatusService.select()
+    .pipe(
+      distinctUntilChanged(),
+      map(summary => {
+        this.filesChanges = summary.files;
+        return summary.files.length;
+      }),
+    ).subscribe(changes => {
+      this.statusSummaryFileLength = changes;
+      this.cd.markForCheck();
+    });
+  }
+
+  private watchingBranch() {
+    this.repositoryBranchesService.select()
+    .subscribe(
+      listBranch => {
+        this.activeBranch = listBranch.find(branch => {
+          return branch.current;
+        });
+
+        if (this.activeBranch) {
+          this.optional.setValue(this.activeBranch.options);
+        }
+      },
+    );
+  }
+
+  private watchingUI() {
+    this.repositoriesMenuService.select().subscribe(uiState => {
+      this.isViewChangeTo = uiState.commit_view;
     });
   }
 }

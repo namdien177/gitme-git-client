@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';
 import { UtilityService } from '../utilities/utility.service';
-import { GitService } from '../../services/features/git.service';
+import { GitService } from '../../services/features/core/git.service';
 import { SmallLoadComponent } from '../components/UI/small-load/small-load.component';
 import { MaterialModule } from './material.module';
 import { SectionLoadComponent } from '../components/UI/section-load/section-load.component';

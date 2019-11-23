@@ -6,7 +6,7 @@ import { RepositoryBranchSummary } from '../../../../state/DATA/branches';
 import { StatusSummary } from '../../../../model/statusSummary.model';
 import { RepositoryStatusService } from '../../../../state/DATA/repository-status';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { GitService } from '../../../../../services/features/git.service';
+import { GitService } from '../../../../../services/features/core/git.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({

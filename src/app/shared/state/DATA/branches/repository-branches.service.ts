@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {RepositoryBranchesStore} from './repository-branches.store';
 import {RepositoryBranchSummary} from './repository-branch.model';
 import {RepositoryBranchesQuery} from './repository-branches.query';
-import {GitService} from '../../../../services/features/git.service';
+import {GitService} from '../../../../services/features/core/git.service';
 import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Repository} from '../repositories';

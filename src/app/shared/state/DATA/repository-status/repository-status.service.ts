@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createInitialState, FileStatusSummaryView, RepositoryStatusStore } from './repository-status.store';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { RepositoryStatusQuery } from './repository-status.query';
-import { GitService } from '../../../../services/features/git.service';
+import { GitService } from '../../../../services/features/core/git.service';
 import { Repository } from '../repositories';
 import { parseShowFileHistory } from '../../../utilities/merge-tree-parser';
 import { deepMutableObject } from '../../../utilities/utilityHelper';

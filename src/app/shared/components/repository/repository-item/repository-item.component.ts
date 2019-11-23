@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
-import { GitService } from '../../../../services/features/git.service';
+import { GitService } from '../../../../services/features/core/git.service';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';

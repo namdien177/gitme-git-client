@@ -1,6 +1,6 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { isAccountType } from '../state/DATA/accounts';
-import { GitService } from '../../services/features/git.service';
+import { GitService } from '../../services/features/core/git.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { map } from 'rxjs/operators';
 import { FileSystemService } from '../../services/system/fileSystem.service';

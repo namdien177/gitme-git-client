@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GitLogsStore } from './git-logs.store';
 import { GitLogsQuery } from './git-logs.query';
-import { GitService } from '../../../../services/features/git.service';
+import { GitService } from '../../../../services/features/core/git.service';
 import { Repository } from '../repositories';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { deepMutableObject } from '../../../utilities/utilityHelper';

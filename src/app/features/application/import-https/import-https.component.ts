@@ -2,18 +2,13 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { electronNode, osNode, pathNode } from '../../../shared/types/types.electron';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { GitService } from '../../../services/features/git.service';
+import { GitService } from '../../../services/features/core/git.service';
 import { FileSystemService } from '../../../services/system/fileSystem.service';
 import { Router } from '@angular/router';
 import { Account, AccountListService } from '../../../shared/state/DATA/accounts';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { SecurityService } from '../../../services/system/security.service';
-import {
-  IsAValidDirectory,
-  IsNotRepository,
-  isValidCloneURL,
-  shouldNotExistInArray,
-} from '../../../shared/validate/customFormValidate';
+import { IsAValidDirectory, IsNotRepository, isValidCloneURL, shouldNotExistInArray, } from '../../../shared/validate/customFormValidate';
 import { catchError, debounceTime, switchMap, takeWhile } from 'rxjs/operators';
 import { merge, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -33,7 +28,7 @@ export class ImportHttpsComponent implements OnInit {
 
   listAccount: Account[] = [];
   listRepository: Repository[] = [];
-
+  display_directory: string = osNode.homedir();
   private readonly electron: typeof electronNode.remote;
 
   constructor(
@@ -63,21 +58,6 @@ export class ImportHttpsComponent implements OnInit {
   get directory() {
     return this.formCloneRepository.get('directory');
   }
-
-  display_directory: string = osNode.homedir();
-
-  // get display_directory() {
-  //   const http = <string>this.http.value;
-  //   const directory = <string>this.directory.value;
-  //   if (directory && this.http.valid) {
-  //     const nameRepo = this.utilityService.repositoryNameFromHTTPS(http);
-  //     if (this.http.valid && nameRepo) {
-  //       return pathNode.join(directory, nameRepo);
-  //     }
-  //   }
-  //
-  //   return directory;
-  // }
 
   get http() {
     return this.formCloneRepository.get('http');
@@ -162,40 +142,34 @@ export class ImportHttpsComponent implements OnInit {
     };
 
     const isExistedOnDB = !!this.listAccount
-      .find(account => account.id === credentialsInstance.id);
+    .find(account => account.id === credentialsInstance.id);
 
     // fetch to check the remote first
     fromPromise(this.gitPackService.cloneTo(this.http.value, this.directory.value + '/', credentialsInstance))
-      .pipe(
-        catchError(err => {
-          // unauthorized or not exist
-          console.log(err);
-          return of('error');
-        }),
-        takeWhile((res) => res !== undefined && res.length === 0),
-        switchMap(() => {
-          return fromPromise(this.repositoryService.createNew(
-            repositoryInstance,
-            credentialsInstance,
-            !isExistedOnDB,
-          ));
-        }),
-      )
-      .subscribe(addStatus => {
-          console.log(addStatus);
-          this.repository_register_error = null;
-          this.cancel();
-        }, error => {
-          this.repository_register_error = 'Register a new repository failed, please try again!';
-          console.log(error);
-        },
-      );
-    /**
-     * Confirm this will:
-     * * Saving credentials and repository into local file database
-     * * Update working repository
-     * * Fetching new repository => reassign main branch.
-     */
+    .pipe(
+      catchError(err => {
+        // unauthorized or not exist
+        console.log(err);
+        return of('error');
+      }),
+      takeWhile((res) => res !== undefined && res.length === 0),
+      switchMap(() => {
+        return fromPromise(this.repositoryService.createNew(
+          repositoryInstance,
+          credentialsInstance,
+          !isExistedOnDB,
+        ));
+      }),
+    )
+    .subscribe(addStatus => {
+        console.log(addStatus);
+        this.repository_register_error = null;
+        this.cancel();
+      }, error => {
+        this.repository_register_error = 'Register a new repository failed, please try again!';
+        console.log(error);
+      },
+    );
   }
 
   switchAccountChooseMode(value: boolean) {

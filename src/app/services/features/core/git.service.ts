@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
 import * as git from 'simple-git/promise';
 import * as moment from 'moment';
-
-import { UtilityService } from '../../shared/utilities/utility.service';
-import { SecurityService } from '../system/security.service';
-import { FileSystemService } from '../system/fileSystem.service';
-import { BranchTracking, CommitOptions, RepositoryBranchSummary as BranchModel } from '../../shared/state/DATA/branches';
-import { parseDiffCheckResult, parseMergeResult, parseStatusSB } from '../../shared/utilities/merge-tree-parser';
-import { parseBranchRemotes, parseCurrentStatus } from '../../shared/utilities/utilityHelper';
-import { Repository } from '../../shared/state/DATA/repositories';
-import { Account } from '../../shared/state/DATA/accounts';
-import { PullResult } from '../../shared/model/PullResult';
 import { pathNode } from 'app/shared/types/types.electron';
-import { DefaultLogFields } from '../../shared/state/DATA/logs';
+
+import { UtilityService } from '../../../shared/utilities/utility.service';
+import { SecurityService } from '../../system/security.service';
+import { FileSystemService } from '../../system/fileSystem.service';
+import { BranchTracking, CommitOptions, RepositoryBranchSummary as BranchModel } from '../../../shared/state/DATA/branches';
+import { parseDiffCheckResult, parseMergeResult, parseStatusSB } from '../../../shared/utilities/merge-tree-parser';
+import { parseBranchRemotes, parseCurrentStatus } from '../../../shared/utilities/utilityHelper';
+import { Repository } from '../../../shared/state/DATA/repositories';
+import { Account } from '../../../shared/state/DATA/accounts';
+import { PullResult } from '../../../shared/model/PullResult';
+import { DefaultLogFields } from '../../../shared/state/DATA/logs';
 
 @Injectable()
 export class GitService {
-
-  private isProcessing = false;
 
   constructor(
     private utilities: UtilityService,
@@ -100,7 +98,7 @@ export class GitService {
    * TODO: might need to check more condition
    * For pushing new branch to remote
    */
-  pushUpStream(directory: string, branchName: string, ...options: string[]) {
+  async pushUpStream(directory: string, branchName: string, ...options: string[]) {
     const defaultOptions = ['--set-upstream'];
     if (options && options.length > 0) {
       defaultOptions.push(...options);
@@ -125,7 +123,7 @@ export class GitService {
    * Commit changes
    */
   async commit(repository: Repository, message: string, fileList: string[] = [], option?: { [properties: string]: string }) {
-    await this.addWatch(repository, ...fileList);
+    await this.gitInstance(repository.directory).raw(['add', '.']);
     return this.gitInstance(repository.directory).commit(message, fileList, option);
   }
 
