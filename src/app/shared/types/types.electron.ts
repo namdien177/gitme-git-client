@@ -1,4 +1,3 @@
-import * as NodePty from 'node-pty';
 import * as electron from 'electron';
 import * as crypto from 'crypto';
 import * as zlib from 'zlib';
@@ -11,11 +10,6 @@ import * as uuid from 'uniqid';
 import * as path from 'path';
 import * as chokidar from 'chokidar';
 
-/**
- * Node-Pty instance in angular compile runtime
- */
-export const nodePty: typeof NodePty = window.require('node-pty');
-export type nodePtyTypeOf = typeof NodePty;
 /**
  * electron instance in angular compile runtime
  */

@@ -16,7 +16,7 @@ import { ApplicationStateService } from '../../shared/state/UI/Application-State
 @Component({
   selector: 'gitme-repositories',
   templateUrl: './repositories.component.html',
-  styleUrls: ['./repositories.component.scss']
+  styleUrls: ['./repositories.component.scss'],
 })
 export class RepositoriesComponent implements OnInit, OnDestroy {
 
@@ -39,7 +39,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private statusService: RepositoryStatusService,
     private applicationStateService: ApplicationStateService,
     private matDialog: MatDialog,
-    private loading: LoadingIndicatorService
+    private loading: LoadingIndicatorService,
   ) {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
@@ -117,21 +117,22 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    */
   private loopRefreshBranchStatus(loopDuration = 30000) {
     interval(loopDuration)
-    .pipe(
-      takeUntil(this.componentDestroyed),
-      takeWhile(() => !this.applicationStateService.getApplicationState().isLosingFocus),
-      switchMap(() => {
-        if (!!this.repository && !!this.activeBranch) {
-          return this.repositoriesService.fetch(
-            { ...this.repository } as Repository,
-            { ...this.activeBranch } as RepositoryBranchSummary
-          );
-        }
-        return of(null);
-      }),
-      switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.statusService.status(this.repository))),
-    ).subscribe(() => {
+      .pipe(
+        takeUntil(this.componentDestroyed),
+        takeWhile(() => !this.applicationStateService.getApplicationState().isLosingFocus),
+        switchMap(() => {
+          if (!!this.repository && !!this.activeBranch) {
+            return this.repositoriesService.fetch(
+              { ...this.repository } as Repository,
+              { ...this.activeBranch } as RepositoryBranchSummary,
+              true,
+            );
+          }
+          return of(null);
+        }),
+        switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
+        switchMap(() => fromPromise(this.statusService.status(this.repository))),
+      ).subscribe(() => {
       console.log('Sequential loop finished');
     });
   }
@@ -148,15 +149,15 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    */
   private watchingRepository() {
     this.repositoriesService
-    .selectActive()
-    .pipe(
-      takeUntil(this.componentDestroyed),
-      distinctUntilChanged(),
-      tap((selectedRepo) => this.repository = selectedRepo)
-    )
-    .subscribe((selectedRepo: Repository) => {
-      this.statusService.status(selectedRepo);
-    });
+      .selectActive()
+      .pipe(
+        takeUntil(this.componentDestroyed),
+        distinctUntilChanged(),
+        tap((selectedRepo) => this.repository = selectedRepo),
+      )
+      .subscribe((selectedRepo: Repository) => {
+        this.statusService.status(selectedRepo);
+      });
   }
 
   /**
@@ -164,24 +165,25 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
    */
   private watchingBranch() {
     this.branchesService
-    .selectActive()
-    .pipe(
-      takeUntil(this.componentDestroyed),
-      distinctUntilChanged(),
-    ).subscribe(
+      .selectActive()
+      .pipe(
+        takeUntil(this.componentDestroyed),
+        distinctUntilChanged(),
+      ).subscribe(
       activeBranch => {
         this.activeBranch = activeBranch;
-      }
+      },
     );
   }
 
   private watchingStatus() {
     this.statusService.select().pipe(
+      distinctUntilChanged(),
       tap(status => {
         if (status.conflicted.length > 0 && !this.conflictViewerOpened) {
           this.conflictViewer();
         }
-      })
+      }),
     ).subscribe(status => {
       console.log(status);
       this.statusSummary = status;
@@ -192,7 +194,8 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     this.loading.setLoading('Fetching!');
     this.repositoriesService.fetch(
       { ...this.repository } as Repository,
-      { ...this.activeBranch } as RepositoryBranchSummary
+      { ...this.activeBranch } as RepositoryBranchSummary,
+      true,
     ).pipe(
       catchError(error => {
         // potential unauthorized => not care as we handle in the status state
@@ -200,7 +203,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
         return of(null);
       }),
       switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.statusService.status(this.repository)))
+      switchMap(() => fromPromise(this.statusService.status(this.repository))),
     ).subscribe((status) => {
       console.log('Fetch completed');
       this.loading.setFinish();
@@ -210,39 +213,39 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
   private pushRemote() {
     this.loading.setLoading('Pushing to remote. Please wait.');
     this.branchesService.push(this.repository, this.activeBranch)
-    .pipe(
-      catchError(error => {
-        // potential conflict => not care as we handle in the status state
-        console.log(error);
-        return of(null);
-      }),
-      switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.statusService.status(this.repository))),
-    )
-    .subscribe((status) => {
-      console.log('Push completed');
-      this.loading.setFinish();
-    });
+      .pipe(
+        catchError(error => {
+          // potential conflict => not care as we handle in the status state
+          console.log(error);
+          return of(null);
+        }),
+        switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
+        switchMap(() => fromPromise(this.statusService.status(this.repository))),
+      )
+      .subscribe((status) => {
+        console.log('Push completed');
+        this.loading.setFinish();
+      });
   }
 
   private pullRemote() {
     this.loading.setLoading('Pulling from remote.');
     this.branchesService.pull(this.repository, this.activeBranch)
-    .pipe(
-      catchError(error => {
-        // potential conflict => not care as we handle in the status state
-        console.log(error);
-        return of(null);
-      }),
-      switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
-      switchMap(() => fromPromise(this.statusService.status(this.repository))),
-    )
-    .subscribe(
-      (result: StatusSummary) => {
-        console.log('Pull completed');
-        this.loading.setFinish();
-      }
-    );
+      .pipe(
+        catchError(error => {
+          // potential conflict => not care as we handle in the status state
+          console.log(error);
+          return of(null);
+        }),
+        switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
+        switchMap(() => fromPromise(this.statusService.status(this.repository))),
+      )
+      .subscribe(
+        (result: StatusSummary) => {
+          console.log('Pull completed');
+          this.loading.setFinish();
+        },
+      );
   }
 
   private conflictViewer() {
@@ -252,36 +255,36 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
       body: 'There are some conflicts that need to be resolved before proceeding.',
       data: {
         repository: this.repository,
-        branch: this.activeBranch
+        branch: this.activeBranch,
       },
       decision: {
         yesText: 'Proceed commit',
         noText: 'Abort',
-      }
+      },
     };
 
     this.matDialog.open(ConflictViewerComponent, {
       width: '450px',
       panelClass: 'bg-primary-black-mat-dialog',
-      data: dataPassing
+      data: dataPassing,
     }).afterClosed()
-    .pipe(
-      tap(() => {
-        this.statusService.select();
-      }),
-      switchMap((decision: boolean) => {
-        if (decision) {
-          // continue to merge
-          const fileList = this.statusSummary.files;
-          return this.branchesService.continueMerge(this.repository, fileList);
-        } else {
-          // abort
-          return this.branchesService.abortMerge(this.repository);
-        }
-      })
-    )
-    .subscribe(() => {
-      this.conflictViewerOpened = false;
-    });
+      .pipe(
+        tap(() => {
+          this.statusService.select();
+        }),
+        switchMap((decision: boolean) => {
+          if (decision) {
+            // continue to merge
+            const fileList = this.statusSummary.files;
+            return this.branchesService.continueMerge(this.repository, fileList);
+          } else {
+            // abort
+            return this.branchesService.abortMerge(this.repository);
+          }
+        }),
+      )
+      .subscribe(() => {
+        this.conflictViewerOpened = false;
+      });
   }
 }
