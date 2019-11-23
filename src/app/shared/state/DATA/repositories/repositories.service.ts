@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RepositoriesStore } from './repositories.store';
 import { Repository } from './repository.model';
-import { distinctUntilChanged, map, switchMap, takeWhile, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, skipWhile, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesQuery } from './repositories.query';
 import { GitService } from '../../../../services/features/core/git.service';
 import { FileSystemService } from '../../../../services/system/fileSystem.service';
@@ -9,8 +9,8 @@ import { AppConfig } from '../../../model/App-Config';
 import { DefineCommon } from '../../../../common/define.common';
 import { LocalStorageService } from '../../../../services/system/localStorage.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { RepositoryBranchSummary } from '../branches';
-import { Observable, of } from 'rxjs';
+import { RepositoryBranchSummary as BranchModel } from '../branches';
+import { Observable, of, Subject } from 'rxjs';
 import { Account, AccountListService } from '../accounts';
 import { SecurityService } from '../../../../services/system/security.service';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
@@ -23,6 +23,9 @@ import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper'
 export class RepositoriesService {
 
   isFetching = false;
+  fetchRequest: Subject<{
+    repository: Repository, branch: BranchModel, option?: { [git: string]: string }
+  }> = new Subject();
   isCommit = false;
 
   constructor(
@@ -35,6 +38,13 @@ export class RepositoriesService {
     private accountListService: AccountListService,
     private securityService: SecurityService,
   ) {
+
+    this.fetchRequest.pipe(
+      skipWhile(() => this.isFetching)
+    ).subscribe(request => {
+      this.isFetching = true;
+      this.fetch(request.repository, request.branch, request.option);
+    });
   }
 
   /**
@@ -125,7 +135,7 @@ export class RepositoriesService {
     this.set(repositories);
   }
 
-  async updateToDataBase(repository: Repository, newBranches: RepositoryBranchSummary[]) {
+  async updateToDataBase(repository: Repository, newBranches: BranchModel[]) {
     const mutableData: Repository = deepMutableObject(repository);
     const existingBranchesData = mutableData.branches;
 
@@ -241,11 +251,7 @@ export class RepositoriesService {
    * @param branch
    * @param option
    */
-  fetch(repository: Repository, branch: RepositoryBranchSummary, option?: { [git: string]: string }) {
-    if (this.isFetching) {
-      return of(null);
-    }
-    this.isFetching = true;
+  fetch(repository: Repository, branch: BranchModel, option?: { [git: string]: string }) {
     // get account
     const credential: Account = this.accountListService.getOneSync(
       repository.credential.id_credential,
@@ -272,6 +278,14 @@ export class RepositoriesService {
       }),
       tap(() => this.isFetching = false)
     );
+  }
+
+  requestFetch(repository: Repository, branch: BranchModel, option?: { [p: string]: string }) {
+    this.fetchRequest.next({
+      repository,
+      branch,
+      option
+    });
   }
 
   setLoading() {
