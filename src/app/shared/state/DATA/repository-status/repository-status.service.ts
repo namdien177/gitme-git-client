@@ -37,7 +37,8 @@ export class RepositoryStatusService {
 
   set(status: StatusSummary) {
     const currentArr = this.query.getValue().files;
-    const convertedFileStatus: FileStatusSummaryView[] = status.files.map<FileStatusSummaryView>(
+    const mutable: StatusSummary = deepMutableObject(status);
+    const convertedFileStatus: FileStatusSummaryView[] = mutable.files.map<FileStatusSummaryView>(
       file => {
         const isCached = this.retrieveExistedCacheFile(currentArr, file.path);
         return {
@@ -48,7 +49,7 @@ export class RepositoryStatusService {
       }
     );
     this.store.update(
-      Object.assign(status, { files: convertedFileStatus })
+      Object.assign(mutable, { files: convertedFileStatus })
     );
   }
 
