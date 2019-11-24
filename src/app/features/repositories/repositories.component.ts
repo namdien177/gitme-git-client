@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { catchError, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap, debounceTime } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
@@ -18,7 +18,7 @@ import { ApplicationStateService } from '../../shared/state/UI/Application-State
   templateUrl: './repositories.component.html',
   styleUrls: ['./repositories.component.scss'],
 })
-export class RepositoriesComponent implements OnInit, OnDestroy {
+export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   repository: Repository = null;                  // Repository instance
   statusSummary: StatusSummary;                   // Statistics of changes (file changed, push/pull/commit status)
@@ -40,16 +40,19 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private applicationStateService: ApplicationStateService,
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
   ) {
+  }
+
+  ngOnInit() {
+  }
+
+  ngAfterViewInit(): void {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
     this.watchingBranch();          // Observing branch
     this.watchingStatus();          // Observing branch status
     this.loopRefreshBranchStatus(); // Loop to auto fetching
-  }
-
-  ngOnInit() {
   }
 
   ngOnDestroy() {
