@@ -32,7 +32,7 @@ export class UtilityService {
   ];
 
   constructor(
-    private securityService: SecurityService
+    private securityService: SecurityService,
   ) {
   }
 
@@ -51,6 +51,7 @@ export class UtilityService {
 
     return +strUnit.substr(0, strUnit.length - 1);
   }
+
   /**
    * Get the string that parsed all unicode characters to safe characters to include in terminal git command
    * @param dangerString
@@ -61,7 +62,7 @@ export class UtilityService {
     for (let i = 0; i < charLength; i++) {
       const viewingChar = dangerString.charAt(i);
       const safeStringFound = this.pairReplacementGitString.find(
-        replace => replace.invalid === viewingChar
+        replace => replace.invalid === viewingChar,
       );
       if (safeStringFound !== undefined) {
         finalString += safeStringFound.replace;
@@ -86,21 +87,20 @@ export class UtilityService {
 
   addOauthTokenToRemote(remoteURL: string, credential: Account, isHTTPS: boolean = true) {
     const { login, oauth_token } = credential;
+    const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(oauth_token));
+    const appendedToken = login + ':' + tokenDecrypted + '@';
+    const regexCheck = new RegExp(`^https://${appendedToken}\\w+`);
+    const regexCheckOld = new RegExp(`^https://.{${appendedToken.length},}\\w+`);
     if (isHTTPS) {
-      const splitStr = remoteURL.split('//');
-      const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(oauth_token));
-
-      let remoteCredentials = '';
-      splitStr.forEach((parts, index) => {
-        remoteCredentials += parts;
-        if (index !== splitStr.length - 1) {
-          remoteCredentials += '//';
-        }
-        if (index === 0) {
-          remoteCredentials += login + ':' + tokenDecrypted + '@';
-        }
-      });
-      return remoteCredentials;
+      if (remoteURL.match(regexCheck)) {
+        // Already included with token
+        return remoteURL;
+      } else if (remoteURL.match(regexCheckOld)) {
+        // // replace with wrong credential
+        // This must be checked more carefully
+        // return remoteURL.replace(new RegExp(`^https://.{${appendedToken.length},}`), `https://${appendedToken}@`);
+      }
+      return remoteURL.replace(/^https:\/\//, `https://${appendedToken}`);
     }
   }
 
@@ -162,7 +162,7 @@ export class UtilityService {
     });
     return {
       front: frontPath,
-      end: dir[dir.length - 1]
+      end: dir[dir.length - 1],
     };
   }
 
@@ -186,7 +186,7 @@ export class UtilityService {
     const added = this.directorySafePath(splitPaths[1].trim());
     return {
       deleted: deleted,
-      added: added
+      added: added,
     };
   }
 

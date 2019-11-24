@@ -6,7 +6,6 @@ import { RepositoriesComponent } from './repositories.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CoreModule } from '../../shared/modules/core.module';
 import { RepoHistoryComponent } from './repo-history/repo-history.component';
-import { RepoSettingsComponent } from './repo-settings/repo-settings.component';
 import { ShareRepositoryComponentsModule } from '../../shared/components/repository/ShareRepositoryComponents.module';
 import { ShareBranchComponentsModule } from '../../shared/components/branch/ShareBranchComponents.module';
 import { ShareCommitComponentsModule } from '../../shared/components/commit/ShareCommitComponents.module';
@@ -21,7 +20,6 @@ const declareComps = [
   declarations: [
     ...declareComps,
     RepoHistoryComponent,
-    RepoSettingsComponent
   ],
   exports: [],
   imports: [
@@ -31,7 +29,7 @@ const declareComps = [
     ShareRepositoryComponentsModule,
     ShareBranchComponentsModule,
     ShareCommitComponentsModule,
-  ]
+  ],
 })
 export class RepositoriesModule {
 }

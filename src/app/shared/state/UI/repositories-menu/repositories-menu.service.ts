@@ -99,7 +99,11 @@ export class RepositoriesMenuService {
     }
   }
 
-  select() {
-    return this.query.select();
+  select(project?) {
+    return this.query.select(project);
+  }
+
+  get() {
+    return this.query.getValue();
   }
 }

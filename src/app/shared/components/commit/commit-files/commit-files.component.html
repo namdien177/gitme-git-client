@@ -21,19 +21,24 @@
         {{utilities.extractFrontPath(file.path).end}}
       </div>
       <div class="type-action">
-        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.created)">
+        <ng-container *ngIf="(file.index === '?' && file.working_dir === '?') || file.index === 'A'">
           <span class="created text-success">
             <i class="far fa-plus-square"></i>
           </span>
         </ng-container>
-        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.deleted)">
+        <ng-container *ngIf="file.index === 'D'">
           <span class="deleted text-danger">
             <i class="far fa-minus-square"></i>
           </span>
         </ng-container>
-        <ng-container *ngIf="utilities.isStringExistIn(file.path, statusSummary.modified)">
+        <ng-container *ngIf="file.index === ' ' && file.working_dir === 'M'">
           <span class="modified text-warning">
             <i class="fas fa-pen-square"></i>
+          </span>
+        </ng-container>
+        <ng-container *ngIf="file.index === 'R'">
+          <span class="renamed text-info">
+            <i class="fas fa-exchange-alt"></i>
           </span>
         </ng-container>
       </div>

@@ -50,8 +50,8 @@ export class AppComponent implements AfterViewInit {
       debounceTime(500),
       switchMap(() => this.watchingRepository()), // get current repository => set repository
       switchMap(() => this.watchingBranch()),     // update branches and get current active branches
-      switchMap(() => this.fetch()),              // fetch
       switchMap(() => this.getBranchStatus()),    // git status
+      switchMap(() => this.fetch()),              // fetch
     )
     .subscribe(
       (status: StatusSummary) => {

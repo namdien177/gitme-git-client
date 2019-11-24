@@ -1,18 +1,18 @@
-import {Injectable} from '@angular/core';
-import {RepositoryBranchesStore} from './repository-branches.store';
-import {RepositoryBranchSummary} from './repository-branch.model';
-import {RepositoryBranchesQuery} from './repository-branches.query';
-import {GitService} from '../../../../services/features/core/git.service';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {Repository} from '../repositories';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {FileStatusSummaryView, RepositoryStatusService} from '../repository-status';
-import {Account, AccountListService} from '../accounts';
-import {UtilityService} from '../../../utilities/utility.service';
-import {FileStatusSummary} from '../../../model/FileStatusSummary';
+import { Injectable } from '@angular/core';
+import { RepositoryBranchesStore } from './repository-branches.store';
+import { RepositoryBranchSummary } from './repository-branch.model';
+import { RepositoryBranchesQuery } from './repository-branches.query';
+import { GitService } from '../../../../services/features/core/git.service';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Repository } from '../repositories';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { FileStatusSummaryView, RepositoryStatusService } from '../repository-status';
+import { Account, AccountListService } from '../accounts';
+import { UtilityService } from '../../../utilities/utility.service';
+import { FileStatusSummary } from '../../../model/FileStatusSummary';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
 
   constructor(
@@ -88,12 +88,12 @@ export class RepositoryBranchesService {
       fromBranchName = fromBranch;
       return fromPromise(
         this.gitService.gitInstance(repository.directory)
-          .checkoutBranch(branchName, fromBranchName)
+        .checkoutBranch(branchName, fromBranchName)
       ).pipe(map(_ => true));
     }
     return fromPromise(
       this.gitService.gitInstance(repository.directory)
-        .checkoutLocalBranch(branchName)
+      .checkoutLocalBranch(branchName)
     ).pipe(map(_ => true));
   }
 
@@ -117,7 +117,7 @@ export class RepositoryBranchesService {
     } else {
       // perform upstream
       return fromPromise(
-        this.gitService.pushUpStream(repository.directory, branch.name)
+        this.gitService.pushUpStream(repository.directory, branch)
       );
     }
   }
@@ -159,7 +159,7 @@ export class RepositoryBranchesService {
     //  $ git push -d <remote_name> <branch_name>       <---- Delete remotely
     //  $ git branch -d <branch_name>                   <---- Delete locally
     const args = force ? '-D' : '-d';
-    const argsRemote = {'-d': null};
+    const argsRemote = { '-d': null };
 
     const removeStatus = {
       local: null,
@@ -215,7 +215,7 @@ export class RepositoryBranchesService {
     // git branch -m new-name
     // git push origin old-name -d
     // git push origin -u new-name
-    const optionOnLocal = ['-m', `${newName}`];
+    const optionOnLocal = ['-m', `${ newName }`];
     const status = {
       changeName: null,
       removeRemote: null,
@@ -244,7 +244,7 @@ export class RepositoryBranchesService {
       if (pushToRemote) {
         status.pushRemote = await this.gitService.pushUpStream(
           repository.directory,
-          newName
+          Object.assign(branch, { name: newName })
         );
       }
     }
