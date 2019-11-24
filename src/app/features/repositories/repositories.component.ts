@@ -84,16 +84,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  commitMenuCategory(view: 'changes' | 'history') {
-    this.isViewChangeTo = view;
-
-    if (view === 'changes') {
-
-    } else {
-
-    }
-  }
-
   actionOnBranch() {
     if (!this.statusSummary || !this.activeBranch || !this.repository) {
       return;

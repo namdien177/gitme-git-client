@@ -5,12 +5,11 @@ import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
 import { StatusSummary } from '../../../shared/model/statusSummary.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'gitme-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
@@ -23,7 +22,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     name: string;
   } = {
     dir: null,
-    name: null
+    name: null,
   };
 
   private componentDestroy: Subject<boolean> = new Subject<boolean>();
@@ -50,31 +49,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private observeDiff() {
     this.gitDiffService.getDiff()
-    .pipe(
-      takeUntil(this.componentDestroy)
-    )
-    .subscribe(
-      diffStatus => {
-        this.diffStatus = diffStatus;
-        if (!!diffStatus && diffStatus.directory) {
-          const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
-          this.info = {
-            name: splitName.end,
-            dir: splitName.front
-          };
-        } else {
-          this.info = {
-            name: null,
-            dir: null
-          };
-        }
-      }
-    );
+      .pipe(
+        takeUntil(this.componentDestroy),
+      )
+      .subscribe(
+        diffStatus => {
+          console.log(diffStatus);
+          this.diffStatus = diffStatus;
+          if (!!diffStatus && diffStatus.directory) {
+            const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
+            this.info = {
+              name: splitName.end,
+              dir: splitName.front,
+            };
+          } else {
+            this.info = {
+              name: null,
+              dir: null,
+            };
+          }
+        },
+      );
   }
 
   private observeStatusChange() {
     this.repositoryStatusService.select().pipe(
-      distinctUntilChanged()
+      distinctUntilChanged(),
     ).subscribe(statusSum => {
       this.statusSummary = statusSum;
     });
