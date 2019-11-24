@@ -122,6 +122,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigateByUrl('/');
         this.appMenu.viewCommitMenu('changes');
     }
+    this.gitDiffs.reset();
   }
 
   toggleCheckboxAllFile(value: boolean) {
