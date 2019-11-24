@@ -1,7 +1,16 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import {
+  catchError,
+  debounceTime,
+  delay,
+  distinctUntilChanged,
+  switchMap,
+  takeUntil,
+  takeWhile,
+  tap,
+} from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
@@ -214,7 +223,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
           console.log(error);
           return of(null);
         }),
-        debounceTime(800),
+        delay(1500),
         switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
         switchMap(() => fromPromise(this.statusService.status(this.repository))),
       )
