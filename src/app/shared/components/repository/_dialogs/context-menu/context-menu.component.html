@@ -8,10 +8,18 @@
 <hr>
 
 <div class="card mb-1 card-merge">
-  <div class="card-body">
-    Delete from application
+  <div (click)="openFolder()"
+       class="card-body">
+    Open folder
+  </div>
+</div>
+
+<div class="card mb-1 card-merge">
+  <div (click)="removeFromDataBase()"
+       class="card-body text-danger">
+    Remove from list
     <br>
-    <div class="sub-text">
+    <div class="sub-text text-muted">
       The repository will be no longer in application control
     </div>
   </div>

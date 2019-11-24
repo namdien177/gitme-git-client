@@ -1,4 +1,5 @@
 <div (click)="switchToRepository()"
+     (contextmenu)="contextMenu()"
      [class.active]="isActive"
      class="card">
   <div class="card-body row">
@@ -34,8 +35,8 @@
          class="timestamp text-muted">
       <em class="far fa-clock"></em>
       <span>
-                {{repository.timestamp != null ? (repository.timestamp | recentTime) : 'Never fetched'}}
-            </span>
+          {{repository.timestamp != null ? (repository.timestamp | recentTime) : 'Never fetched'}}
+      </span>
     </div>
   </div>
 </div>
