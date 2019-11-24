@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
 import { catchError, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap, debounceTime } from 'rxjs/operators';
@@ -40,6 +40,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     private applicationStateService: ApplicationStateService,
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService,
+    private cd: ChangeDetectorRef
   ) {
     this.watchingUIState();         // Observing dropdown list of components
     this.watchingRepository();      // Observing repository
@@ -187,6 +188,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy {
     ).subscribe(status => {
       console.log(status);
       this.statusSummary = status;
+      this.cd.detectChanges();
     });
   }
 
