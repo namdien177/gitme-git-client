@@ -117,7 +117,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
           this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
         ) {
           status = 'new';
-        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted)) {
+        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted) || fileSummary.index === 'D') {
           status = 'delete';
         } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.conflicted)) {
           status = 'conflicted';

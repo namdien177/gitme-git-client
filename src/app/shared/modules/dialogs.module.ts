@@ -12,6 +12,7 @@ import { BranchCheckoutStashComponent } from '../components/branch/_dialogs/bran
 import { BranchRenameComponent } from '../components/branch/_dialogs/branch-rename/branch-rename.component';
 import { BranchMergeComponent } from '../components/branch/_dialogs/branch-merge/branch-merge.component';
 import { ConflictViewerComponent } from '../components/UI/dialogs/conflict-viewer/conflict-viewer.component';
+import { ContextMenuComponent } from '../components/repository/_dialogs/context-menu/context-menu.component';
 
 
 const dialogComps = [
@@ -26,20 +27,21 @@ const dialogComps = [
   BranchRenameComponent,
   BranchMergeComponent,
   ConflictViewerComponent,
+  ContextMenuComponent,
 ];
 
 @NgModule({
   declarations: [
-    ...dialogComps
+    ...dialogComps,
   ],
   imports: [
     CommonModule,
     MaterialModule,
-    CoreModule
+    CoreModule,
   ],
   entryComponents: [
-    ...dialogComps
-  ]
+    ...dialogComps,
+  ],
 })
 export class DialogsModule {
 }
