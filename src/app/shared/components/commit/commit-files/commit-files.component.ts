@@ -59,7 +59,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
       summary => {
         this.repository = this.repositoriesService.getActive();
         this.emitStatusCheckedFile(summary.files);
-        if (summary.files.length > 0 && !deepEquals(summary.files, this.statusSummary.files) && !this._fileActivated) {
+        if (summary.files.length > 0 && !deepEquals(summary.files, this.statusSummary.files) && !this._fileActivated  && this.menuState.get().commit_view === 'changes') {
           this.viewDiffFile(summary.files[0], 0);
         } else if (summary.files.length === 0 && this.menuState.get().commit_view === 'changes') {
           this.gitDiffService.reset();
