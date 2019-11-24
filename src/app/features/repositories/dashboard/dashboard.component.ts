@@ -50,11 +50,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private observeDiff() {
     this.gitDiffService.getDiff()
       .pipe(
+        distinctUntilChanged(),
         takeUntil(this.componentDestroy),
       )
       .subscribe(
         diffStatus => {
-          console.log(diffStatus);
           this.diffStatus = diffStatus;
           if (!!diffStatus && diffStatus.directory) {
             const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
