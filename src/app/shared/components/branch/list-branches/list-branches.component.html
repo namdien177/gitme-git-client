@@ -2,6 +2,8 @@
   <label class="search-branches">
     <input class="form-control form-control-dark form-control-float"
            placeholder="Find branch"
+           [(ngModel)]="searchText"
+           (keyup)="onSearchText()"
            type="text">
   </label>
 
@@ -16,9 +18,17 @@
   </div>
 
   <div class="list-branches">
-    <gitme-branch-item *ngFor="let branch of branches; trackBy: trackBranchID"
-                       [branchSummary]="branch"
-                       class="branch">
-    </gitme-branch-item>
+    <ng-container *ngIf="searchBranches.length == 0">
+      <gitme-branch-item *ngFor="let branch of branches; trackBy: trackBranchID"
+                         [branchSummary]="branch"
+                         class="branch">
+      </gitme-branch-item>
+    </ng-container>
+    <ng-container *ngIf="searchBranches.length > 0">
+      <gitme-branch-item *ngFor="let branch of searchBranches; trackBy: trackBranchID"
+                         [branchSummary]="branch"
+                         class="branch">
+      </gitme-branch-item>
+    </ng-container>
   </div>
 </div>

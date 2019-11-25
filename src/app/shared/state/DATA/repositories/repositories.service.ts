@@ -22,9 +22,9 @@ import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper'
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
 
+  isCommit = false;
   private isFetching = false;
   private cachedFetching = null;
-  isCommit = false;
 
   constructor(
     protected store: RepositoriesStore,
@@ -106,7 +106,6 @@ export class RepositoriesService {
         }
       }
     }
-
     const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
       this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
         repositories[0].id : null;

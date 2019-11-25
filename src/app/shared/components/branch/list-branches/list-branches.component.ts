@@ -3,9 +3,9 @@ import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../sta
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { MatDialog } from '@angular/material';
 import { BranchNewOptionComponent } from '../_dialogs/branch-new/branch-new-option/branch-new-option.component';
-import { map, switchMap, takeWhile } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import { defaultCommitOptionDialog, YesNoDialogModel } from '../../../model/yesNoDialog.model';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { StatusSummary } from '../../../model/statusSummary.model';
 import { BranchCheckoutStashComponent } from '../_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -24,6 +24,10 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   branches: RepositoryBranchSummary[] = [];
   @Output()
   branchesChange: EventEmitter<RepositoryBranchSummary[]> = new EventEmitter();
+
+  searchText: string = null;
+  searchBranches: RepositoryBranchSummary[] = [];
+  searchPipes: Subject<string> = new Subject<string>();
 
   _temporaryBranchInfo: {
     name: string,
@@ -48,6 +52,20 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.searchPipes.pipe(
+      debounceTime(200),
+      tap(() => this.searchBranches = []),
+      distinctUntilChanged(),
+      filter(text => !!text && text.length > 2),
+    ).subscribe(text => {
+      const regex = new RegExp(`${ text }`, `g`);
+      console.log(regex);
+      this.branches.forEach(branch => {
+        if (branch.name.match(regex)) {
+          this.searchBranches.push(branch);
+        }
+      });
+    });
   }
 
   ngOnInit() {
@@ -154,5 +172,9 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
 
   trackBranchID(index: number, item: RepositoryBranchSummary) {
     return item.id;
+  }
+
+  onSearchText() {
+    this.searchPipes.next(this.searchText);
   }
 }
