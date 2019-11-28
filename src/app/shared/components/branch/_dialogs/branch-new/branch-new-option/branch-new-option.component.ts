@@ -28,11 +28,11 @@ export class BranchNewOptionComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<BranchNewOptionComponent>,
+    @Inject(MAT_DIALOG_DATA) public emittedDataFromView: YesNoDialogModel,
     private repositoryStatusService: RepositoryStatusService,
     private repositoryBranchService: RepositoryBranchesService,
     private securityService: SecurityService,
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public emittedDataFromView: YesNoDialogModel
   ) {
     this.repository = emittedDataFromView.data['repository'];
     this.branch = emittedDataFromView.data['branch'];
@@ -76,17 +76,17 @@ export class BranchNewOptionComponent implements OnInit {
 
     // Listen to input branch to parse to safe name
     this.branchNameInput.valueChanges.pipe(
-        // debounceTime(100),
-        distinctUntilChanged()
+      // debounceTime(100),
+      distinctUntilChanged()
     ).subscribe(value => {
-        const safeValue = isValidNameGitBranch(value);
-        if (safeValue.status) {
-            this.branchName.setValue(value);
-            this.parseNameBranch = null;
-        } else {
-            this.branchName.setValue(safeValue.name);
-            this.parseNameBranch = safeValue.msg;
-        }
+      const safeValue = isValidNameGitBranch(value);
+      if (safeValue.status) {
+        this.branchName.setValue(value);
+        this.parseNameBranch = null;
+      } else {
+        this.branchName.setValue(safeValue.name);
+        this.parseNameBranch = safeValue.msg;
+      }
     });
   }
 

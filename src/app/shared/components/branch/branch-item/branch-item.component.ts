@@ -3,11 +3,13 @@ import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../sta
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { StatusSummary } from '../../../model/statusSummary.model';
-import { MatBottomSheet } from '@angular/material';
+import { MatBottomSheet, MatDialog } from '@angular/material';
 import { BranchOptionsComponent } from '../_dialogs/branch-options/branch-options.component';
 import { switchMap, takeWhile } from 'rxjs/operators';
 import { LoadingIndicatorService } from '../../../state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { BranchStashComponent } from '../_dialogs/branch-stash/branch-stash.component';
+import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
 
 @Component({
   selector: 'gitme-branch-item',
@@ -26,7 +28,8 @@ export class BranchItemComponent implements OnInit {
     private repositoryStatusService: RepositoryStatusService,
     private repositoriesService: RepositoriesService,
     private matBottomSheet: MatBottomSheet,
-    private loading: LoadingIndicatorService
+    private loading: LoadingIndicatorService,
+    private matDialog: MatDialog
   ) {
     this.repositoriesService.selectActive()
     .subscribe(repo => {
@@ -63,7 +66,21 @@ export class BranchItemComponent implements OnInit {
           }
         );
       } else if (this.repository && this.status.files.length > 0) {
-
+        const data: YesNoDialogModel = {
+          title: 'Failed to checkout',
+          body: 'There are changes that need to be committed before checkout to a new branch',
+          data: null,
+          decision: {
+            noText: 'Cancel',
+            yesText: 'Apply'
+          }
+        };
+        this.matDialog.open(BranchStashComponent, {
+          width: '280px',
+          height: 'auto',
+          data: data,
+          panelClass: 'bg-primary-black-mat-dialog',
+        });
       }
     }
 
