@@ -72,8 +72,7 @@ export class RepositoriesService {
     const statusSave = await this.saveToDatabase(newRepository);
 
     if (statusSave.status) {
-      await this.loadFromDataBase();
-
+      await this.loadFromDataBase(true);
       // adding config to the system
       const config = {
         'user.email': credentials.email,
@@ -88,7 +87,7 @@ export class RepositoriesService {
   /**
    * Load all the repository configs in all local json file
    */
-  async loadFromDataBase() {
+  async loadFromDataBase(initActive = false) {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
     if (!!!configFile) {
@@ -120,7 +119,11 @@ export class RepositoriesService {
       } else {
         findCached = repositories[0];
       }
-      this.setActive(findCached);
+      if (initActive) {
+        this.setActive([...repositories].pop());
+      } else {
+        this.setActive(findCached);
+      }
     }
     this.set(repositories);
   }
@@ -144,7 +147,12 @@ export class RepositoriesService {
    */
   add(arrData: Repository) {
     this.store.add(arrData, { prepend: true });
-    this.setActive(arrData);
+    const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
+      this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : arrData ?
+        arrData.id : null;
+    if (previousWorking === arrData.id) {
+      this.setActive(arrData);
+    }
   }
 
   /**
