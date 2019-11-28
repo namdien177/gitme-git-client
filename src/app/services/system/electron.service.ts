@@ -139,9 +139,6 @@ export class ElectronService implements OnDestroy {
   minimizeApplication() {
     this.window.minimize();
   }
-  loadUrl(url) {
-    this.window.loadURL(url);
-  }
 
   private setupUUID() {
     if (!this.localStorage.isAvailable(DefineCommon.ELECTRON_APPS_UUID_KEYNAME)) {

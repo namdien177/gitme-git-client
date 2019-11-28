@@ -170,19 +170,24 @@ export class RepositoryBranchesService {
       // prevent deleting master branch
       return removeStatus;
     }
-
     if (branch.has_remote) {
       // get account
       const credentials: Account = this.accountService.getOneSync(
         repository.credential.id_credential
       );
 
-      removeStatus.remote = await this.gitService.push(
-        repository,
-        branch,
-        credentials,
-        argsRemote
-      );
+      try {
+        await this.gitService.push(
+          repository,
+          branch,
+          credentials,
+          argsRemote
+        );
+        removeStatus.remote = true;
+      } catch (e) {
+        console.log(e);
+        removeStatus.remote = false;
+      }
     }
 
     if (branch.has_local) {
