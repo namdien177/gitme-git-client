@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
-import { BrowserWindow, remote, webFrame } from 'electron';
+import { BrowserWindow, ipcRenderer, remote, webFrame } from 'electron';
 import { machineIdSync } from 'node-machine-id';
 import * as childProcess from 'child_process';
 import * as os from 'os';
@@ -10,7 +10,7 @@ import { electronNode, fsNode } from '../../shared/types/types.electron';
 import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
-import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
+import { RepositoriesService } from '../../shared/state/DATA/repositories';
 import { AccountListService } from '../../shared/state/DATA/accounts';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
@@ -32,7 +32,7 @@ export class ElectronService implements OnDestroy {
     private securityService: SecurityService,
     private fileService: FileSystemService,
     private dataService: DataService,
-    private repositoryService: RepositoriesService,
+    private repositoriesList: RepositoriesService,
     private accountList: AccountListService,
   ) {
     // Conditional imports
@@ -56,7 +56,7 @@ export class ElectronService implements OnDestroy {
   ngOnDestroy(): void {
   }
 
-  async initializeConfigFromLocalDatabase() {
+  initializeConfigFromLocalDatabase() {
     /**
      * Loading the configuration file
      */
@@ -81,8 +81,7 @@ export class ElectronService implements OnDestroy {
   }
 
   async initializeRepositoriesFromLocalDatabase(repository_config: string[]) {
-    this.repositoryService.reset();
-    const cachedRepository: Repository[] = [];
+    this.repositoriesList.reset();
     if (!!repository_config && repository_config.length > 0) {
       /**
        * Loading repository config files
@@ -96,16 +95,14 @@ export class ElectronService implements OnDestroy {
           if (// ensure the config file is existed
             this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_REPOSITORIES(fileName))) {
             // load to memory repos and other settings
-            const takenRepo = await this.setupApplicationRepositories(
+            await this.setupApplicationRepositories(
               this.dataService.getRepositoriesConfigData(fileName)
             );
             repositoryConfigFileName.push(fileName);
-            cachedRepository.push(takenRepo);
           }
         }
       }
     }
-    await this.repositoryService.loadFromDataBase(cachedRepository);
   }
 
   async initializeAccountsFromLocalDatabase(account_config: number[]) {
@@ -142,7 +139,6 @@ export class ElectronService implements OnDestroy {
   minimizeApplication() {
     this.window.minimize();
   }
-
   loadUrl(url) {
     this.window.loadURL(url);
   }
@@ -161,25 +157,27 @@ export class ElectronService implements OnDestroy {
     }
   }
 
-  private async setupApplicationConfiguration(fileContext: Promise<AppConfig>) {
-    const contextStatus = await fileContext;
-    await this.initializeRepositoriesFromLocalDatabase(contextStatus.repository_config);
-    await this.initializeAccountsFromLocalDatabase(contextStatus.account_config);
+  private setupApplicationConfiguration(fileContext: Promise<AppConfig>) {
+    fileContext.then(async contextStatus => {
+      // Load repository configs
+      await this.initializeRepositoriesFromLocalDatabase(contextStatus.repository_config);
+      await this.initializeAccountsFromLocalDatabase(contextStatus.account_config);
+    });
   }
 
   private async setupApplicationRepositories(fileContext: Promise<AppRepositories>) {
-    const contextStatus = await fileContext;
-    if (!!contextStatus.repository) {
-      this.repositoryService.add(contextStatus.repository);
-    }
-
-    return contextStatus.repository;
+    return await fileContext.then((contextStatus: AppRepositories) => {
+      if (!!contextStatus.repository) {
+        this.repositoriesList.add(contextStatus.repository);
+      }
+    });
   }
 
   private async setupApplicationAccounts(fileContext: Promise<AppAccounts>) {
-    const contextStatus = await fileContext;
-    if (!!contextStatus.account) {
-      this.accountList.add(contextStatus.account);
-    }
+    return await fileContext.then((contextStatus: AppAccounts) => {
+      if (!!contextStatus.account) {
+        this.accountList.add(contextStatus.account);
+      }
+    });
   }
 }

@@ -56,6 +56,8 @@ export class RepoHistoryComponent implements OnInit {
   activeViewTracking() {
     this.logsService.observeActive()
     .pipe(
+      // filter((commit) => !!commit),
+      // skipWhile(log => deepEquals(log, this.viewLogs)),
       distinctUntilChanged(),
       catchError(err => {
         console.log(err);
@@ -63,6 +65,7 @@ export class RepoHistoryComponent implements OnInit {
       }),
       filter(log => !!log),
       switchMap((log: ListLogLine) => {
+        console.log(log);
         this.viewLogs = log;
         this.activeFile = null;
         return fromPromise(this.statusService.filesFromCommit(this.repository, log.hash));

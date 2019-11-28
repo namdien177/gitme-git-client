@@ -88,7 +88,7 @@ export class RepositoriesService {
   /**
    * Load all the repository configs in all local json file
    */
-  async loadFromDataBase(takeFromActive: Repository[] = []) {
+  async loadFromDataBase() {
     const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
     if (!!!configFile) {
@@ -97,26 +97,21 @@ export class RepositoriesService {
 
     const repositoryFile = configFile.repository_config;
     const repositories: Repository[] = [];
-    if (takeFromActive.length === 0) {
-      for (const idRepository of repositoryFile) {
-        const repos = await this.dataService.getRepositoriesConfigData(idRepository);
-        if (!!repos && !!repos.repository) {
-          if (this.fileService.isDirectoryExist(repos.repository.directory)) {
-            const repository: Repository = { ...repos.repository } as Repository;
-            repositories.push(repository);
-          }
+    for (const idRepository of repositoryFile) {
+      const repos = await this.dataService.getRepositoriesConfigData(idRepository);
+      if (!!repos && !!repos.repository) {
+        if (this.fileService.isDirectoryExist(repos.repository.directory)) {
+          const repository: Repository = { ...repos.repository } as Repository;
+          repositories.push(repository);
         }
       }
-    } else {
-      repositories.push(...takeFromActive);
     }
-
     const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
       this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
         repositories[0].id : null;
 
     if (repositories.length > 0) {
-      let findCached: Repository;
+      let findCached: Repository = null;
       if (!!previousWorking) {
         findCached = repositories.find(repo => repo.id === previousWorking);
         if (!findCached) {
@@ -149,11 +144,7 @@ export class RepositoriesService {
    */
   add(arrData: Repository) {
     this.store.add(arrData, { prepend: true });
-    const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
-      this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : null;
-    if (!previousWorking) {
-      this.setActive(arrData);
-    }
+    this.setActive(arrData);
   }
 
   /**
@@ -252,6 +243,7 @@ export class RepositoriesService {
    */
   fetch(repository: Repository, branch: BranchModel, updateTime: boolean = false) {
     if (this.isFetching) {
+      console.log('skipping operation fetching');
       this.isFetching = false;
       return of(this.cachedFetching);
     }

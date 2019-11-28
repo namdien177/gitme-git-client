@@ -188,6 +188,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }),
     ).subscribe(status => {
+      console.log(status);
       this.statusSummary = status;
       this.cd.detectChanges();
     });

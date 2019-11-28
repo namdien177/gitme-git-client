@@ -162,6 +162,7 @@ export class ImportHttpsComponent implements OnInit {
       }),
     )
     .subscribe(addStatus => {
+        console.log(addStatus);
         this.repository_register_error = null;
         this.cancel();
       }, error => {
