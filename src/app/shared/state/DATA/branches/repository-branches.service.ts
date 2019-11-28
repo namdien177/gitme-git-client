@@ -117,7 +117,7 @@ export class RepositoryBranchesService {
     } else {
       // perform upstream
       return fromPromise(
-        this.gitService.pushUpStream(repository.directory, branch)
+        this.gitService.pushUpStream(repository, branch, credentials)
       );
     }
   }
@@ -248,8 +248,9 @@ export class RepositoryBranchesService {
     } else {
       if (pushToRemote) {
         status.pushRemote = await this.gitService.pushUpStream(
-          repository.directory,
-          Object.assign(branch, { name: newName })
+          repository,
+          Object.assign(branch, { name: newName }),
+          credentials
         );
       }
     }

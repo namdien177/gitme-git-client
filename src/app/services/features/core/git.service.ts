@@ -125,20 +125,29 @@ export class GitService {
   }
 
   /**
-   * TODO: might need to check more condition
    * For pushing new branch to remote
    */
-  async pushUpStream(directory: string, branch: BranchModel, options?: { [k: string]: null | string | any }) {
+  async pushUpStream(repository: Repository, branch: BranchModel, credentials: Account, options?: { [k: string]: null | string | any }) {
     let defaultOptions = { '-u': null };
     if (options) {
       defaultOptions = Object.assign(defaultOptions, options);
     }
     const trackName = branch.tracking ? branch.tracking.name : 'origin';
-    return this.gitInstance(directory).push(
-      trackName ? trackName : 'origin',
+    const remote = this.utilities.getOAuthRemote(branch, repository, credentials, 'push');
+    let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', trackName]);
+    if (typeof originalRemote !== 'string') {
+      originalRemote = branch.tracking.push;
+    } else {
+      originalRemote = originalRemote.replace('\n', '');
+    }
+    await this.gitInstance(repository.directory).remote(['set-url', trackName, remote]);
+    const pushStatus = await this.gitInstance(repository.directory).push(
+      trackName,
       branch.name,
       defaultOptions,
     );
+    await this.gitInstance(repository.directory).remote(['set-url', trackName, originalRemote]);
+    return pushStatus;
   }
 
   /**
