@@ -2,6 +2,7 @@
      class="left-panel">
   <div (isOutside)="clickOutSide($event, 'repositories')"
        [class.active]="isRepositoryBoxOpen"
+       [whiteListClass]="['cdk-overlay-backdrop', 'cdk-overlay-container']"
        appIsClickOutside
        class="function gm--repository">
 

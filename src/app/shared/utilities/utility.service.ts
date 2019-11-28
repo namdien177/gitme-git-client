@@ -86,9 +86,9 @@ export class UtilityService {
   }
 
   addOauthTokenToRemote(remoteURL: string, credential: Account, isHTTPS: boolean = true) {
-    const { login, oauth_token } = credential;
+    const { oauth_token } = credential;
     const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(oauth_token));
-    const appendedToken = login + ':' + tokenDecrypted + '@';
+    const appendedToken = tokenDecrypted + '@';
     const regexCheck = new RegExp(`^https://${appendedToken}\\w+`);
     const regexCheckOld = new RegExp(`^https://.{${appendedToken.length},}\\w+`);
     if (isHTTPS) {

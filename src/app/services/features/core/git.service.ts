@@ -11,8 +11,8 @@ import { parseDiffCheckResult, parseMergeResult, parseStatusSB } from '../../../
 import { parseBranchRemotes, parseCurrentStatus } from '../../../shared/utilities/utilityHelper';
 import { Repository } from '../../../shared/state/DATA/repositories';
 import { Account } from '../../../shared/state/DATA/accounts';
-import { PullResult } from '../../../shared/model/PullResult';
 import { DefaultLogFields } from '../../../shared/state/DATA/logs';
+import { DataService } from '../data.service';
 
 @Injectable()
 export class GitService {
@@ -21,6 +21,7 @@ export class GitService {
     private utilities: UtilityService,
     private securityService: SecurityService,
     private fileSystem: FileSystemService,
+    private dataSystem: DataService
   ) {
   }
 
@@ -64,8 +65,19 @@ export class GitService {
         repository,
       };
     }
+    if (!credentials) {
+      credentials = (await this.dataSystem.getAccountsConfigData(repository.credential.id_credential)).account;
+    }
     const remoteFetch = this.utilities.getOAuthRemote(branch, repository, credentials, 'fetch');
+    let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', branch.tracking.name]);
+    if (typeof originalRemote !== 'string') {
+      originalRemote = branch.tracking.push;
+    } else {
+      originalRemote = originalRemote.replace('\n', '');
+    }
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, remoteFetch]);
     const data = await this.gitInstance(directory).fetch(remoteFetch);
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
     return {
       fetchData: data,
       repository,
@@ -77,10 +89,19 @@ export class GitService {
    */
   async pull(repository: Repository, branch: BranchModel, credentials: Account, options?: { [key: string]: null | string | any }) {
     const remote = this.utilities.getOAuthRemote(branch, repository, credentials, 'fetch');
-    return this.gitInstance(repository.directory).pull(
+    let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', branch.tracking.name]);
+    if (typeof originalRemote !== 'string') {
+      originalRemote = branch.tracking.push;
+    } else {
+      originalRemote = originalRemote.replace('\n', '');
+    }
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, remote]);
+    const pullSum = await this.gitInstance(repository.directory).pull(
       remote, branch.name,
       options,
-    ) as Promise<PullResult>;
+    );
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
+    return pullSum;
   }
 
   /**
@@ -89,9 +110,18 @@ export class GitService {
    */
   async push(repository: Repository, branch: BranchModel, credentials: Account, options?: { [p: string]: null | string | any }) {
     const remote = this.utilities.getOAuthRemote(branch, repository, credentials, 'push');
-    return this.gitInstance(repository.directory).push(
-      remote, branch.name, options,
+    let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', branch.tracking.name]);
+    if (typeof originalRemote !== 'string') {
+      originalRemote = branch.tracking.push;
+    } else {
+      originalRemote = originalRemote.replace('\n', '');
+    }
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, remote]);
+    const statusPush = await this.gitInstance(repository.directory).push(
+      branch.tracking.name, branch.name, options,
     );
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
+    return statusPush;
   }
 
   /**
