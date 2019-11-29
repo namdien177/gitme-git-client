@@ -126,6 +126,7 @@ export class RepositoriesService {
       }
     }
     this.set(repositories);
+    return repositories;
   }
 
   async updateToDataBase(repository: Repository, newBranches: BranchModel[]) {

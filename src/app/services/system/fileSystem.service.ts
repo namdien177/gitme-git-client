@@ -326,12 +326,19 @@ export class FileSystemService {
 
   async removeFile(directory: string) {
     if (!this.isFileExist(directory)) {
-      return this.promiseReturn(null, 'File does not exist', false);
+      return true;
     }
 
     const statusDeletePF = this.util.promisify(this.fs.unlink);
     await statusDeletePF(directory);
-    return this.isFileExist(directory);
+    let status;
+    try {
+      status = await this.isFileExist(directory);
+    } catch (e) {
+      status = false;
+      console.log(e);
+    }
+    return status;
   }
 
   private parsingData<dataType>(data: dataType | object | string, extension: '.txt' | '.json' | ''): { valid: boolean, data: string } {
