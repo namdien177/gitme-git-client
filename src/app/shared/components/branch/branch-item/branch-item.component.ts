@@ -58,6 +58,7 @@ export class BranchItemComponent implements OnInit {
         .pipe(
           switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.repository))),
           switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.repository, branches))),
+          switchMap(() => this.repositoryStatusService.status(this.repository)),
         )
         .subscribe(
           () => {
