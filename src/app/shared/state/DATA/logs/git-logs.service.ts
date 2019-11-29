@@ -43,7 +43,7 @@ export class GitLogsService {
   getLastLog(repository: Repository) {
     return fromPromise(this.git.getFirstLog(repository)).pipe(
       map(re => {
-        return re.all[0];
+        return re.replace('\n', '');
       })
     );
   }

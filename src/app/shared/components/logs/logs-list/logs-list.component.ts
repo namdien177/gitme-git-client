@@ -59,7 +59,7 @@ export class LogsListComponent implements OnInit {
       })
     )
     .subscribe(firstLog => {
-      this.allCommitConfirmed = firstLog && firstLog.hash === this.lastHash;
+      this.allCommitConfirmed = firstLog && firstLog === this.lastHash;
     });
   }
 }

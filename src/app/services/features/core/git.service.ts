@@ -410,7 +410,9 @@ export class GitService {
    * Get the first log ever.
    */
   async getFirstLog(repository: Repository) {
-    return this.gitInstance(repository.directory).log(['--reverse', '-1']);
+    return this.gitInstance(repository.directory).raw([
+      'rev-list', '--max-parents=0', 'HEAD'
+    ]);
   }
 
   /**

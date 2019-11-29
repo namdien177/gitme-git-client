@@ -90,8 +90,7 @@ export class AppComponent implements AfterViewInit {
    * => update status of current branch
    */
   private watchingRepository() {
-    return fromPromise(this.repositoriesService.loadFromDataBase()).pipe(
-      switchMap(() => this.repositoriesService.selectActive()),
+    return this.repositoriesService.selectActive().pipe(
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
         return of(selectedRepo);
