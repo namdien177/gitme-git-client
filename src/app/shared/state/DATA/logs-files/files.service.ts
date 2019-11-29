@@ -3,7 +3,6 @@ import { FilesStore } from './files.store';
 import { FilesQuery } from './files.query';
 import { GitService } from '../../../../services/features/core/git.service';
 import { LogFile } from './files.model';
-import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class FilesService {

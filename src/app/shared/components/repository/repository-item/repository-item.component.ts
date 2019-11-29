@@ -36,16 +36,16 @@ export class RepositoryItemComponent implements OnInit {
 
   ngOnInit() {
     this.retrieveFetchStatusRepository()
-      .pipe(
-        switchMap(summary => {
-          this.repositorySummary = summary;
-          return of(this.repositoriesService.getActive());
-        }),
-        distinctUntilChanged(),
-        switchMap(() => {
-          return this.accountListService.getOneAsync(this.repository.id);
-        }),
-      ).subscribe(
+    .pipe(
+      switchMap(summary => {
+        this.repositorySummary = summary;
+        return of(this.repositoriesService.getActive());
+      }),
+      distinctUntilChanged(),
+      switchMap(() => {
+        return this.accountListService.getOneAsync(this.repository.id);
+      }),
+    ).subscribe(
       account => {
         this.account = account;
       },

@@ -8,7 +8,7 @@ describe('ConflictViewerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConflictViewerComponent ]
+      declarations: [ConflictViewerComponent]
     })
     .compileComponents();
   }));

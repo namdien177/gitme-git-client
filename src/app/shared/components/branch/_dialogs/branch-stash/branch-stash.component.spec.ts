@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BranchMergeComponent } from './branch-merge.component';
+import { BranchStashComponent } from './branch-stash.component';
 
-describe('BranchMergeComponent', () => {
-  let component: BranchMergeComponent;
-  let fixture: ComponentFixture<BranchMergeComponent>;
+describe('BranchStashComponent', () => {
+  let component: BranchStashComponent;
+  let fixture: ComponentFixture<BranchStashComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [BranchMergeComponent]
+      declarations: [BranchStashComponent]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BranchMergeComponent);
+    fixture = TestBed.createComponent(BranchStashComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

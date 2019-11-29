@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LocalStorageService } from '../../services/system/localStorage.service';
-import { ClickOutSideDirective, OverCountedDirective, ReactiveEllipsisDirective, SimpleEllipsisDirective } from '../directives';
+import { ClickOutSideDirective, OverCountedDirective, ReactiveEllipsisDirective, SimpleEllipsisDirective } from '../directive';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';

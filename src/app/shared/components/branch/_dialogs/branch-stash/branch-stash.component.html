@@ -1,0 +1,15 @@
+<h2 class="m-0 weight-lighter title">
+  {{data.title}}
+</h2>
+
+<p class="mt-0 mb-2 body text-muted body">
+  {{data.body}}
+</p>
+
+<div class="form-actions">
+  <button (click)="abortCheckout()"
+          color="warn"
+          mat-flat-button>
+    {{data.decision.noText}}
+  </button>
+</div>

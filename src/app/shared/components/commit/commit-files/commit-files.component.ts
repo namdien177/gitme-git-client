@@ -59,7 +59,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
       summary => {
         this.repository = this.repositoriesService.getActive();
         this.emitStatusCheckedFile(summary.files);
-        if (summary.files.length > 0 && !deepEquals(summary.files, this.statusSummary.files) && !this._fileActivated  && this.menuState.get().commit_view === 'changes') {
+        if (summary.files.length > 0 && !deepEquals(summary.files, this.statusSummary.files) && !this._fileActivated && this.menuState.get().commit_view === 'changes') {
           this.viewDiffFile(summary.files[0], 0);
         } else if (summary.files.length === 0 && this.menuState.get().commit_view === 'changes') {
           this.gitDiffService.reset();
@@ -107,33 +107,33 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
     }
 
     fromPromise(this.repositoriesService.getDiffOfFile(this.repository, fileSummary))
-      .pipe(
-        distinctUntilChanged(),
-      )
-      .subscribe((diff) => {
-        let status: diffChangeStatus = 'new';
-        if (
-          this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created) ||
-          this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
-        ) {
-          status = 'new';
-        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted) || fileSummary.index === 'D') {
-          status = 'delete';
-        } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.conflicted)) {
-          status = 'conflicted';
-        } else {
-          status = 'change';
-        }
+    .pipe(
+      distinctUntilChanged(),
+    )
+    .subscribe((diff) => {
+      let status: diffChangeStatus = 'new';
+      if (
+        this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created) ||
+        this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
+      ) {
+        status = 'new';
+      } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.deleted) || fileSummary.index === 'D') {
+        status = 'delete';
+      } else if (this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.conflicted)) {
+        status = 'conflicted';
+      } else {
+        status = 'change';
+      }
 
-        this.gitDiffService.setDiff(
-          diff,
-          fileSummary.path,
-          status,
-        );
+      this.gitDiffService.setDiff(
+        diff,
+        fileSummary.path,
+        status,
+      );
 
-        this._fileActivated = fileSummary;
-        this.repositoryStatusService.setActive(index);
-      });
+      this._fileActivated = fileSummary;
+      this.repositoryStatusService.setActive(index);
+    });
   }
 
   openContextDialog(file: FileStatusSummaryView) {

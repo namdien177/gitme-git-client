@@ -1,9 +1,9 @@
 <div class="container-fluid">
   <label class="search-branches">
-    <input class="form-control form-control-dark form-control-float"
-           placeholder="Find branch"
+    <input (keyup)="onSearchText()"
            [(ngModel)]="searchText"
-           (keyup)="onSearchText()"
+           class="form-control form-control-dark form-control-float"
+           placeholder="Find branch"
            type="text">
   </label>
 

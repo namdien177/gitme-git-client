@@ -1,0 +1,23 @@
+@import "src/styles/theme";
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > *:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  .body {
+    font-size: 0.8rem;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  > *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
