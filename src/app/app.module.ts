@@ -10,8 +10,6 @@ import { AppRouting } from './app.routing';
 // NG Translate
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
-import { WebviewDirective } from './shared/directives/webview.directive';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { AkitaNgRouterStoreModule } from '@datorama/akita-ng-router-store';
 import { AppConfig } from 'environments/environment';
@@ -38,7 +36,6 @@ export function HttpLoaderFactory(http: HttpClient) {
 const declareComps = [
   AppComponent,
   WindowsFrameComponent,
-  WebviewDirective,
   ImportLocalComponent,
   CreateLocalComponent,
   ImportHttpsComponent,

@@ -49,7 +49,6 @@ export class FileSystemService {
   }
 
 
-
   /**
    * Check if directory exist.
    * If it's not a directory, or not exist, return false

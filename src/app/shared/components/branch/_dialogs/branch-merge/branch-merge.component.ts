@@ -1,11 +1,11 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {YesNoDialogModel} from '../../../../model/yesNoDialog.model';
-import {Repository} from '../../../../state/DATA/repositories';
-import {RepositoryBranchesService, RepositoryBranchSummary} from '../../../../state/DATA/branches';
-import {RepositoryStatusService, RepositoryStatusState} from '../../../../state/DATA/repository-status';
-import {ComputedAction} from '../../../../model/merge.interface';
-import {fromPromise} from 'rxjs/internal-compatibility';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { YesNoDialogModel } from '../../../../model/yesNoDialog.model';
+import { Repository } from '../../../../state/DATA/repositories';
+import { RepositoryBranchesService, RepositoryBranchSummary } from '../../../../state/DATA/branches';
+import { RepositoryStatusService, RepositoryStatusState } from '../../../../state/DATA/repository-status';
+import { ComputedAction } from '../../../../model/merge.interface';
+import { fromPromise } from 'rxjs/internal-compatibility';
 
 @Component({
   selector: 'gitme-branch-merge',
@@ -60,10 +60,10 @@ export class BranchMergeComponent implements OnInit {
 
   merge() {
     fromPromise(this.branchService.merge(this.repository, this.branchFrom))
-      .subscribe(stat => {
-        console.log(stat);
-        this.dialogRef.close(undefined);
-      });
+    .subscribe(stat => {
+      console.log(stat);
+      this.dialogRef.close(undefined);
+    });
   }
 
   abortMerge() {

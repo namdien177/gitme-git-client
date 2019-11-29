@@ -8,7 +8,7 @@ describe('BranchMergeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BranchMergeComponent ]
+      declarations: [BranchMergeComponent]
     })
     .compileComponents();
   }));

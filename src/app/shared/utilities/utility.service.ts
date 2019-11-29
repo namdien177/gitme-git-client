@@ -89,8 +89,8 @@ export class UtilityService {
     const { oauth_token } = credential;
     const tokenDecrypted = this.gitStringSafe(this.securityService.decryptAES(oauth_token));
     const appendedToken = tokenDecrypted + '@';
-    const regexCheck = new RegExp(`^https://${appendedToken}\\w+`);
-    const regexCheckOld = new RegExp(`^https://.{${appendedToken.length},}\\w+`);
+    const regexCheck = new RegExp(`^https://${ appendedToken }\\w+`);
+    const regexCheckOld = new RegExp(`^https://.{${ appendedToken.length },}\\w+`);
     if (isHTTPS) {
       if (remoteURL.match(regexCheck)) {
         // Already included with token
@@ -100,7 +100,7 @@ export class UtilityService {
         // This must be checked more carefully
         // return remoteURL.replace(new RegExp(`^https://.{${appendedToken.length},}`), `https://${appendedToken}@`);
       }
-      return remoteURL.replace(/^https:\/\//, `https://${appendedToken}`);
+      return remoteURL.replace(/^https:\/\//, `https://${ appendedToken }`);
     }
   }
 

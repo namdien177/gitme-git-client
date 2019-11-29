@@ -8,7 +8,7 @@ describe('BranchCheckoutStashComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BranchCheckoutStashComponent ]
+      declarations: [BranchCheckoutStashComponent]
     })
     .compileComponents();
   }));

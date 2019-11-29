@@ -1,11 +1,11 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material';
-import {FileStatusSummaryView} from '../../../../../state/DATA/repository-status';
-import {RepositoryBranchesService} from '../../../../../state/DATA/branches';
-import {RepositoriesService, Repository} from '../../../../../state/DATA/repositories';
-import {FileSystemService} from '../../../../../../services/system/fileSystem.service';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {switchMap} from 'rxjs/operators';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
+import { FileStatusSummaryView } from '../../../../../state/DATA/repository-status';
+import { RepositoryBranchesService } from '../../../../../state/DATA/branches';
+import { RepositoriesService, Repository } from '../../../../../state/DATA/repositories';
+import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'gitme-single',
@@ -62,15 +62,15 @@ export class SingleComponent implements OnInit {
   revertChanges() {
     const singleFileArr: FileStatusSummaryView[] = this.file;
     fromPromise(this.branchServices.revertFiles(this.repository, singleFileArr))
-      .pipe(
-        switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-      )
-      .subscribe(
-        () => {
-          this.dismissed('REVERT');
-        }
-      );
+    .pipe(
+      switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+    )
+    .subscribe(
+      () => {
+        this.dismissed('REVERT');
+      }
+    );
   }
 
   openFileLocation() {
@@ -93,26 +93,26 @@ export class SingleComponent implements OnInit {
   ignoreThisFile() {
     if (this.data.mode === 'single') {
       fromPromise(this.branchServices.ignoreFiles(this.repository, this.file[0]))
-        .pipe(
-          switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-          switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-        )
-        .subscribe(() => {
-          this.dismissed('IGNORED');
-        });
+      .pipe(
+        switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+      )
+      .subscribe(() => {
+        this.dismissed('IGNORED');
+      });
     }
   }
 
   ignoreThisExtension() {
     if (this.data.mode === 'single') {
       fromPromise(this.branchServices.ignoreExtension(this.repository, this.file[0]))
-        .pipe(
-          switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-          switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
-        )
-        .subscribe(() => {
-          this.dismissed('IGNORED');
-        });
+      .pipe(
+        switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
+        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+      )
+      .subscribe(() => {
+        this.dismissed('IGNORED');
+      });
     }
   }
 }
