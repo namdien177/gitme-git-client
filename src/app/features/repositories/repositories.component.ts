@@ -12,6 +12,7 @@ import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conf
 import { LoadingIndicatorService } from '../../shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ApplicationStateService } from '../../shared/state/UI/Application-State';
+import { GitService } from '../../services/features/core/git.service';
 
 @Component({
   selector: 'gitme-repositories',
@@ -40,6 +41,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService,
     private cd: ChangeDetectorRef,
+    private git: GitService
   ) {
   }
 

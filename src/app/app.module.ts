@@ -26,6 +26,7 @@ import { ImportHttpsComponent } from './features/application/import-https/import
 import { ShareCredentialsComponentsModule } from './shared/components/credential/ShareCredentialsComponents.module';
 import { StarterScreenComponent } from './shared/layout/starter-screen/starter-screen.component';
 import { DatabaseResolver } from './shared/resolver/database.resolver';
+import { UnauthorizeDialogComponent } from './shared/components/UI/dialogs/unauthorize-dialog/unauthorize-dialog.component';
 
 
 // AoT requires an exported function for factories
@@ -45,6 +46,7 @@ const declareComps = [
   declarations: [
     ...declareComps,
     StarterScreenComponent,
+    UnauthorizeDialogComponent,
   ],
   imports: [
     BrowserModule,
