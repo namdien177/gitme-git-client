@@ -29,7 +29,7 @@ export class RepositoriesService {
   constructor(
     protected store: RepositoriesStore,
     protected query: RepositoriesQuery,
-    private gitService: GitService,
+    private git: GitService,
     private dataService: DataService,
     private fileService: FileSystemService,
     private localStorageService: LocalStorageService,
@@ -220,7 +220,7 @@ export class RepositoriesService {
   }
 
   async addConfig(repository: Repository, configObject: { [configName: string]: string }) {
-    const gitConfig = this.gitService.gitInstance(repository.directory);
+    const gitConfig = this.git.gitInstance(repository.directory);
     Object.keys(configObject).forEach(configName => {
       gitConfig.addConfig(configName, configObject[configName]);
     });
@@ -241,7 +241,7 @@ export class RepositoriesService {
     }
     this.isCommit = true;
     return fromPromise(
-      this.gitService.commit(repository, title, files, option),
+      this.git.commit(repository, title, files, option),
     ).pipe(tap(() => this.isCommit = false));
   }
 
@@ -267,7 +267,7 @@ export class RepositoriesService {
       repository.timestamp = moment().valueOf();
     }
     return fromPromise(
-      this.gitService.fetch(repository, credential, branch),
+      this.git.fetch(repository, credential, branch),
     ).pipe(
       takeWhile(shouldValid => !!shouldValid.fetchData),
       distinctUntilChanged(),
@@ -317,7 +317,7 @@ export class RepositoriesService {
   }
 
   async saveToDatabase(repositoryUpdate: Repository) {
-    repositoryUpdate.branches = await this.gitService.getBranches(repositoryUpdate.directory);
+    repositoryUpdate.branches = await this.git.getBranches(repositoryUpdate.directory);
     const statusUpdate = await this.dataService.createRepositoryData(repositoryUpdate, this.securityService.appUUID);
     return {
       value: repositoryUpdate,
@@ -369,6 +369,6 @@ export class RepositoriesService {
   }
 
   async getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
-    return await this.gitService.diffs(repository, fileStatusSummary.path);
+    return await this.git.diffs(repository, fileStatusSummary.path);
   }
 }

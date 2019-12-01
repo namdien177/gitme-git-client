@@ -25,6 +25,7 @@ import { CreateLocalComponent } from './features/application/create-local/create
 import { ImportHttpsComponent } from './features/application/import-https/import-https.component';
 import { ShareCredentialsComponentsModule } from './shared/components/credential/ShareCredentialsComponents.module';
 import { StarterScreenComponent } from './shared/layout/starter-screen/starter-screen.component';
+import { UnauthorizeDialogComponent } from './shared/components/UI/dialogs/unauthorize-dialog/unauthorize-dialog.component';
 
 
 // AoT requires an exported function for factories
@@ -48,6 +49,7 @@ const declareComps = [
   declarations: [
     ...declareComps,
     StarterScreenComponent,
+    UnauthorizeDialogComponent,
   ],
   imports: [
     BrowserModule,

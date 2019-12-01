@@ -9,7 +9,7 @@ import { Account, AccountListService } from '../../../shared/state/DATA/accounts
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { SecurityService } from '../../../services/system/security.service';
 import { IsAValidDirectory, IsNotRepository, isValidCloneURL, shouldNotExistInArray, } from '../../../shared/validate/customFormValidate';
-import { catchError, debounceTime, switchMap, takeWhile } from 'rxjs/operators';
+import { catchError, debounceTime, filter, switchMap, takeWhile } from 'rxjs/operators';
 import { merge, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { LoadingIndicatorService } from '../../../shared/state/UI/Loading-Indicator';
@@ -145,17 +145,37 @@ export class ImportHttpsComponent implements OnInit {
 
     const isExistedOnDB = !!this.listAccount
     .find(account => account.id === credentialsInstance.id);
-    this.ld.setLoading('Cloning');
-    // fetch to check the remote first
-    fromPromise(this.git.cloneTo(this.http.value, this.directory.value + '/', credentialsInstance))
-    .pipe(
+    this.repository_register_error = null;
+    this.ld.setLoading('Checking authorization');
+    fromPromise(this.git.checkRemote(this.http.value, credentialsInstance)).pipe(
+      switchMap(isAuthorize => {
+        if (isAuthorize) {
+          return of(true);
+        }
+        this.ld.setFinish();
+        this.repository_register_error = 'The repository does not exist. Either the account not authorized or the repository URL not correct';
+        return of(null);
+      }),
+      filter(stats => !!stats),
+      switchMap(() => {
+        this.ld.setLoading('Cloning');
+        return fromPromise(this.git.cloneTo(
+          this.http.value, this.directory.value + '/', credentialsInstance
+        ));
+      }),
       catchError(err => {
         // unauthorized or not exist
-        this.ld.setFinish();
         console.log(err);
+        this.ld.setFinish();
         return of('error');
       }),
-      takeWhile((res) => res !== undefined && res.length === 0),
+      takeWhile((res) => {
+        if (res !== undefined && res.length === 0) {
+          return true;
+        }
+        this.ld.setFinish();
+        return false;
+      }),
       switchMap(() => {
         return fromPromise(this.repositoryState.createNew(
           repositoryInstance,
@@ -163,11 +183,12 @@ export class ImportHttpsComponent implements OnInit {
           !isExistedOnDB,
         ));
       }),
-    )
-    .subscribe(addStatus => {
+    ).subscribe(addStatus => {
+        this.ld.setFinish();
         this.repository_register_error = null;
         this.cancel();
       }, error => {
+        this.ld.setFinish();
         this.repository_register_error = 'Register a new repository failed, please try again!';
         console.log(error);
       },
