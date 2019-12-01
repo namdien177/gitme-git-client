@@ -15,7 +15,7 @@ export class GitLogsService {
   constructor(
     protected store: GitLogsStore,
     protected query: GitLogsQuery,
-    protected git: GitService
+    protected git: GitService,
   ) {
   }
 
@@ -78,5 +78,17 @@ export class GitLogsService {
       this.store.removeActive(this.query.getActive());
     }
     this.store.setActive(logsHash);
+  }
+
+  revertCommitRemote(repository: Repository, commitSHA: string) {
+    return fromPromise(this.git.revertCommit(repository, commitSHA));
+  }
+
+  revertCommitLocal(repository: Repository, commitLocalSHA: string, numberFromBegin = 1) {
+    return fromPromise(this.git.revertLocalCommit(repository, commitLocalSHA, numberFromBegin));
+  }
+
+  reset() {
+    this.store.reset();
   }
 }

@@ -12,7 +12,7 @@ import { parseBranchRemotes, parseCurrentStatus } from '../../../shared/utilitie
 import { Repository } from '../../../shared/state/DATA/repositories';
 import { Account } from '../../../shared/state/DATA/accounts';
 import { DefaultLogFields } from '../../../shared/state/DATA/logs';
-import { DataService } from '../data.service';
+import { DataService } from './data.service';
 
 @Injectable()
 export class GitService {
@@ -179,10 +179,21 @@ export class GitService {
   }
 
   /**
-   * TODO
+   * revert a specific commit (that was pushed
    */
-  async revertToCommit(repository: Repository, commitSHA: string) {
+  async revertCommit(repository: Repository, commitSHA: string) {
+    return this.gitInstance(repository.directory).revert(commitSHA);
+  }
 
+  /**
+   * Revert commit that was not pushed
+   * @param repository
+   * @param commitSHA
+   * @param totalCommit
+   */
+  async revertLocalCommit(repository: Repository, commitSHA: string, totalCommit: number = 1) {
+    return this.gitInstance(repository.directory)
+    .reset([`${ commitSHA }~${ totalCommit }`]);
   }
 
   /**

@@ -4,7 +4,7 @@ import { appNode as app, webContentsNode as webContents } from './shared/types/t
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/branches';
-import { debounceTime, filter, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, skipWhile, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
@@ -49,6 +49,7 @@ export class AppComponent implements AfterViewInit {
       filter(value => !value.isLosingFocus),
       debounceTime(500),
       switchMap(() => this.watchingRepository()), // get current repository => set repository
+      skipWhile(() => !this.repository),
       switchMap(() => this.watchingBranch()),     // update branches and get current active branches
       switchMap(() => this.getBranchStatus()),    // git status
       switchMap(() => this.fetch()),              // fetch
@@ -66,8 +67,6 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    const currentURL = this.route.snapshot;
-    console.log(currentURL);
     this.router.navigateByUrl('/');
   }
 

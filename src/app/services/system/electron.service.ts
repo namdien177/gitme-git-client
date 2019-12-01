@@ -13,7 +13,7 @@ import { AccountListService } from '../../shared/state/DATA/accounts';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, InitializeAppConfig } from '../../shared/model/App-Config';
-import { DataService } from '../features/data.service';
+import { DataService } from '../features/core/data.service';
 
 @Injectable({ providedIn: 'root' })
 export class ElectronService {

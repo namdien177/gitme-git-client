@@ -22,7 +22,7 @@ export function createInitialState(): RepositoriesMenuState {
 }
 
 @Injectable({ providedIn: 'root' })
-@StoreConfig({ name: 'repositories-menu' })
+@StoreConfig({ name: 'repositories-menu', resettable: true })
 export class RepositoriesMenuStore extends Store<RepositoriesMenuState> {
 
   constructor() {

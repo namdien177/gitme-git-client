@@ -1,6 +1,7 @@
 <div class="scrollDetection">
   <div (click)="viewLog(log.hash)"
-       *ngFor="let log of (logList | async)"
+       (contextmenu)="viewLog(log.hash); revert(log.hash, i)"
+       *ngFor="let log of (logList | async); let i = index"
        [class.active]="log.hash === (activeHash | async).hash"
        class="line-log">
     <div class="log-title">
