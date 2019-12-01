@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UnauthorizeDialogComponent } from './unauthorize-dialog.component';
+import { UnAuthorizedDialogComponent } from './un-authorized-dialog.component';
 
 describe('UnauthorizeDialogComponent', () => {
-  let component: UnauthorizeDialogComponent;
-  let fixture: ComponentFixture<UnauthorizeDialogComponent>;
+  let component: UnAuthorizedDialogComponent;
+  let fixture: ComponentFixture<UnAuthorizedDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UnauthorizeDialogComponent ]
+      declarations: [ UnAuthorizedDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnauthorizeDialogComponent);
+    fixture = TestBed.createComponent(UnAuthorizedDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

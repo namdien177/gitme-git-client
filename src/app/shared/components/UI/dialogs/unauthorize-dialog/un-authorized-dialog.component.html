@@ -1,0 +1,20 @@
+<h2 class="weight-lighter m-0 mb-2">
+  Unable to find the remote
+</h2>
+<p class="mt-0 mb-2 body text-muted">
+  The remote of this repository was not found. Either the remote was deleted, or the account was not authorized for
+  private access. Please login again.
+</p>
+
+<div class="account-display">
+  <gitme-credential-input (accountNewChange)="listenNewAccount($event)"
+                          [account]="data.account"></gitme-credential-input>
+</div>
+
+<div class="decision">
+  <button (click)="checkRemote()"
+          class="bg-primary-black-darker"
+          mat-raised-button>
+    Check authorization
+  </button>
+</div>
