@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { DataService } from '../../services/features/data.service';
+import { DataService } from '../../services/features/core/data.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { SecurityService } from '../../services/system/security.service';
 import { switchMap } from 'rxjs/operators';

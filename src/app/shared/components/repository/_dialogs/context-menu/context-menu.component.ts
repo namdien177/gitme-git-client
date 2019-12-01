@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../../state/DATA/repositories';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
 import { FileSystemService } from '../../../../../services/system/fileSystem.service';
-import { DataService } from '../../../../../services/features/data.service';
+import { DataService } from '../../../../../services/features/core/data.service';
 import { SecurityService } from '../../../../../services/system/security.service';
 import { fsNode } from '../../../../types/types.electron';
 import { DefineCommon } from '../../../../../common/define.common';

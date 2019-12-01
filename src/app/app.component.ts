@@ -67,8 +67,6 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    const currentURL = this.route.snapshot;
-    console.log(currentURL);
     this.router.navigateByUrl('/');
   }
 

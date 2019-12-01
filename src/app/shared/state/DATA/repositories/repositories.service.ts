@@ -15,7 +15,7 @@ import { Account, AccountListService } from '../accounts';
 import { SecurityService } from '../../../../services/system/security.service';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
 import * as moment from 'moment';
-import { DataService } from '../../../../services/features/data.service';
+import { DataService } from '../../../../services/features/core/data.service';
 import { SystemResponse } from '../../../model/system.response';
 import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
 

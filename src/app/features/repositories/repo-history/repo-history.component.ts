@@ -30,7 +30,8 @@ export class RepoHistoryComponent implements OnInit {
     public utilities: UtilityService
   ) {
     this.repository = this.repositoryService.getActive();
-    this.logsService.initialLogs(this.repository).subscribe(prepareComplete => {
+    this.logsService.initialLogs(this.repository)
+    .subscribe(() => {
       this.activeViewTracking();
     });
 

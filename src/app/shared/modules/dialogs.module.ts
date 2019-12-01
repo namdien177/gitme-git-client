@@ -14,6 +14,7 @@ import { BranchMergeComponent } from '../components/branch/_dialogs/branch-merge
 import { ConflictViewerComponent } from '../components/UI/dialogs/conflict-viewer/conflict-viewer.component';
 import { ContextMenuComponent } from '../components/repository/_dialogs/context-menu/context-menu.component';
 import { BranchStashComponent } from '../components/branch/_dialogs/branch-stash/branch-stash.component';
+import { RevertOptionsComponent } from '../components/logs/_dialogs/revert-options/revert-options.component';
 
 
 const dialogComps = [
@@ -29,7 +30,8 @@ const dialogComps = [
   BranchMergeComponent,
   ConflictViewerComponent,
   ContextMenuComponent,
-  BranchStashComponent
+  BranchStashComponent,
+  RevertOptionsComponent
 ];
 
 @NgModule({
