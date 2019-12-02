@@ -65,8 +65,8 @@ export class CredentialInputComponent {
       })
     )
     .subscribe(account => {
-      console.log(account);
-      this.account = account;
+        console.log(account);
+        this.account = account;
         this.emitData();
       }
     );

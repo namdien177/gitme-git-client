@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../services/system/electron.service';
 import { AppConfig } from '../../model/App-Config';
 import { DataService } from '../../../services/features/core/data.service';
@@ -9,7 +9,7 @@ import { SecurityService } from '../../../services/system/security.service';
   templateUrl: './windows-frame.component.html',
   styleUrls: ['./windows-frame.component.scss']
 })
-export class WindowsFrameComponent implements OnInit {
+export class WindowsFrameComponent implements OnInit, AfterViewInit {
 
   appConfig: AppConfig = null;
   idApp: string = null;
@@ -19,14 +19,6 @@ export class WindowsFrameComponent implements OnInit {
     private securityService: SecurityService,
     private dataService: DataService
   ) {
-    this.idApp = this.securityService.appUUID;
-    this.dataService.getConfigAppData(this.idApp).then(
-      config => {
-        if (!!config) {
-          this.appConfig = config;
-        }
-      }
-    );
   }
 
   ngOnInit() {
@@ -38,5 +30,17 @@ export class WindowsFrameComponent implements OnInit {
 
   closeWindows() {
     this.electronServices.closeApplication();
+  }
+
+  ngAfterViewInit(): void {
+    this.idApp = this.securityService.appUUID;
+    this.dataService.getConfigAppData(this.idApp).then(
+      config => {
+        console.log(config);
+        if (!!config) {
+          this.appConfig = config;
+        }
+      }
+    );
   }
 }
