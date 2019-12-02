@@ -1,12 +1,10 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { BrowserWindow, remote } from 'electron';
+import { machineIdSync } from 'node-machine-id';
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
-import { BrowserWindow, ipcRenderer, remote, webFrame } from 'electron';
-import { machineIdSync } from 'node-machine-id';
-import * as childProcess from 'child_process';
-import * as os from 'os';
 import { LocalStorageService } from './localStorage.service';
-import { electronNode, fsNode } from '../../shared/types/types.electron';
+import { electronNode } from '../../shared/types/types.electron';
 import { SecurityService } from './security.service';
 import { FileSystemService } from './fileSystem.service';
 import { DefineCommon } from '../../common/define.common';
@@ -15,15 +13,11 @@ import { AccountListService } from '../../shared/state/DATA/accounts';
 import { AppRepositories } from '../../shared/model/App-Repositories';
 import { AppAccounts } from '../../shared/model/App-Accounts';
 import { AppConfig, InitializeAppConfig } from '../../shared/model/App-Config';
-import { DataService } from '../features/data.service';
+import { DataService } from '../features/core/data.service';
 
 @Injectable({ providedIn: 'root' })
-export class ElectronService implements OnDestroy {
-  webFrame: typeof webFrame;
+export class ElectronService {
   remote: typeof remote;
-  childProcess: typeof childProcess;
-  fs: typeof fsNode;
-  os: typeof os;
   private readonly window: BrowserWindow;
   private readonly machine_id: string;
 
@@ -37,15 +31,10 @@ export class ElectronService implements OnDestroy {
   ) {
     // Conditional imports
     if (ElectronService.isElectron()) {
-      this.webFrame = electronNode.webFrame;
       this.remote = electronNode.remote;
       this.window = electronNode.remote.getCurrentWindow();
-      this.childProcess = window.require('child_process');
-
-      this.fs = fsNode;
       this.machine_id = machineIdSync();
       this.setupUUID();
-      this.initializeConfigFromLocalDatabase();
     }
   }
 
@@ -53,30 +42,26 @@ export class ElectronService implements OnDestroy {
     return window && window.process && window.process.type;
   }
 
-  ngOnDestroy(): void {
-  }
-
-  initializeConfigFromLocalDatabase() {
+  async initializeConfigFromLocalDatabase() {
     /**
      * Loading the configuration file
      */
     const configDefaultName = this.machine_id;
     if (this.fileService.isFileExist(DefineCommon.ROOT + DefineCommon.DIR_CONFIG(configDefaultName))) {
       // load to memory repos and other settings
-      this.setupApplicationConfiguration(
+      await this.setupApplicationConfiguration(
         this.dataService.getConfigAppData(configDefaultName)
       );
     } else {
       const data: AppConfig = InitializeAppConfig(configDefaultName);
-      this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG()).then(
-        () => {
-          this.setupApplicationConfiguration(
-            this.dataService.getConfigAppData(configDefaultName)
-          );
-        }, reject => {
-          console.log(reject);
-        }
-      );
+      try {
+        await this.fileService.createFile(configDefaultName, data, DefineCommon.DIR_CONFIG());
+        await this.setupApplicationConfiguration(
+          this.dataService.getConfigAppData(configDefaultName)
+        );
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -154,12 +139,10 @@ export class ElectronService implements OnDestroy {
     }
   }
 
-  private setupApplicationConfiguration(fileContext: Promise<AppConfig>) {
-    fileContext.then(async contextStatus => {
-      // Load repository configs
-      await this.initializeRepositoriesFromLocalDatabase(contextStatus.repository_config);
-      await this.initializeAccountsFromLocalDatabase(contextStatus.account_config);
-    });
+  private async setupApplicationConfiguration(fileContext: Promise<AppConfig>) {
+    const contextStatus = await fileContext;
+    await this.initializeRepositoriesFromLocalDatabase(contextStatus.repository_config);
+    await this.initializeAccountsFromLocalDatabase(contextStatus.account_config);
   }
 
   private async setupApplicationRepositories(fileContext: Promise<AppRepositories>) {

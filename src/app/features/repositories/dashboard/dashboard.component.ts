@@ -49,27 +49,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private observeDiff() {
     this.gitDiffService.getDiff()
-      .pipe(
-        distinctUntilChanged(),
-        takeUntil(this.componentDestroy),
-      )
-      .subscribe(
-        diffStatus => {
-          this.diffStatus = diffStatus;
-          if (!!diffStatus && diffStatus.directory) {
-            const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
-            this.info = {
-              name: splitName.end,
-              dir: splitName.front,
-            };
-          } else {
-            this.info = {
-              name: null,
-              dir: null,
-            };
-          }
-        },
-      );
+    .pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy),
+    )
+    .subscribe(
+      diffStatus => {
+        this.diffStatus = diffStatus;
+        if (!!diffStatus && diffStatus.directory) {
+          const splitName = this.utilityService.extractFrontPath(diffStatus.directory);
+          this.info = {
+            name: splitName.end,
+            dir: splitName.front,
+          };
+        } else {
+          this.info = {
+            name: null,
+            dir: null,
+          };
+        }
+      },
+    );
   }
 
   private observeStatusChange() {

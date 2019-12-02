@@ -117,7 +117,7 @@ export class RepositoryBranchesService {
     } else {
       // perform upstream
       return fromPromise(
-        this.gitService.pushUpStream(repository.directory, branch)
+        this.gitService.pushUpStream(repository, branch, credentials)
       );
     }
   }
@@ -248,8 +248,9 @@ export class RepositoryBranchesService {
     } else {
       if (pushToRemote) {
         status.pushRemote = await this.gitService.pushUpStream(
-          repository.directory,
-          Object.assign(branch, { name: newName })
+          repository,
+          Object.assign(branch, { name: newName }),
+          credentials
         );
       }
     }
@@ -302,16 +303,6 @@ export class RepositoryBranchesService {
   }
 
   set(listBranch: RepositoryBranchSummary[]) {
-    // listBranch.sort(
-    //   (branchA, branchB) => {
-    //     if (branchA.current) {
-    //       return -1;
-    //     } else if (branchB.current) {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   }
-    // );
     listBranch.every(branch => {
       if (branch.current) {
         this.setActive(branch);
@@ -352,5 +343,9 @@ export class RepositoryBranchesService {
 
   setActiveID(branchID: string) {
     this.store.setActive(branchID);
+  }
+
+  reset() {
+    this.store.reset();
   }
 }

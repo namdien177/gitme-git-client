@@ -1,8 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { GitLogsService, ListLogLine } from '../../../state/DATA/logs';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, skipWhile, switchMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, skipWhile, switchMap, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
+import { RepositoryStatusService } from '../../../state/DATA/repository-status';
+import { MatBottomSheet } from '@angular/material';
+import { RevertOptionsComponent } from '../_dialogs/revert-options/revert-options.component';
+import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
+import { fromPromise } from 'rxjs/internal-compatibility';
+import { RepositoryBranchesService } from '../../../state/DATA/branches';
+import { GitDiffService } from '../../../state/DATA/git-diff';
 
 @Component({
   selector: 'gitme-logs-list',
@@ -21,7 +28,11 @@ export class LogsListComponent implements OnInit {
 
   constructor(
     private logService: GitLogsService,
-    private repositoriesService: RepositoriesService,
+    private repositoryState: RepositoriesService,
+    private statusState: RepositoryStatusService,
+    private branchState: RepositoryBranchesService,
+    private diffState: GitDiffService,
+    private bottomSheet: MatBottomSheet
   ) {
     this.logList = this.logService.observeLogs().pipe(
       skipWhile(s => !s || s.length === 0),
@@ -48,7 +59,7 @@ export class LogsListComponent implements OnInit {
   }
 
   viewMore() {
-    const activeRepository: Repository = this.repositoriesService.getActive();
+    const activeRepository: Repository = this.repositoryState.getActive();
     this.logService.getMoreLogs(activeRepository, this.lastDate)
     .pipe(
       switchMap(newdata => {
@@ -59,7 +70,43 @@ export class LogsListComponent implements OnInit {
       })
     )
     .subscribe(firstLog => {
-      this.allCommitConfirmed = firstLog && firstLog.hash === this.lastHash;
+      this.allCommitConfirmed = firstLog && firstLog === this.lastHash;
+    });
+  }
+
+  revert(hash: string, i: number) {
+    const repository: Repository = this.repositoryState.getActive();
+    const currentStatus = this.statusState.get();
+    const isLocal = i + 1 <= currentStatus.ahead;
+    // if local, allow option to delete the previous commit
+    const data: YesNoDialogModel = {
+      title: 'Commit Options',
+      body: null,
+      data: {
+        hash: hash,
+        index: i,
+        isLocal
+      },
+      decision: {
+        noText: 'Cancel',
+        yesText: 'Apply'
+      }
+    };
+    const revertOptionSheet = this.bottomSheet.open(
+      RevertOptionsComponent, {
+        panelClass: ['bg-primary-black', 'p-2-option'],
+        data: data
+      }
+    );
+
+    revertOptionSheet.afterDismissed()
+    .pipe(
+      filter(res => !!res),
+      switchMap(() => fromPromise(this.statusState.status(repository))),
+      switchMap(() => this.logService.initialLogs(repository))
+    )
+    .subscribe(choice => {
+      console.log(choice);
     });
   }
 }

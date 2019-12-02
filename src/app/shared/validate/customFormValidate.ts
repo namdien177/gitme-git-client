@@ -18,7 +18,7 @@ export function ArrayLengthShouldLargerThan(length: number): ValidatorFn {
       };
     }
     const validateArray = control.value.length > length;
-    return validateArray ? null : { length: `The array length was sorter or equal ${length}` };
+    return validateArray ? null : { length: `The array length was sorter or equal ${ length }` };
   };
 }
 
@@ -51,7 +51,7 @@ export function shouldNotExistInArray(array: string[], sourceName: string = 'arr
       return value === toCheck;
     });
 
-    return !isMatch ? null : { match: `${value} is existed in the ${sourceName}` };
+    return !isMatch ? null : { match: `${ value } is existed in the ${ sourceName }` };
   };
 }
 

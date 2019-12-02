@@ -7,7 +7,6 @@ import { RepoHistoryComponent } from './repo-history/repo-history.component';
 const routes: Routes = [
   {
     path: '', component: RepositoriesComponent, children: [
-      // { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: '', pathMatch: 'full', component: DashboardComponent },
       { path: 'history', component: RepoHistoryComponent },
     ]

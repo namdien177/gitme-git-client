@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../../../services/system/electron.service';
 import { AppConfig } from '../../model/App-Config';
-import { DataService } from '../../../services/features/data.service';
+import { DataService } from '../../../services/features/core/data.service';
 import { SecurityService } from '../../../services/system/security.service';
 
 @Component({

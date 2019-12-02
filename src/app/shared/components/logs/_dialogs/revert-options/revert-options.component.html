@@ -1,0 +1,28 @@
+<small class="text-muted">
+  Selected commit
+</small>
+
+<h2 class="m-0 weight-lighter">
+  {{hash.slice(0, 8)}}
+</h2>
+<hr>
+
+<div (click)="revertCommit()"
+     class="card mb-1 card-merge">
+  <div class="card-body">
+    Revert this commit
+  </div>
+</div>
+
+<div (click)="undoCommit()"
+     *ngIf="isLocal"
+     class="card mb-1 card-merge">
+  <div class="card-body">
+    Undo this commit
+    <br>
+    <small class="text-muted">
+      Local commit can be undo and will not display in history log.
+    </small>
+  </div>
+</div>
+

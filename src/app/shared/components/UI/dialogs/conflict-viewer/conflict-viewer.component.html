@@ -8,7 +8,7 @@
 <div class="list-file">
   <div *ngFor="let fileDirectory of listConflicted; trackBy: trackByPath"
        class="row">
-    <div class="resolve-status" [class.resolved]="fileDirectory.status">
+    <div [class.resolved]="fileDirectory.status" class="resolve-status">
       <ng-container *ngIf="!fileDirectory.status">
         <i class="fa fa-warning text-warning"></i>
       </ng-container>

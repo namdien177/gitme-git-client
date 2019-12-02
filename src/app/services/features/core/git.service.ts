@@ -12,7 +12,7 @@ import { parseBranchRemotes, parseCurrentStatus } from '../../../shared/utilitie
 import { Repository } from '../../../shared/state/DATA/repositories';
 import { Account } from '../../../shared/state/DATA/accounts';
 import { DefaultLogFields } from '../../../shared/state/DATA/logs';
-import { DataService } from '../data.service';
+import { DataService } from './data.service';
 
 @Injectable()
 export class GitService {

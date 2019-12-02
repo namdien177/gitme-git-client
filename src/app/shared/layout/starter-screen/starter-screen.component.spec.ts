@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BranchMergeComponent } from './branch-merge.component';
+import { StarterScreenComponent } from './starter-screen.component';
 
-describe('BranchMergeComponent', () => {
-  let component: BranchMergeComponent;
-  let fixture: ComponentFixture<BranchMergeComponent>;
+describe('StarterScreenComponent', () => {
+  let component: StarterScreenComponent;
+  let fixture: ComponentFixture<StarterScreenComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [BranchMergeComponent]
+      declarations: [StarterScreenComponent]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BranchMergeComponent);
+    fixture = TestBed.createComponent(StarterScreenComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

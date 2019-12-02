@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivateChild, Router, RouterStateSnapshot, 
 import { Observable, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
-import { DataService } from '../../services/features/data.service';
+import { DataService } from '../../services/features/core/data.service';
 import { SecurityService } from '../../services/system/security.service';
 import { FileSystemService } from '../../services/system/fileSystem.service';
 

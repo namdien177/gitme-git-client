@@ -70,10 +70,7 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    console.dir(this.routerNG.nativeElement);
-    console.log(this.routerNG.nativeElement.childNodes);
     setTimeout(() => {
-      console.log(this.routerNG.nativeElement.childNodes);
       if (this.routerNG.nativeElement.childNodes.length <= 2) {
         location.reload();
       }
