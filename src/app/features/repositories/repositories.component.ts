@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, of, Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../shared/state/UI/repositories-menu';
-import { catchError, debounceTime, delay, distinctUntilChanged, switchMap, takeUntil, takeWhile, tap, } from 'rxjs/operators';
+import { catchError, debounceTime, delay, distinctUntilChanged, skipWhile, switchMap, takeUntil, takeWhile, tap, } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../shared/state/DATA/repositories';
 import { StatusSummary } from '../../shared/model/statusSummary.model';
 import { RepositoryBranchesService, RepositoryBranchSummary } from '../../shared/state/DATA/branches';
@@ -12,7 +12,6 @@ import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conf
 import { LoadingIndicatorService } from '../../shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ApplicationStateService } from '../../shared/state/UI/Application-State';
-import { GitService } from '../../services/features/core/git.service';
 
 @Component({
   selector: 'gitme-repositories',
@@ -41,7 +40,6 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService,
     private cd: ChangeDetectorRef,
-    private git: GitService
   ) {
   }
 
@@ -115,6 +113,14 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
     .pipe(
       takeUntil(this.componentDestroyed),
       takeWhile(() => !this.appState.getApplicationState().isLosingFocus),
+      takeWhile(() => !this.appState.getApplicationState().isCheckingAuthorize),
+      switchMap(() => {
+        this.appState.setCheckingAuthorize();
+        return this.repositoryState.reAuthorizeProcess(this.repository, this.activeBranch, this.matDialog);
+      }),
+      skipWhile((authorize) => {
+        return !authorize;
+      }),
       switchMap(() => {
         if (!!this.repository && !!this.activeBranch) {
           return this.repositoryState.fetch(
@@ -187,15 +193,22 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private fetchRemote() {
     this.loading.setLoading('Fetching!');
-    this.repositoryState.fetch(
-      { ...this.repository } as Repository,
-      { ...this.activeBranch } as RepositoryBranchSummary,
-      true,
-    ).pipe(
-      catchError(error => {
-        // potential unauthorized => not care as we handle in the status state
-        console.log(error);
-        return of(null);
+    this.appState.setCheckingAuthorize();
+    this.repositoryState.reAuthorizeProcess(this.repository, this.activeBranch, this.matDialog).pipe(
+      skipWhile((authorize) => {
+        this.appState.setFinishCheckAuthorize();
+        this.loading.setFinish();
+        if (!authorize) {
+          console.log('Fetch failed. Unauthorized!');
+        }
+        return !authorize;
+      }),
+      switchMap(() => {
+        return this.repositoryState.fetch(
+          { ...this.repository } as Repository,
+          { ...this.activeBranch } as RepositoryBranchSummary,
+          true,
+        );
       }),
       switchMap(() => fromPromise(this.branchState.updateAll(this.repository))),
       switchMap(() => fromPromise(this.statusState.status(this.repository))),
@@ -207,6 +220,17 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private pushRemote() {
     this.loading.setLoading('Pushing to remote. Please wait.');
+    this.appState.setCheckingAuthorize();
+    this.repositoryState.reAuthorizeProcess(this.repository, this.activeBranch, this.matDialog).pipe(
+      skipWhile((authorize) => {
+        this.appState.setFinishCheckAuthorize();
+        this.loading.setFinish();
+        if (!authorize) {
+          console.log('Pull failed. Unauthorized!');
+        }
+        return !authorize;
+      }),
+    );
     this.branchState.push(this.repository, this.activeBranch)
     .pipe(
       catchError(error => {

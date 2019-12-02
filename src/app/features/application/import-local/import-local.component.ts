@@ -161,7 +161,7 @@ export class ImportLocalComponent implements OnInit {
           return of(true);
         }
         this.ld.setFinish();
-        this.repository_register_error = 'The repository does not exist. Either the account not authorized or the repository URL not correct';
+        this.repository_register_error = 'The remote repository does not exist. Either the account not authorized or the repository URL not correct';
         return of(null);
       }),
       filter(stats => !!stats),

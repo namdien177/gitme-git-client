@@ -20,6 +20,7 @@ import { SystemResponse } from '../../../model/system.response';
 import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
 import { MatDialog } from '@angular/material';
 import { UnAuthorizedDialogComponent } from '../../../components/UI/dialogs/unauthorize-dialog/un-authorized-dialog.component';
+import { ApplicationStateService } from '../../UI/Application-State';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -37,7 +38,7 @@ export class RepositoriesService {
     private lSService: LocalStorageService,
     private accountService: AccountListService,
     private security: SecurityService,
-    private matDialog: MatDialog
+    private appState: ApplicationStateService
   ) {
   }
 
@@ -256,7 +257,6 @@ export class RepositoriesService {
   fetch(repository: Repository, branch: BranchModel, updateTime: boolean = false) {
     if (this.isFetching) {
       console.log('skipping operation fetching');
-      this.isFetching = false;
       return of(this.cachedFetching);
     }
     this.isFetching = true;
@@ -273,6 +273,7 @@ export class RepositoriesService {
     .pipe(
       switchMap(statusAuthorize => {
         if (!statusAuthorize) {
+          this.isFetching = false;
           // Unauthorized, required authorize
           // return this.reAuthorizeProcess(repository, branch, credential);
         }
@@ -378,17 +379,31 @@ export class RepositoriesService {
     return await this.git.diffs(repository, fileStatusSummary.path);
   }
 
-  private reAuthorizeProcess(repository: Repository, branch: BranchModel, credential: Account) {
-    const data = {
-      repository,
-      branch,
-      credential
-    };
-
-    return this.matDialog.open(UnAuthorizedDialogComponent, {
-      data: data,
-      panelClass: 'bg-primary-black-mat-dialog',
-      width: '400px'
-    }).afterClosed();
+  reAuthorizeProcess(repository: Repository, branch: BranchModel, matDialog: MatDialog, mode: 'fetch' | 'push' = 'fetch') {
+    return fromPromise(this.dataService.getAccountsConfigData(repository.credential.id_credential))
+    .pipe(
+      switchMap(credential => {
+        if (!credential) {
+          return of(null);
+        }
+        const data = {
+          repository,
+          branch,
+          credential,
+          mode
+        };
+        return matDialog.open<UnAuthorizedDialogComponent, { repository, branch, credential }>(UnAuthorizedDialogComponent, {
+          data: data,
+          panelClass: 'bg-primary-black-mat-dialog',
+          width: '400px'
+        }).afterClosed();
+      }),
+      map(res => {
+        if (res !== undefined) {
+          this.appState.setFinishCheckAuthorize();
+        }
+        return !!res;
+      })
+    );
   }
 }

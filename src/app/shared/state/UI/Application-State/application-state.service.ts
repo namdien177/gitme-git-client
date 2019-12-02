@@ -6,24 +6,33 @@ import { ApplicationStateQuery } from './application-state.query';
 export class ApplicationStateService {
 
   constructor(
-    private applicationStateStore: ApplicationStateStore,
-    private applicationStateQuery: ApplicationStateQuery
+    private store: ApplicationStateStore,
+    private query: ApplicationStateQuery
   ) {
   }
 
   setBlur() {
-    this.applicationStateStore.update({ isLosingFocus: true });
+    this.store.update({ isLosingFocus: true });
   }
 
   setFocus() {
-    this.applicationStateStore.update({ isLosingFocus: false });
+    this.store.update({ isLosingFocus: false });
   }
 
   observeApplicationState() {
-    return this.applicationStateQuery.select();
+    return this.query.select();
   }
 
   getApplicationState() {
-    return this.applicationStateQuery.getValue();
+    return this.query.getValue();
   }
+
+  setCheckingAuthorize() {
+    this.store.update({ isCheckingAuthorize: true });
+  }
+
+  setFinishCheckAuthorize() {
+    this.store.update({ isCheckingAuthorize: false });
+  }
+
 }
