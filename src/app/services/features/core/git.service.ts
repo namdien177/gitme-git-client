@@ -68,16 +68,11 @@ export class GitService {
     if (!credentials) {
       credentials = (await this.dataSystem.getAccountsConfigData(repository.credential.id_credential)).account;
     }
-    const remoteFetch = this.utilities.getOAuthRemote(branch, repository, credentials, 'fetch');
-    let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', branch.tracking.name]);
-    if (typeof originalRemote !== 'string') {
-      originalRemote = branch.tracking.push;
-    } else {
-      originalRemote = originalRemote.replace('\n', '');
-    }
-    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, remoteFetch]);
-    const data = await this.gitInstance(directory).fetch(remoteFetch);
-    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
+    const branchTracking = branch.tracking.name;
+    const data = await this.processingDynamicRemote(
+      repository, branch, credentials, 'fetch',
+      this.gitInstance(directory).fetch(branchTracking)
+    );
     return {
       fetchData: data,
       repository,
@@ -88,12 +83,14 @@ export class GitService {
    * Pull new changes from remote with credentials
    */
   async pull(repository: Repository, branch: BranchModel, credentials: Account, options?: { [key: string]: null | string | any }) {
-    const executeFunc = this.gitInstance(repository.directory).pull(
-      branch.tracking.name,
-      branch.name,
-      options,
+    return this.processingDynamicRemote(
+      repository, branch, credentials, 'fetch',
+      this.gitInstance(repository.directory).pull(
+        branch.tracking.name,
+        branch.name,
+        options,
+      )
     );
-    return this.processingDynamicRemote(repository, branch, credentials, 'fetch', executeFunc);
   }
 
   /**
@@ -101,10 +98,9 @@ export class GitService {
    * Push the commits to remote by credentials and tracking
    */
   async push(repository: Repository, branch: BranchModel, credentials: Account, options?: { [p: string]: null | string | any }) {
-    const executeFunc = this.gitInstance(repository.directory).push(
+    return this.processingDynamicRemote(repository, branch, credentials, 'push', this.gitInstance(repository.directory).push(
       branch.tracking.name, branch.name, options,
-    );
-    return this.processingDynamicRemote(repository, branch, credentials, 'push', executeFunc);
+    ));
   }
 
   /**
@@ -116,12 +112,14 @@ export class GitService {
       defaultOptions = Object.assign(defaultOptions, options);
     }
     const trackName = branch.tracking ? branch.tracking.name : 'origin';
-    const executeFunc = this.gitInstance(repository.directory).push(
-      trackName,
-      branch.name,
-      defaultOptions,
+    return await this.processingDynamicRemote(
+      repository, branch, credentials, 'push',
+      this.gitInstance(repository.directory).push(
+        trackName,
+        branch.name,
+        defaultOptions,
+      )
     );
-    return await this.processingDynamicRemote(repository, branch, credentials, 'push', executeFunc);
   }
 
   /**
