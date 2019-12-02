@@ -4,15 +4,14 @@ import { appNode as app, webContentsNode as webContents } from './shared/types/t
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/branches';
-import { debounceTime, distinctUntilChanged, filter, map, skipUntil, skipWhile, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, skipWhile, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
 import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { deepMutableObject } from './shared/utilities/utilityHelper';
-import { MatDialog } from '@angular/material';
 
 
 @Component({
@@ -22,20 +21,19 @@ import { MatDialog } from '@angular/material';
 })
 export class AppComponent implements AfterViewInit {
   loadingState: Observable<LoadingIndicatorState>;
-  isPromptAuthorize = false;
 
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
 
   constructor(
-    public appState: ApplicationStateService,
+    public applicationStateService: ApplicationStateService,
     private repositoriesService: RepositoriesService,
     private repositoryBranchesService: RepositoryBranchesService,
     private repositoryStatusService: RepositoryStatusService,
     private translate: TranslateService,
     private ld: LoadingIndicatorService,
     private router: Router,
-    private matDialog: MatDialog
+    private route: ActivatedRoute
   ) {
     translate.setDefaultLang('en');
     this.listenerFocus();
@@ -45,25 +43,16 @@ export class AppComponent implements AfterViewInit {
      * Fetch all data
      * get status
      */
-    this.appState.observeApplicationState()
+    this.applicationStateService.observeApplicationState()
     .pipe(
+      startWith({ isLosingFocus: false }),
       filter(value => !value.isLosingFocus),
-      filter((data) => !data.isCheckingAuthorize),
       debounceTime(500),
       switchMap(() => this.watchingRepository()), // get current repository => set repository
       skipWhile(() => !this.repository),
-      switchMap(() => this.getBranchStatus()),    // git status
       switchMap(() => this.watchingBranch()),     // update branches and get current active branches
-      switchMap(() => {
-        if (!this.appState.getApplicationState().isCheckingAuthorize) {
-          this.appState.setCheckingAuthorize();
-        }
-        return this.repositoriesService.reAuthorizeProcess(this.repository, this.branch, this.matDialog);
-      }),
-      skipWhile((authorize) => {
-        return !authorize;
-      }),
-      switchMap(() => this.fetch()),
+      switchMap(() => this.getBranchStatus()),    // git status
+      switchMap(() => this.fetch()),              // fetch
     )
     .subscribe(
       (status: StatusSummary) => {
@@ -75,20 +64,20 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.appState.setBlur();
-    this.appState.setFocus();
+    this.applicationStateService.setBlur();
+    this.applicationStateService.setFocus();
 
     this.router.navigateByUrl('/');
   }
 
   listenerFocus() {
     app.on('browser-window-focus', (event, window) => {
-      this.appState.setFocus();
+      this.applicationStateService.setFocus();
     });
     app.on('browser-window-blur', (event, window) => {
       if (webContents.isDevToolsFocused()) {
       } else {
-        this.appState.setBlur();
+        this.applicationStateService.setBlur();
       }
     });
   }

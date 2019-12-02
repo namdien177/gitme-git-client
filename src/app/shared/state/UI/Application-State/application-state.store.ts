@@ -3,13 +3,11 @@ import { Store, StoreConfig } from '@datorama/akita';
 
 export interface ApplicationStateState {
   isLosingFocus: boolean;
-  isCheckingAuthorize: boolean;
 }
 
 export function createInitialState(): ApplicationStateState {
   return {
-    isLosingFocus: false,
-    isCheckingAuthorize: false
+    isLosingFocus: false
   };
 }
 
