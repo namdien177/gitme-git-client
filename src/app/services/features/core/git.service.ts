@@ -50,7 +50,9 @@ export class GitService {
    * @param dir Raw directory, then will be converted to a safer string later.
    */
   gitInstance(dir?: string) {
-    dir = this.utilities.directorySafePath(dir);
+    if (dir) {
+      dir = this.utilities.directorySafePath(dir);
+    }
     return git(dir);
   }
 
@@ -552,7 +554,7 @@ export class GitService {
       res => !!res ? res : '',
     );
     if (stringRemotes.length < 1) {
-      return false;
+      return null;
     }
     /**
      * Each remote will have structure as:
@@ -602,8 +604,15 @@ export class GitService {
     ]);
   }
 
-  async addWatch(repository: Repository, ...fileDir: string[]) {
-    return await this.gitInstance(repository.directory).add(fileDir);
+  async checkRemote(remote: string, credentials: Account) {
+    const remoteOauth = this.utilities.addOauthTokenToRemote(remote, credentials);
+    let lsRemote = null;
+    try {
+      lsRemote = await this.gitInstance().listRemote(['-h', remoteOauth]);
+    } catch (e) {
+      console.log(e);
+    }
+    return !!lsRemote;
   }
 }
 

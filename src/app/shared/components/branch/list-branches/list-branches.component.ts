@@ -4,12 +4,12 @@ import { RepositoriesService, Repository } from '../../../state/DATA/repositorie
 import { MatDialog } from '@angular/material';
 import { BranchNewOptionComponent } from '../_dialogs/branch-new/branch-new-option/branch-new-option.component';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, takeWhile, tap } from 'rxjs/operators';
-import { defaultCommitOptionDialog, YesNoDialogModel } from '../../../model/yesNoDialog.model';
+import { YesNoDialogModel } from '../../../model/yesNoDialog.model';
 import { of, Subject } from 'rxjs';
 import { StatusSummary } from '../../../model/statusSummary.model';
-import { BranchCheckoutStashComponent } from '../_dialogs/branch-new/branch-checkout-stash/branch-checkout-stash.component';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
+import { BranchStashComponent } from '../_dialogs/branch-stash/branch-stash.component';
 
 @Component({
   selector: 'gitme-repo-branches',
@@ -35,15 +35,15 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   } = null;
 
   constructor(
-    private repositoryBranchesService: RepositoryBranchesService,
+    private branchesService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
     private statusService: RepositoryStatusService,
     private matDialog: MatDialog
   ) {
-    this.repositoryBranchesService.selectActive().subscribe(
+    this.branchesService.selectActive().subscribe(
       br => this.branch = br
     );
-    this.repositoryBranchesService.select().subscribe(
+    this.branchesService.select().subscribe(
       br => this.branches = br
     );
     this.repositoriesService.selectActive().subscribe(
@@ -122,7 +122,7 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
           return this.createBranchMethod(final);
         }
       ),
-      switchMap(() => fromPromise(this.repositoryBranchesService.updateAll(this.repository))),
+      switchMap(() => fromPromise(this.branchesService.updateAll(this.repository))),
       switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.repository, branches)))
     ).subscribe(
       action => {
@@ -132,16 +132,22 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
   }
 
   openStashMenu() {
-    const defaultStash = defaultCommitOptionDialog;
-    defaultStash.title = 'Oops! There are some changes on current branch!';
-    defaultStash.body = 'What should we do with it?';
-    return this.matDialog.open(BranchCheckoutStashComponent, {
-      width: '380px',
+    const warnChanges: YesNoDialogModel = {
+      title: 'Failed to checkout',
+      body: 'There are changes that need to be committed before checkout to a new branch',
+      data: null,
+      decision: {
+        noText: 'Cancel',
+        yesText: 'Apply'
+      }
+    };
+    return this.matDialog.open(BranchStashComponent, {
+      width: '280px',
       height: 'auto',
+      data: warnChanges,
       panelClass: 'bg-primary-black-mat-dialog',
-      data: defaultStash
     }).afterClosed().pipe(
-      map(res => res === undefined ? 0 : res)
+      map(() => 0)
     );
   }
 
@@ -150,24 +156,12 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
       null : this._temporaryBranchInfo.fromBranch;
     if (methodCode === 2) {
       // create new branch and bring changes to
-      return this.repositoryBranchesService.newBranchFrom(
+      return this.branchesService.newBranchFrom(
         this.repository,
         this._temporaryBranchInfo.name,
         branchToGo
       );
     }
-
-    // stash changes and create new branch
-    return this.repositoryBranchesService.stashChanges(this.repository).pipe(
-      switchMap(stash => {
-        console.log(stash);
-        return this.repositoryBranchesService.newBranchFrom(
-          this.repository,
-          this._temporaryBranchInfo.name,
-          branchToGo
-        );
-      })
-    );
   }
 
   trackBranchID(index: number, item: RepositoryBranchSummary) {

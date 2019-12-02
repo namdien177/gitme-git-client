@@ -15,6 +15,8 @@ import { ConflictViewerComponent } from '../components/UI/dialogs/conflict-viewe
 import { ContextMenuComponent } from '../components/repository/_dialogs/context-menu/context-menu.component';
 import { BranchStashComponent } from '../components/branch/_dialogs/branch-stash/branch-stash.component';
 import { RevertOptionsComponent } from '../components/logs/_dialogs/revert-options/revert-options.component';
+import { UnAuthorizedDialogComponent } from '../components/UI/dialogs/unauthorize-dialog/un-authorized-dialog.component';
+import { ShareCredentialsComponentsModule } from '../components/credential/ShareCredentialsComponents.module';
 
 
 const dialogComps = [
@@ -31,7 +33,8 @@ const dialogComps = [
   ConflictViewerComponent,
   ContextMenuComponent,
   BranchStashComponent,
-  RevertOptionsComponent
+  RevertOptionsComponent,
+  UnAuthorizedDialogComponent,
 ];
 
 @NgModule({
@@ -42,6 +45,7 @@ const dialogComps = [
     CommonModule,
     MaterialModule,
     CoreModule,
+    ShareCredentialsComponentsModule
   ],
   entryComponents: [
     ...dialogComps,
