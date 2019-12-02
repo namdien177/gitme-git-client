@@ -13,7 +13,7 @@ import { of } from 'rxjs';
 })
 export class CredentialInputComponent {
 
-  @Output() accountNewChange: EventEmitter<Account> = new EventEmitter();
+  @Output() accountNewChange = new EventEmitter();
   @Output() isNewCredentialsValid = new EventEmitter();
 
   @Input()

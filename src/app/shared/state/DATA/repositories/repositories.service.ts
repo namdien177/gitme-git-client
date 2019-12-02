@@ -18,9 +18,6 @@ import * as moment from 'moment';
 import { DataService } from '../../../../services/features/core/data.service';
 import { SystemResponse } from '../../../model/system.response';
 import { deepEquals, deepMutableObject } from '../../../utilities/utilityHelper';
-import { MatDialog } from '@angular/material';
-import { UnAuthorizedDialogComponent } from '../../../components/UI/dialogs/unauthorize-dialog/un-authorized-dialog.component';
-import { ApplicationStateService } from '../../UI/Application-State';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoriesService {
@@ -32,13 +29,12 @@ export class RepositoriesService {
   constructor(
     protected store: RepositoriesStore,
     protected query: RepositoriesQuery,
-    private git: GitService,
+    private gitService: GitService,
     private dataService: DataService,
     private fileService: FileSystemService,
-    private lSService: LocalStorageService,
-    private accountService: AccountListService,
-    private security: SecurityService,
-    private appState: ApplicationStateService
+    private localStorageService: LocalStorageService,
+    private accountListService: AccountListService,
+    private securityService: SecurityService,
   ) {
   }
 
@@ -49,7 +45,7 @@ export class RepositoriesService {
    * @param isNewAccount
    */
   async createNew(newRepository: Repository, credentials: Account, isNewAccount: boolean = true) {
-    const systemDefaultName = this.security.appUUID;
+    const systemDefaultName = this.securityService.appUUID;
     if (isNewAccount) {
       // Save the new credential to file store;
       const storeNewAccount = await this.dataService.createAccountData(credentials, systemDefaultName);
@@ -92,7 +88,7 @@ export class RepositoriesService {
    * Load all the repository configs in all local json file
    */
   async loadFromDataBase(initActive = false) {
-    const machineID = this.security.appUUID;
+    const machineID = this.securityService.appUUID;
     const configFile: AppConfig = await this.dataService.getConfigAppData(machineID);
     if (!!!configFile) {
       return;
@@ -109,8 +105,8 @@ export class RepositoriesService {
         }
       }
     }
-    const previousWorking = this.lSService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
-      this.lSService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
+    const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
+      this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : repositories.length > 0 ?
         repositories[0].id : null;
 
     if (repositories.length > 0) {
@@ -152,8 +148,8 @@ export class RepositoriesService {
    */
   add(arrData: Repository) {
     this.store.add(arrData, { prepend: true });
-    const previousWorking = this.lSService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
-      this.lSService.get(DefineCommon.CACHED_WORKING_REPO) : arrData ?
+    const previousWorking = this.localStorageService.isAvailable(DefineCommon.CACHED_WORKING_REPO) ?
+      this.localStorageService.get(DefineCommon.CACHED_WORKING_REPO) : arrData ?
         arrData.id : null;
     if (previousWorking === arrData.id) {
       this.setActive(arrData);
@@ -178,7 +174,7 @@ export class RepositoriesService {
     const currentActive = this.query.getActive();
     this.store.removeActive(currentActive);
     this.store.setActive(activeRepository.id);
-    this.lSService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
+    this.localStorageService.set(DefineCommon.CACHED_WORKING_REPO, activeRepository.id);
   }
 
   /**
@@ -223,7 +219,7 @@ export class RepositoriesService {
   }
 
   async addConfig(repository: Repository, configObject: { [configName: string]: string }) {
-    const gitConfig = this.git.gitInstance(repository.directory);
+    const gitConfig = this.gitService.gitInstance(repository.directory);
     Object.keys(configObject).forEach(configName => {
       gitConfig.addConfig(configName, configObject[configName]);
     });
@@ -244,7 +240,7 @@ export class RepositoriesService {
     }
     this.isCommit = true;
     return fromPromise(
-      this.git.commit(repository, title, files, option),
+      this.gitService.commit(repository, title, files, option),
     ).pipe(tap(() => this.isCommit = false));
   }
 
@@ -257,33 +253,21 @@ export class RepositoriesService {
   fetch(repository: Repository, branch: BranchModel, updateTime: boolean = false) {
     if (this.isFetching) {
       console.log('skipping operation fetching');
+      this.isFetching = false;
       return of(this.cachedFetching);
     }
     this.isFetching = true;
     // get account
-    const credential: Account = this.accountService.getOneSync(
+    const credential: Account = this.accountListService.getOneSync(
       repository.credential.id_credential,
     );
     // update timestamp
     if (updateTime) {
       repository.timestamp = moment().valueOf();
     }
-
-    return fromPromise(this.git.checkRemote(branch.tracking.fetch, credential))
-    .pipe(
-      switchMap(statusAuthorize => {
-        if (!statusAuthorize) {
-          this.isFetching = false;
-          // Unauthorized, required authorize
-          // return this.reAuthorizeProcess(repository, branch, credential);
-        }
-        return of(credential);
-      }),
-      switchMap((account) => {
-        return fromPromise(
-          this.git.fetch(repository, account, branch),
-        );
-      }),
+    return fromPromise(
+      this.gitService.fetch(repository, credential, branch),
+    ).pipe(
       takeWhile(shouldValid => !!shouldValid.fetchData),
       distinctUntilChanged(),
       switchMap(res => {
@@ -324,8 +308,8 @@ export class RepositoriesService {
   }
 
   async saveToDatabase(repositoryUpdate: Repository) {
-    repositoryUpdate.branches = await this.git.getBranches(repositoryUpdate.directory);
-    const statusUpdate = await this.dataService.createRepositoryData(repositoryUpdate, this.security.appUUID);
+    repositoryUpdate.branches = await this.gitService.getBranches(repositoryUpdate.directory);
+    const statusUpdate = await this.dataService.createRepositoryData(repositoryUpdate, this.securityService.appUUID);
     return {
       value: repositoryUpdate,
       message: '',
@@ -372,38 +356,10 @@ export class RepositoriesService {
   }
 
   async getAppConfig(): Promise<AppConfig | null> {
-    return await this.dataService.getConfigAppData(this.security.appUUID);
+    return await this.dataService.getConfigAppData(this.securityService.appUUID);
   }
 
   async getDiffOfFile(repository: Repository, fileStatusSummary: FileStatusSummary) {
-    return await this.git.diffs(repository, fileStatusSummary.path);
-  }
-
-  reAuthorizeProcess(repository: Repository, branch: BranchModel, matDialog: MatDialog, mode: 'fetch' | 'push' = 'fetch') {
-    return fromPromise(this.dataService.getAccountsConfigData(repository.credential.id_credential))
-    .pipe(
-      switchMap(credential => {
-        if (!credential) {
-          return of(null);
-        }
-        const data = {
-          repository,
-          branch,
-          credential,
-          mode
-        };
-        return matDialog.open<UnAuthorizedDialogComponent, { repository, branch, credential }>(UnAuthorizedDialogComponent, {
-          data: data,
-          panelClass: 'bg-primary-black-mat-dialog',
-          width: '400px'
-        }).afterClosed();
-      }),
-      map(res => {
-        if (res !== undefined) {
-          this.appState.setFinishCheckAuthorize();
-        }
-        return !!res;
-      })
-    );
+    return await this.gitService.diffs(repository, fileStatusSummary.path);
   }
 }
