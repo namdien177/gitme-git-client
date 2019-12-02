@@ -1,10 +1,10 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { appNode as app, webContentsNode as webContents } from './shared/types/types.electron';
 import { ApplicationStateService } from './shared/state/UI/Application-State';
 import { RepositoriesService, Repository } from './shared/state/DATA/repositories';
 import { RepositoryBranchesService, RepositoryBranchSummary } from './shared/state/DATA/branches';
-import { debounceTime, filter, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, skipWhile, startWith, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
@@ -21,6 +21,9 @@ import { deepMutableObject } from './shared/utilities/utilityHelper';
 })
 export class AppComponent implements AfterViewInit {
   loadingState: Observable<LoadingIndicatorState>;
+
+  @ViewChild('routerNG', { static: false })
+  routerNG: ElementRef<HTMLDivElement>;
 
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
@@ -49,6 +52,7 @@ export class AppComponent implements AfterViewInit {
       filter(value => !value.isLosingFocus),
       debounceTime(500),
       switchMap(() => this.watchingRepository()), // get current repository => set repository
+      skipWhile(() => !this.repository),
       switchMap(() => this.watchingBranch()),     // update branches and get current active branches
       switchMap(() => this.getBranchStatus()),    // git status
       switchMap(() => this.fetch()),              // fetch
@@ -66,9 +70,14 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    const currentURL = this.route.snapshot;
-    console.log(currentURL);
-    this.router.navigateByUrl('/');
+    console.dir(this.routerNG.nativeElement);
+    console.log(this.routerNG.nativeElement.childNodes);
+    setTimeout(() => {
+      console.log(this.routerNG.nativeElement.childNodes);
+      if (this.routerNG.nativeElement.childNodes.length <= 2) {
+        location.reload();
+      }
+    }, 1000);
   }
 
   listenerFocus() {
@@ -90,8 +99,7 @@ export class AppComponent implements AfterViewInit {
    * => update status of current branch
    */
   private watchingRepository() {
-    return fromPromise(this.repositoriesService.loadFromDataBase()).pipe(
-      switchMap(() => this.repositoriesService.selectActive()),
+    return this.repositoriesService.selectActive().pipe(
       switchMap((selectedRepo: Repository) => {
         this.repository = selectedRepo;
         return of(selectedRepo);

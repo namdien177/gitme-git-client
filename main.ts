@@ -108,6 +108,7 @@ try {
 ipcMain.on('github-authenticate', function (event, arg) {
   let credentials = null;
   let crashErrorLogs = null;
+  let requested = false;
   const filter = {
     urls: ['https://*.github.com/*']
   };
@@ -134,13 +135,17 @@ ipcMain.on('github-authenticate', function (event, arg) {
   });
 
   authWindow.webContents.on('will-navigate', async (eventNavigate, urlPassing) => {
+    console.log(137, urlPassing);
     await clearSession(urlPassing, authWindow);
-    const authorized = await handleUrl(urlPassing);
-    if (authorized) {
-      credentials = authorized['access_token'];
-      crashErrorLogs = authorized['crashError'];
-      if (credentials) {
-        authWindow.close();
+    if (urlPassing.match(/^(http:\/\/localhost:4200\/\?via=github&code=)/) && !requested) {
+      requested = true;
+      const authorized = await handleUrl(urlPassing, 139);
+      if (authorized) {
+        credentials = authorized['access_token'];
+        crashErrorLogs = authorized['crashError'];
+        if (credentials) {
+          authWindow.close();
+        }
       }
     }
   });
@@ -148,9 +153,6 @@ ipcMain.on('github-authenticate', function (event, arg) {
   session.defaultSession.webRequest.onCompleted(filter, async (details) => {
     const onCompleteUrl = details.url;
     await clearSession(onCompleteUrl, authWindow);
-    const authorized = await handleUrl(onCompleteUrl);
-    credentials = authorized['access_token'];
-    crashErrorLogs = authorized['crashError'];
   });
 
   authWindow.on('close', () => event.returnValue = { credentials, crashErrorLogs });
@@ -158,11 +160,9 @@ ipcMain.on('github-authenticate', function (event, arg) {
 
 async function clearSession(urlSession: string, authWindowPassing: BrowserWindow) {
   if (urlSession.includes('code=')) {
-    // Chưa biết xử lý chỗ này như nào cho tối ưu. Hehe
     const githubSession = authWindowPassing.webContents.session;
     // clear cookies for next time login;
     await githubSession.clearStorageData({
-      // Clear để có thể login nhiều tài khoản chăng? Hoặc logout sẽ tiện hơn.
       storages: [
         'cookies', 'localstorage'
       ]
@@ -170,7 +170,7 @@ async function clearSession(urlSession: string, authWindowPassing: BrowserWindow
   }
 }
 
-async function handleUrl(codeUrl) {
+async function handleUrl(codeUrl, row?: number) {
   const raw_code = /code=([^&]*)/.exec(codeUrl) || null,
     code = (raw_code && raw_code.length > 1) ? raw_code[1] : null,
     error = /\?error=(.+)$/.exec(codeUrl);
@@ -203,8 +203,12 @@ async function handleUrl(codeUrl) {
         });
         response.on('end', function () {
           const json = JSON.parse(result.toString());
-          console.log('access token:' + json.access_token);
-          resolve(json);
+          console.log(row, 'access token:' + json.access_token);
+          if (json.access_token) {
+            resolve(json);
+          } else {
+            resolve(null);
+          }
         });
         response.on('error', function (err) {
           console.error('ERROR: ' + err.message);
