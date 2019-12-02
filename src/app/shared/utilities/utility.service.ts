@@ -130,9 +130,9 @@ export class UtilityService {
       remote = remote.replace('\n', '');
     }
 
-    if (remote.match(/^(https:\/\/)\w+@github\.com\/\w+\.git$/)) {
+    if (remote.match(/^https:\/\/(\w+@)+github.com\/.+.git$/g)) {
       const split = remote.split(/\/\/|@/g);
-      remote = split[0] + '//' + split[2];
+      remote = split[0] + '//' + split[split.length - 1];
     }
 
     return remote;
