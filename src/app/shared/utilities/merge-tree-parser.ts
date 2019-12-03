@@ -269,23 +269,41 @@ export function parseStatusSB(rawText: string) {
   }
 }
 
-export function parseShowFileHistory(rawText: string) {
-  const fileLogs: LogFile[] = [];
+export function parseShowFileHistory(rawText: string, isMerge: boolean = false) {
+  const showCommit: {
+    files: LogFile[],
+    merge: {
+      first: string,
+      second: string
+    }
+  } = { files: [], merge: null };
   if (!rawText || rawText.trim().length === 0) {
-    return fileLogs;
+    return showCommit;
   }
   const splitRows = rawText.split('\n').filter(emp => emp.trim().length > 0);
-  // first 4-5 rows is log information, so splice them away
-  let arrayFileInfo = splitRows.slice(4);
-  // check if the first row is body message
-  if (arrayFileInfo[0].match(/^\s\s\s\s\w+/)) {
-    arrayFileInfo = arrayFileInfo.slice(1);
+  let slideIndex = 4;
+  if (isMerge) {
+    slideIndex = 5;
+    const splitMerge = splitRows[1].split(/\s/g).map(st => st.trim()).filter(emp => emp.length > 0);
+    showCommit.merge = {
+      first: splitMerge[1],
+      second: splitMerge[2],
+    };
   }
-  arrayFileInfo.forEach(file => {
-    fileLogs.push({
-      path: file.slice(2),
-      status: <FileChangeStatus>file.slice(0, 1)
+  // first 4-5 rows is log information, so splice them away
+  let arrayFileInfo = splitRows.slice(slideIndex);
+  if (arrayFileInfo.length > 0) {
+    // check if the first row is body message
+    if (arrayFileInfo[0].match(/^\s\s\s\s\w+/)) {
+      arrayFileInfo = arrayFileInfo.slice(1);
+    }
+    arrayFileInfo.forEach(file => {
+      showCommit.files.push({
+        path: file.slice(2),
+        status: <FileChangeStatus>file.slice(0, 1)
+      });
     });
-  });
-  return fileLogs;
+  }
+  console.log(showCommit);
+  return showCommit;
 }

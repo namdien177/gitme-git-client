@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { GitLogsService, ListLogLine } from '../../../shared/state/DATA/logs';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
-import { catchError, distinctUntilChanged, filter, switchMap, takeWhile } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, skipWhile, switchMap, takeWhile } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileChangeStatus, LogFile } from '../../../shared/state/DATA/logs-files';
 import { UtilityService } from '../../../shared/utilities/utility.service';
 import { diffChangeStatus, GitDiffService } from '../../../shared/state/DATA/git-diff';
 import { Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../../shared/state/UI/repositories-menu';
+import { deepEquals } from '../../../shared/utilities/utilityHelper';
 
 @Component({
   selector: 'gitme-repo-history',
@@ -50,8 +51,7 @@ export class RepoHistoryComponent implements OnInit {
         ));
       })
     )
-    .subscribe(gitDiff => {
-      console.log(gitDiff);
+    .subscribe(diff => {
     });
   }
 
@@ -61,8 +61,6 @@ export class RepoHistoryComponent implements OnInit {
   activeViewTracking() {
     this.logsService.observeActive()
     .pipe(
-      // filter((commit) => !!commit),
-      // skipWhile(log => deepEquals(log, this.viewLogs)),
       distinctUntilChanged(),
       catchError(err => {
         console.log(err);
@@ -72,11 +70,12 @@ export class RepoHistoryComponent implements OnInit {
       switchMap((log: ListLogLine) => {
         this.viewLogs = log;
         this.activeFile = null;
+        console.log(log);
         return fromPromise(this.statusService.filesFromCommit(this.repository, log.hash));
       }),
     )
     .subscribe(res => {
-      this.commitmentFiles = res.map((file, index) => {
+      this.commitmentFiles = res.files.map((file, index) => {
         return { file: file, active: index === 0 };
       });
       if (this.commitmentFiles[0]) {

@@ -423,12 +423,24 @@ export class GitService {
    * Get the diff of the file in a commit.
    */
   async diffsFromCommit(repository: Repository, filePath: string, commitSHA: string) {
-    return this.gitInstance(repository.directory).diff([
-      `${ commitSHA }^1`,
-      `${ commitSHA }`,
-      '--',
-      `${ filePath }`,
-    ]);
+    const lastHash = (await this.getFirstLog(repository)).replace('\n', '').trim();
+    let options = [];
+    if (lastHash === commitSHA) {
+      options = [
+        `4b825dc642cb6eb9a060e54bf8d69288fbee4904`, // default empty tree
+        `${ commitSHA }`,
+        '--',
+        `${ filePath }`,
+      ];
+    } else {
+      options = [
+        `${ commitSHA }^1`,
+        `${ commitSHA }`,
+        '--',
+        `${ filePath }`,
+      ];
+    }
+    return this.gitInstance(repository.directory).diff(options);
   }
 
   /**
