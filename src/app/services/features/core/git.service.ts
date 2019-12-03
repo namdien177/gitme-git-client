@@ -69,10 +69,11 @@ export class GitService {
       credentials = (await this.dataSystem.getAccountsConfigData(repository.credential.id_credential)).account;
     }
     const branchTracking = branch.tracking.name;
-    const data = await this.processingDynamicRemote(
-      repository, branch, credentials, 'fetch',
-      this.gitInstance(directory).fetch(branchTracking)
+    const originalRemote = await this.processingDynamicRemote(
+      repository, branch, credentials, 'fetch'
     );
+    const data = await this.gitInstance(directory).fetch(branchTracking);
+    await this.gitInstance(repository.directory).remote(['set-url', branchTracking, originalRemote]);
     return {
       fetchData: data,
       repository,
@@ -83,14 +84,16 @@ export class GitService {
    * Pull new changes from remote with credentials
    */
   async pull(repository: Repository, branch: BranchModel, credentials: Account, options?: { [key: string]: null | string | any }) {
-    return this.processingDynamicRemote(
-      repository, branch, credentials, 'fetch',
-      this.gitInstance(repository.directory).pull(
-        branch.tracking.name,
-        branch.name,
-        options,
-      )
+    const originalRemote = await this.processingDynamicRemote(
+      repository, branch, credentials, 'fetch'
     );
+    const data = await this.gitInstance(repository.directory).pull(
+      branch.tracking.name,
+      branch.name,
+      options,
+    );
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
+    return data;
   }
 
   /**
@@ -98,9 +101,12 @@ export class GitService {
    * Push the commits to remote by credentials and tracking
    */
   async push(repository: Repository, branch: BranchModel, credentials: Account, options?: { [p: string]: null | string | any }) {
-    return this.processingDynamicRemote(repository, branch, credentials, 'push', this.gitInstance(repository.directory).push(
+    const originalRemote = await this.processingDynamicRemote(repository, branch, credentials, 'push');
+    const data = await this.gitInstance(repository.directory).push(
       branch.tracking.name, branch.name, options,
-    ));
+    );
+    await this.gitInstance(repository.directory).remote(['set-url', branch.tracking.name, originalRemote]);
+    return data;
   }
 
   /**
@@ -112,14 +118,14 @@ export class GitService {
       defaultOptions = Object.assign(defaultOptions, options);
     }
     const trackName = branch.tracking ? branch.tracking.name : 'origin';
-    return await this.processingDynamicRemote(
-      repository, branch, credentials, 'push',
-      this.gitInstance(repository.directory).push(
-        trackName,
-        branch.name,
-        defaultOptions,
-      )
+    const originalRemote = await this.processingDynamicRemote(repository, branch, credentials, 'push');
+    const data = await this.gitInstance(repository.directory).push(
+      trackName,
+      branch.name,
+      defaultOptions,
     );
+    await this.gitInstance(repository.directory).remote(['set-url', trackName, originalRemote]);
+    return data;
   }
 
   /**
@@ -579,15 +585,13 @@ export class GitService {
   }
 
   private async processingDynamicRemote(repository: Repository, branch: BranchModel, credentials: Account,
-                                        mode: 'fetch' | 'push', func: Promise<any>) {
+                                        mode: 'fetch' | 'push') {
     const trackName = branch.tracking.name;
     let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', trackName]);
     originalRemote = this.utilities.fixRemote(originalRemote, branch.tracking[mode]);
     const remoteFetch = this.utilities.getOAuthRemote(branch, repository, credentials, 'fetch');
     await this.gitInstance(repository.directory).remote(['set-url', trackName, remoteFetch]);
-    const data = await func;
-    await this.gitInstance(repository.directory).remote(['set-url', trackName, originalRemote]);
-    return data;
+    return originalRemote;
   }
 }
 
