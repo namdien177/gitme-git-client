@@ -11,7 +11,7 @@ import { RepositoryStatusService } from './shared/state/DATA/repository-status';
 import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ActivatedRoute, Router } from '@angular/router';
-import { deepMutableObject } from './shared/utilities/utilityHelper';
+import { deepEquals, deepMutableObject } from './shared/utilities/utilityHelper';
 
 
 @Component({
@@ -35,8 +35,6 @@ export class AppComponent implements AfterViewInit {
     private repositoryStatusService: RepositoryStatusService,
     private translate: TranslateService,
     private ld: LoadingIndicatorService,
-    private router: Router,
-    private route: ActivatedRoute
   ) {
     translate.setDefaultLang('en');
     this.listenerFocus();

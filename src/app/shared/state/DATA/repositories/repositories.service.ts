@@ -73,6 +73,7 @@ export class RepositoriesService {
 
     if (statusSave.status) {
       await this.loadFromDataBase(true);
+      await this.accountListService.loadFromDatabase();
       // adding config to the system
       const config = {
         'user.email': credentials.email,
@@ -283,6 +284,14 @@ export class RepositoriesService {
             }
           });
         }
+        // const listCurrent: Repository[] = deepMutableObject(this.get());
+        // const idOld = listCurrent.findIndex(old => old.id === saveRepo.id);
+        // if (idOld > -1) {
+        //   listCurrent[idOld] = saveRepo;
+        // } else {
+        //   listCurrent.push(saveRepo);
+        // }
+        // this.set(listCurrent);
         return fromPromise(this.updateExistingRepositoryOnLocalDatabase(saveRepo));
       }),
       tap(() => this.isFetching = false),
