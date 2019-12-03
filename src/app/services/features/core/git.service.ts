@@ -243,7 +243,8 @@ export class GitService {
    * Abort merge when not fast-forward
    */
   async mergeAbort(repository: Repository) {
-    return await this.gitInstance(repository.directory).merge(['--abort']);
+    await this.gitInstance(repository.directory).merge(['--abort']);
+    return repository;
   }
 
   /**
@@ -260,7 +261,7 @@ export class GitService {
       message = 'Resolve conflict';
     }
     await this.commit(repository, message, files, { '-i': null });
-    return this.status(repository);
+    return repository;
   }
 
   /**

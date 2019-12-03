@@ -277,9 +277,7 @@ export class RepositoryBranchesService {
     );
     // Take paths
     const paths: string[] = this.utilities.extractFilePathFromGitStatus(files);
-    return fromPromise(
-      this.gitService.mergeContinue(repository, paths, credentials)
-    );
+    return this.gitService.mergeContinue(repository, paths, credentials);
   }
 
   getMergeStatus(
@@ -297,9 +295,7 @@ export class RepositoryBranchesService {
     /**
      * TODO: need refresh
      */
-    return fromPromise(
-      this.gitService.mergeAbort(repository)
-    );
+    return this.gitService.mergeAbort(repository);
   }
 
   set(listBranch: RepositoryBranchSummary[]) {

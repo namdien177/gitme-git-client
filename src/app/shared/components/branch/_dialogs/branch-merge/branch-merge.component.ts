@@ -61,6 +61,9 @@ export class BranchMergeComponent implements OnInit {
     fromPromise(this.branchService.merge(this.repository, this.branchFrom))
     .subscribe(stat => {
       this.dialogRef.close(undefined);
+    }, error => {
+      console.log(error);
+      this.dialogRef.close(undefined);
     });
   }
 

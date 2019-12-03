@@ -6,7 +6,7 @@ import { catchError, distinctUntilChanged, filter, switchMap, takeWhile } from '
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileChangeStatus, LogFile } from '../../../shared/state/DATA/logs-files';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { diffChangeStatus } from '../../../shared/state/DATA/git-diff';
+import { diffChangeStatus, GitDiffService } from '../../../shared/state/DATA/git-diff';
 import { Subject } from 'rxjs';
 import { RepositoriesMenuService } from '../../../shared/state/UI/repositories-menu';
 
@@ -29,7 +29,8 @@ export class RepoHistoryComponent implements OnInit {
     private statusService: RepositoryStatusService,
     private logsService: GitLogsService,
     public utilities: UtilityService,
-    private menuService: RepositoriesMenuService
+    private menuService: RepositoriesMenuService,
+    private gitDiff: GitDiffService
   ) {
     this.repository = this.repositoryService.getActive();
     this.logsService.initialLogs(this.repository)
@@ -78,7 +79,11 @@ export class RepoHistoryComponent implements OnInit {
       this.commitmentFiles = res.map((file, index) => {
         return { file: file, active: index === 0 };
       });
-      this.viewDiffFile(this.commitmentFiles[0].file);
+      if (this.commitmentFiles[0]) {
+        this.viewDiffFile(this.commitmentFiles[0].file);
+      } else {
+        this.gitDiff.reset();
+      }
     });
   }
 

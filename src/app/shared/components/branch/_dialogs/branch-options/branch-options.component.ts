@@ -13,6 +13,7 @@ import { BranchMergeComponent } from '../branch-merge/branch-merge.component';
 import { Account, AccountListService } from '../../../../state/DATA/accounts';
 import { ComputedAction, MergeResult } from '../../../../model/merge.interface';
 import { LoadingIndicatorService } from '../../../../state/UI/Loading-Indicator';
+import { RepositoryStatusService } from '../../../../state/DATA/repository-status';
 
 @Component({
   selector: 'gitme-branch-options',
@@ -37,6 +38,7 @@ export class BranchOptionsComponent implements OnInit {
     private repositoryBranchService: RepositoryBranchesService,
     private repositoriesService: RepositoriesService,
     private accountService: AccountListService,
+    private statusService: RepositoryStatusService,
     private cb: ChangeDetectorRef,
     private ld: LoadingIndicatorService
   ) {
@@ -164,8 +166,13 @@ export class BranchOptionsComponent implements OnInit {
       }
     );
 
-    dialogMerge.afterClosed().subscribe(decision => {
-      console.log(decision);
+    dialogMerge.afterClosed()
+    .pipe(
+      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches))),
+      switchMap(() => fromPromise(this.statusService.status(this.data.repository)))
+    )
+    .subscribe(decision => {
     });
   }
 

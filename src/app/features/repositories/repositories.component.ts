@@ -266,19 +266,17 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
       data: dataPassing,
     }).afterClosed()
     .pipe(
-      tap(() => {
-        this.statusState.select();
-      }),
       switchMap((decision: boolean) => {
         if (decision) {
           // continue to merge
           const fileList = this.statusSummary.files;
-          return this.branchState.continueMerge(this.repository, fileList);
+          return fromPromise(this.branchState.continueMerge(this.repository, fileList));
         } else {
           // abort
-          return this.branchState.abortMerge(this.repository);
+          return fromPromise(this.branchState.abortMerge(this.repository));
         }
       }),
+      switchMap((repository) => this.statusState.status(repository))
     )
     .subscribe(() => {
       this.conflictViewerOpened = false;

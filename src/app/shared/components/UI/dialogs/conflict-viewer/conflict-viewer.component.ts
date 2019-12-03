@@ -69,7 +69,13 @@ export class ConflictViewerComponent implements OnInit {
   }
 
   buildListConflict(summaryConflicted: string[], fileChecked: string[]) {
+    console.log(summaryConflicted);
     this.listConflicted = summaryConflicted.map(path => {
+      if (Array.isArray(path)) {
+        path = path.join('');
+      } else if (typeof path === 'object') {
+        path = Object.keys(path).map(key => path[key]).join('');
+      }
       return {
         path: path,
         status: !(fileChecked.indexOf(path) > -1)

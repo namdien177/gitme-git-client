@@ -70,6 +70,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
           this.gitDiffService.reset();
           this._fileActivated = null;
         }
+        console.log(summary);
         this.statusSummary = summary;
       },
     );
