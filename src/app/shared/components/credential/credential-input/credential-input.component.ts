@@ -50,11 +50,14 @@ export class CredentialInputComponent {
   }
 
   requestUserInfo(token: string) {
+    console.log(token);
     this.githubService.getUser(token)
     .pipe(
       map(rawInfo => {
+        console.log(rawInfo);
         // Encrypt the token
         rawInfo.oauth_token = this.secureService.encryptAES(token);
+        console.log(rawInfo);
         return rawInfo;
       }),
       catchError(err => {
@@ -62,6 +65,7 @@ export class CredentialInputComponent {
       })
     )
     .subscribe(account => {
+        console.log(account);
         this.account = account;
         this.emitData();
       }

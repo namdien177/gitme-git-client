@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../polyfills';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
@@ -25,12 +25,16 @@ import { CreateLocalComponent } from './features/application/create-local/create
 import { ImportHttpsComponent } from './features/application/import-https/import-https.component';
 import { ShareCredentialsComponentsModule } from './shared/components/credential/ShareCredentialsComponents.module';
 import { StarterScreenComponent } from './shared/layout/starter-screen/starter-screen.component';
-import { DatabaseResolver } from './shared/resolver/database.resolver';
+import { UnauthorizeDialogComponent } from './shared/components/UI/dialogs/unauthorize-dialog/unauthorize-dialog.component';
 
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+export function configFactory(config: ElectronService) {
+  return () => config.initializeConfigFromLocalDatabase();
 }
 
 const declareComps = [
@@ -45,6 +49,7 @@ const declareComps = [
   declarations: [
     ...declareComps,
     StarterScreenComponent,
+    UnauthorizeDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -68,7 +73,12 @@ const declareComps = [
   providers: [
     ElectronService,
     LocalStorageService,
-    DatabaseResolver
+    {
+      provide: APP_INITIALIZER,
+      useFactory: configFactory,
+      deps: [ElectronService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })

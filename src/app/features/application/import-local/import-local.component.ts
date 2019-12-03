@@ -10,7 +10,9 @@ import { SecurityService } from '../../../services/system/security.service';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { Router } from '@angular/router';
 import { IsAValidDirectory, IsRepository, shouldNotExistInArray } from '../../../shared/validate/customFormValidate';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, filter, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { LoadingIndicatorService } from '../../../shared/state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-import-local',
@@ -31,19 +33,20 @@ export class ImportLocalComponent implements OnInit {
   private readonly electron: typeof electronNode.remote;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private accountListService: AccountListService,
-    private repositoryService: RepositoriesService,
-    private utilityService: UtilityService,
-    private gitPackService: GitService,
-    private fileSystemService: FileSystemService,
+    private fb: FormBuilder,
+    private account: AccountListService,
+    private repository: RepositoriesService,
+    private utilities: UtilityService,
+    private git: GitService,
+    private fsSystem: FileSystemService,
     private cd: ChangeDetectorRef,
-    private securityService: SecurityService,
-    private router: Router
+    private security: SecurityService,
+    private router: Router,
+    private ld: LoadingIndicatorService
   ) {
     this.electron = electronNode.remote;
-    this.listRepository = this.repositoryService.get();
-    this.listAccount = this.accountListService.getSync();
+    this.listRepository = this.repository.get();
+    this.listAccount = this.account.getSync();
   }
 
   get repo_name() {
@@ -59,14 +62,14 @@ export class ImportLocalComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.formRegisterRepository = this.formBuilder.group({
+    this.formRegisterRepository = this.fb.group({
       repository_directory: [
         osNode.homedir(), [
           Validators.required,
-          IsAValidDirectory(this.fileSystemService),
+          IsAValidDirectory(this.fsSystem),
           shouldNotExistInArray(this.listRepository.map(re => re.directory))
         ],
-        IsRepository(this.gitPackService),
+        IsRepository(this.git),
       ],
       repo_name: [
         '', [Validators.required, Validators.minLength(1)]
@@ -92,7 +95,7 @@ export class ImportLocalComponent implements OnInit {
     let openDir = osNode.homedir();
     if (
       this.repository_directory.value &&
-      this.fileSystemService.isDirectoryExist(this.repository_directory.value)
+      this.fsSystem.isDirectoryExist(this.repository_directory.value)
     ) {
       openDir = this.repository_directory.value;
     }
@@ -117,7 +120,7 @@ export class ImportLocalComponent implements OnInit {
     }
     const credentialsInstance: Account = <Account>this.repo_account.value;
     const repositoryInstance: Repository = {
-      id: this.securityService.randomID,
+      id: this.security.randomID,
       name: this.repo_name.value,
       directory: this.repository_directory.value,
       credential: {
@@ -136,16 +139,44 @@ export class ImportLocalComponent implements OnInit {
      * * Update working repository
      * * Fetching new repository => reassign main branch.
      */
-    fromPromise(this.repositoryService.createNew(
-      repositoryInstance,
-      credentialsInstance,
-      !isExistedOnDB
-      // !this.isListAccountTab
-    )).subscribe(
+    this.repository_register_error = null;
+    this.ld.setLoading('Checking authorize account');
+    fromPromise(this.git.getRemoteTracking(repositoryInstance.directory)).pipe(
+      filter(r => {
+        if (!r) {
+          this.ld.setFinish();
+          this.repository_register_error = ' Unable to get information of the repository';
+        }
+        return !!r;
+      }),
+      switchMap(remote => {
+        const remoteOrigin = remote.find(r => r.name === 'origin');
+        if (!remoteOrigin) {
+          return of(null);
+        }
+        return fromPromise(this.git.checkRemote(remoteOrigin.fetch, credentialsInstance));
+      }),
+      switchMap(isAuthorize => {
+        if (isAuthorize) {
+          return of(true);
+        }
+        this.ld.setFinish();
+        this.repository_register_error = 'The repository does not exist. Either the account not authorized or the repository URL not correct';
+        return of(null);
+      }),
+      filter(stats => !!stats),
+      switchMap(() => fromPromise(this.repository.createNew(
+        repositoryInstance,
+        credentialsInstance,
+        !isExistedOnDB
+      ))),
+    ).subscribe(
       addStatus => {
+        this.ld.setFinish();
         this.repository_register_error = null;
         this.cancel();
       }, error => {
+        this.ld.setFinish();
         this.repository_register_error = 'Register a new repository failed, please try again!';
         console.log(error);
       }
@@ -159,7 +190,7 @@ export class ImportLocalComponent implements OnInit {
 
   private convertDisplayDirectoryToSafeDirectory(rawDirectory: string) {
     if (!!rawDirectory) {
-      const safeDir = this.utilityService.directorySafePath(rawDirectory);
+      const safeDir = this.utilities.directorySafePath(rawDirectory);
       if (safeDir) {
         this.repository_directory.setValue(safeDir);
         this.repository_directory.markAsDirty();
@@ -172,9 +203,9 @@ export class ImportLocalComponent implements OnInit {
   }
 
   private async setupNameRepository(viewingDirectory: string) {
-    const safeString = this.utilityService.slashFixer(viewingDirectory);
+    const safeString = this.utilities.slashFixer(viewingDirectory);
     const arrPaths = safeString.split('/');
-    let nameExpected = await this.gitPackService.getName(arrPaths);
+    let nameExpected = await this.git.getName(arrPaths);
     if (!nameExpected) {
       nameExpected = arrPaths[arrPaths.length - 1];
     }

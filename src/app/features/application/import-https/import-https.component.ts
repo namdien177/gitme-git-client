@@ -9,9 +9,10 @@ import { Account, AccountListService } from '../../../shared/state/DATA/accounts
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { SecurityService } from '../../../services/system/security.service';
 import { IsAValidDirectory, IsNotRepository, isValidCloneURL, shouldNotExistInArray, } from '../../../shared/validate/customFormValidate';
-import { catchError, debounceTime, switchMap, takeWhile } from 'rxjs/operators';
+import { catchError, debounceTime, filter, switchMap, takeWhile } from 'rxjs/operators';
 import { merge, of } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
+import { LoadingIndicatorService } from '../../../shared/state/UI/Loading-Indicator';
 
 @Component({
   selector: 'gitme-import-https',
@@ -32,19 +33,20 @@ export class ImportHttpsComponent implements OnInit {
   private readonly electron: typeof electronNode.remote;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private accountListService: AccountListService,
-    private repositoryService: RepositoriesService,
-    private utilityService: UtilityService,
-    private gitPackService: GitService,
-    private fileSystemService: FileSystemService,
+    private fb: FormBuilder,
+    private accountState: AccountListService,
+    private repositoryState: RepositoriesService,
+    private utilities: UtilityService,
+    private git: GitService,
+    private fsService: FileSystemService,
     private cd: ChangeDetectorRef,
-    private securityService: SecurityService,
+    private security: SecurityService,
     private router: Router,
+    private ld: LoadingIndicatorService
   ) {
     this.electron = electronNode.remote;
-    this.listRepository = this.repositoryService.get();
-    this.listAccount = this.accountListService.getSync();
+    this.listRepository = this.repositoryState.get();
+    this.listAccount = this.accountState.getSync();
   }
 
   get repo_name() {
@@ -64,7 +66,7 @@ export class ImportHttpsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.formCloneRepository = this.formBuilder.group({
+    this.formCloneRepository = this.fb.group({
       http: [
         '', [
           Validators.required,
@@ -75,10 +77,10 @@ export class ImportHttpsComponent implements OnInit {
       directory: [
         osNode.homedir(), [
           Validators.required,
-          IsAValidDirectory(this.fileSystemService),
+          IsAValidDirectory(this.fsService),
           shouldNotExistInArray(this.listRepository.map(re => re.directory)),
         ],
-        IsNotRepository(this.gitPackService),
+        IsNotRepository(this.git),
       ],
       repo_name: [
         '', [Validators.required, Validators.minLength(1)],
@@ -106,7 +108,7 @@ export class ImportHttpsComponent implements OnInit {
     let openDir = osNode.homedir();
     if (
       this.directory.value &&
-      this.fileSystemService.isDirectoryExist(this.directory.value)
+      this.fsService.isDirectoryExist(this.directory.value)
     ) {
       openDir = this.directory.value;
     }
@@ -131,7 +133,7 @@ export class ImportHttpsComponent implements OnInit {
     }
     const credentialsInstance: Account = <Account>this.repo_account.value;
     const repositoryInstance: Repository = {
-      id: this.securityService.randomID,
+      id: this.security.randomID,
       name: this.repo_name.value,
       directory: this.display_directory,
       credential: {
@@ -143,29 +145,50 @@ export class ImportHttpsComponent implements OnInit {
 
     const isExistedOnDB = !!this.listAccount
     .find(account => account.id === credentialsInstance.id);
-
-    // fetch to check the remote first
-    fromPromise(this.gitPackService.cloneTo(this.http.value, this.directory.value + '/', credentialsInstance))
-    .pipe(
+    this.repository_register_error = null;
+    this.ld.setLoading('Checking authorization');
+    fromPromise(this.git.checkRemote(this.http.value, credentialsInstance)).pipe(
+      switchMap(isAuthorize => {
+        if (isAuthorize) {
+          return of(true);
+        }
+        this.ld.setFinish();
+        this.repository_register_error = 'The repository does not exist. Either the account not authorized or the repository URL not correct';
+        return of(null);
+      }),
+      filter(stats => !!stats),
+      switchMap(() => {
+        this.ld.setLoading('Cloning');
+        return fromPromise(this.git.cloneTo(
+          this.http.value, this.directory.value + '/', credentialsInstance
+        ));
+      }),
       catchError(err => {
         // unauthorized or not exist
         console.log(err);
+        this.ld.setFinish();
         return of('error');
       }),
-      takeWhile((res) => res !== undefined && res.length === 0),
+      takeWhile((res) => {
+        if (res !== undefined && res.length === 0) {
+          return true;
+        }
+        this.ld.setFinish();
+        return false;
+      }),
       switchMap(() => {
-        return fromPromise(this.repositoryService.createNew(
+        return fromPromise(this.repositoryState.createNew(
           repositoryInstance,
           credentialsInstance,
           !isExistedOnDB,
         ));
       }),
-    )
-    .subscribe(addStatus => {
-        console.log(addStatus);
+    ).subscribe(addStatus => {
+        this.ld.setFinish();
         this.repository_register_error = null;
         this.cancel();
       }, error => {
+        this.ld.setFinish();
         this.repository_register_error = 'Register a new repository failed, please try again!';
         console.log(error);
       },
@@ -179,7 +202,7 @@ export class ImportHttpsComponent implements OnInit {
 
   private safeDirectory(rawDirectory: string) {
     if (!!rawDirectory) {
-      const fixSlash = this.utilityService.slashFixer(rawDirectory);
+      const fixSlash = this.utilities.slashFixer(rawDirectory);
       this.directory.setValue(fixSlash);
       this.directory.markAsDirty();
     }
@@ -202,7 +225,7 @@ export class ImportHttpsComponent implements OnInit {
     this.display_directory = directory;
 
     if (this.http.valid && this.directory.valid) {
-      const nameRepo = this.utilityService.repositoryNameFromHTTPS(http);
+      const nameRepo = this.utilities.repositoryNameFromHTTPS(http);
       if (nameRepo) {
         this.repo_name.setValue(nameRepo);
       }

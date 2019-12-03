@@ -265,6 +265,12 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
   private watchingUI() {
     this.appMenu.select().subscribe(uiState => {
       this.isViewChangeTo = uiState.commit_view;
+      if (this.isViewChangeTo === 'changes') {
+        this.router.navigate(['/']);
+      } else {
+        this.router.navigate(['/history']);
+      }
+      this.gitDiffs.reset();
     });
   }
 }

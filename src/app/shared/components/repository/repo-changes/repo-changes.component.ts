@@ -14,7 +14,6 @@ export class RepoChangesComponent implements OnInit, AfterViewInit {
 
   constructor(
     private gitDiffService: GitDiffService,
-    private cd: ChangeDetectorRef
   ) {
   }
 

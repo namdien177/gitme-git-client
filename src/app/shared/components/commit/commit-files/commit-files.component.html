@@ -31,7 +31,7 @@
             <i class="far fa-minus-square"></i>
           </span>
         </ng-container>
-        <ng-container *ngIf="file.index === ' ' && file.working_dir === 'M'">
+        <ng-container *ngIf="(file.index === ' ' && file.working_dir === 'M') || (file.index === 'M' && file.working_dir === ' ')">
           <span class="modified text-warning">
             <i class="fas fa-pen-square"></i>
           </span>
@@ -39,6 +39,11 @@
         <ng-container *ngIf="file.index === 'R'">
           <span class="renamed text-info">
             <i class="fas fa-exchange-alt"></i>
+          </span>
+        </ng-container>
+        <ng-container *ngIf="file.index === 'U' && file.working_dir === 'U'">
+          <span class="conflict text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
           </span>
         </ng-container>
       </div>

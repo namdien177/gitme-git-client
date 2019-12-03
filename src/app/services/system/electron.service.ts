@@ -19,7 +19,7 @@ import { DataService } from '../features/core/data.service';
 export class ElectronService {
   remote: typeof remote;
   private readonly window: BrowserWindow;
-  private readonly machine_id: string;
+  private machine_id: string;
 
   constructor(
     private localStorage: LocalStorageService,
@@ -33,8 +33,6 @@ export class ElectronService {
     if (ElectronService.isElectron()) {
       this.remote = electronNode.remote;
       this.window = electronNode.remote.getCurrentWindow();
-      this.machine_id = machineIdSync();
-      this.setupUUID();
     }
   }
 
@@ -43,6 +41,8 @@ export class ElectronService {
   }
 
   async initializeConfigFromLocalDatabase() {
+    this.machine_id = machineIdSync();
+    this.setupUUID();
     /**
      * Loading the configuration file
      */
@@ -63,6 +63,7 @@ export class ElectronService {
         console.log(e);
       }
     }
+    console.log('Finish setup');
   }
 
   async initializeRepositoriesFromLocalDatabase(repository_config: string[]) {

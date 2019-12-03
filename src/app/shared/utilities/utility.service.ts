@@ -109,6 +109,7 @@ export class UtilityService {
     if (!branch.tracking) {
       try {
         remote = repository.branches.find(b => b.name === 'master').tracking[mode];
+        remote = this.fixRemote(remote);
         OAuthRemote = this.addOauthTokenToRemote(remote, credentials);
       } catch (e) {
         console.log(e);
@@ -116,9 +117,25 @@ export class UtilityService {
       }
     } else {
       remote = branch.tracking[mode];
+      remote = this.fixRemote(remote);
       OAuthRemote = this.addOauthTokenToRemote(remote, credentials);
     }
     return OAuthRemote;
+  }
+
+  fixRemote(remote: void | string, replaceTracking?: string) {
+    if (typeof remote !== 'string') {
+      remote = replaceTracking;
+    } else {
+      remote = remote.replace('\n', '');
+    }
+
+    if (remote.match(/^https:\/\/(\w+@)+github.com\/.+.git$/g)) {
+      const split = remote.split(/\/\/|@/g);
+      remote = split[0] + '//' + split[split.length - 1];
+    }
+
+    return remote;
   }
 
   /**

@@ -59,12 +59,18 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
       summary => {
         this.repository = this.repositoriesService.getActive();
         this.emitStatusCheckedFile(summary.files);
-        if (summary.files.length > 0 && !deepEquals(summary.files, this.statusSummary.files) && !this._fileActivated && this.menuState.get().commit_view === 'changes') {
+        if (
+          summary.files.length > 0 &&
+          !deepEquals(summary.files, this.statusSummary.files) &&
+          !this._fileActivated &&
+          this.menuState.get().commit_view === 'history'
+        ) {
           this.viewDiffFile(summary.files[0], 0);
         } else if (summary.files.length === 0 && this.menuState.get().commit_view === 'changes') {
           this.gitDiffService.reset();
           this._fileActivated = null;
         }
+        console.log(summary);
         this.statusSummary = summary;
       },
     );
@@ -111,7 +117,7 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
     .subscribe((diff) => {
-      let status: diffChangeStatus = 'new';
+      let status: diffChangeStatus;
       if (
         this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.created) ||
         this.utilities.isStringExistIn(fileSummary.path, this.statusSummary.not_added)
@@ -124,13 +130,11 @@ export class CommitFilesComponent implements OnInit, AfterViewInit {
       } else {
         status = 'change';
       }
-
       this.gitDiffService.setDiff(
         diff,
         fileSummary.path,
         status,
       );
-
       this._fileActivated = fileSummary;
       this.repositoryStatusService.setActive(index);
     });

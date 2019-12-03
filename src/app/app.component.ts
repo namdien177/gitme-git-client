@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { appNode as app, webContentsNode as webContents } from './shared/types/types.electron';
 import { ApplicationStateService } from './shared/state/UI/Application-State';
@@ -10,7 +10,7 @@ import { StatusSummary } from './shared/model/statusSummary.model';
 import { RepositoryStatusService } from './shared/state/DATA/repository-status';
 import { LoadingIndicatorService, LoadingIndicatorState } from './shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { deepMutableObject } from './shared/utilities/utilityHelper';
 
 
@@ -22,6 +22,9 @@ import { deepMutableObject } from './shared/utilities/utilityHelper';
 export class AppComponent implements AfterViewInit {
   loadingState: Observable<LoadingIndicatorState>;
 
+  @ViewChild('routerNG', { static: false })
+  routerNG: ElementRef<HTMLDivElement>;
+
   private repository: Repository = null;
   private branch: RepositoryBranchSummary = null;
 
@@ -32,8 +35,7 @@ export class AppComponent implements AfterViewInit {
     private repositoryStatusService: RepositoryStatusService,
     private translate: TranslateService,
     private ld: LoadingIndicatorService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     translate.setDefaultLang('en');
     this.listenerFocus();
@@ -67,7 +69,13 @@ export class AppComponent implements AfterViewInit {
     this.applicationStateService.setBlur();
     this.applicationStateService.setFocus();
 
-    this.router.navigateByUrl('/');
+    setTimeout(() => {
+      if (this.routerNG.nativeElement.childNodes.length <= 2) {
+        this.router.navigate(['/']).then(() => {
+          location.reload();
+        });
+      }
+    }, 1000);
   }
 
   listenerFocus() {

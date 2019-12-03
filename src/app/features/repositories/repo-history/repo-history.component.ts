@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { RepositoriesService, Repository } from '../../../shared/state/DATA/repositories';
 import { GitLogsService, ListLogLine } from '../../../shared/state/DATA/logs';
 import { RepositoryStatusService } from '../../../shared/state/DATA/repository-status';
-import { catchError, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, switchMap, takeWhile } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { FileChangeStatus, LogFile } from '../../../shared/state/DATA/logs-files';
 import { UtilityService } from '../../../shared/utilities/utility.service';
-import { diffChangeStatus } from '../../../shared/state/DATA/git-diff';
+import { diffChangeStatus, GitDiffService } from '../../../shared/state/DATA/git-diff';
 import { Subject } from 'rxjs';
+import { RepositoriesMenuService } from '../../../shared/state/UI/repositories-menu';
 
 @Component({
   selector: 'gitme-repo-history',
@@ -27,7 +28,9 @@ export class RepoHistoryComponent implements OnInit {
     private repositoryService: RepositoriesService,
     private statusService: RepositoryStatusService,
     private logsService: GitLogsService,
-    public utilities: UtilityService
+    public utilities: UtilityService,
+    private menuService: RepositoriesMenuService,
+    private gitDiff: GitDiffService
   ) {
     this.repository = this.repositoryService.getActive();
     this.logsService.initialLogs(this.repository)
@@ -38,6 +41,7 @@ export class RepoHistoryComponent implements OnInit {
     this.requestViewLog
     .pipe(
       distinctUntilChanged(),
+      takeWhile(() => this.menuService.get().commit_view === 'history'),
       switchMap((fileLog) => {
         this.activeFile = fileLog;
         this.changeActive(fileLog.path);
@@ -66,7 +70,6 @@ export class RepoHistoryComponent implements OnInit {
       }),
       filter(log => !!log),
       switchMap((log: ListLogLine) => {
-        console.log(log);
         this.viewLogs = log;
         this.activeFile = null;
         return fromPromise(this.statusService.filesFromCommit(this.repository, log.hash));
@@ -76,7 +79,11 @@ export class RepoHistoryComponent implements OnInit {
       this.commitmentFiles = res.map((file, index) => {
         return { file: file, active: index === 0 };
       });
-      this.viewDiffFile(this.commitmentFiles[0].file);
+      if (this.commitmentFiles[0]) {
+        this.viewDiffFile(this.commitmentFiles[0].file);
+      } else {
+        this.gitDiff.reset();
+      }
     });
   }
 

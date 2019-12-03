@@ -12,6 +12,7 @@ import { ConflictViewerComponent } from '../../shared/components/UI/dialogs/conf
 import { LoadingIndicatorService } from '../../shared/state/UI/Loading-Indicator';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { ApplicationStateService } from '../../shared/state/UI/Application-State';
+import { GitService } from '../../services/features/core/git.service';
 
 @Component({
   selector: 'gitme-repositories',
@@ -40,6 +41,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
     private matDialog: MatDialog,
     private loading: LoadingIndicatorService,
     private cd: ChangeDetectorRef,
+    private git: GitService
   ) {
   }
 
@@ -264,19 +266,17 @@ export class RepositoriesComponent implements OnInit, OnDestroy, AfterViewInit {
       data: dataPassing,
     }).afterClosed()
     .pipe(
-      tap(() => {
-        this.statusState.select();
-      }),
       switchMap((decision: boolean) => {
         if (decision) {
           // continue to merge
           const fileList = this.statusSummary.files;
-          return this.branchState.continueMerge(this.repository, fileList);
+          return fromPromise(this.branchState.continueMerge(this.repository, fileList));
         } else {
           // abort
-          return this.branchState.abortMerge(this.repository);
+          return fromPromise(this.branchState.abortMerge(this.repository));
         }
       }),
+      switchMap((repository) => this.statusState.status(repository))
     )
     .subscribe(() => {
       this.conflictViewerOpened = false;

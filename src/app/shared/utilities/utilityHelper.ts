@@ -421,7 +421,12 @@ export function deepEquals(x, y, exceptionName?: string) {
 }
 
 export function deepMutableObject(objectImmutable: object) {
-  const retObj: any = {};
+  let retObj: any;
+  if (Array.isArray(objectImmutable)) {
+    retObj = [];
+  } else {
+    retObj = {};
+  }
 
   if (objectImmutable === null || objectImmutable === undefined) {
     return objectImmutable;

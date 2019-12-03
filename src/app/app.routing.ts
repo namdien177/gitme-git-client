@@ -4,14 +4,10 @@ import { ExistRepositoryConfigGuard } from './shared/guard/exist-repository-conf
 import { NotExistRepositoryConfigGuard } from './shared/guard/not-exist-repository-config.guard';
 import { ImportHttpsComponent } from './features/application/import-https/import-https.component';
 import { ImportLocalComponent } from './features/application/import-local/import-local.component';
-import { DatabaseResolver } from './shared/resolver/database.resolver';
 
 const routes: Routes = [
   {
     path: '',
-    resolve: {
-      database: DatabaseResolver
-    },
     children: [
       {
         path: '',

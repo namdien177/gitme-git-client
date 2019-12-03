@@ -23,7 +23,12 @@ export class GitDiffService {
     this.store.setLoading(true);
     let diffState: GitDiffResult = null;
     if (!!diff && diff.length > 0) {
-      diffState = await this.codeHighLightService.getDiffHTML(diff);
+      try {
+        diffState = await this.codeHighLightService.getDiffHTML(diff);
+      } catch (e) {
+        diffState = createInitialState().diff;
+        status = null;
+      }
     } else {
       diffState = createInitialState().diff;
       status = 'new';
