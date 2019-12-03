@@ -31,8 +31,7 @@ export class RepositoryStatusService {
     if (rawStatus.match(/Merge:\s.+\s.+\nAuthor/g)) {
       // in merge
       isMergeRequest = true;
-      rawStatus = await this.git.gitInstance(repository.directory)
-        .raw(['show', '--first-parent', '--name-status', commitSHA]);
+      rawStatus = await this.git.showCommit(repository, '--first-parent', commitSHA);
     }
     return parseShowFileHistory(rawStatus, isMergeRequest);
   }
