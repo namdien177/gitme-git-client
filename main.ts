@@ -135,7 +135,6 @@ ipcMain.on('github-authenticate', function (event, arg) {
   });
 
   authWindow.webContents.on('will-navigate', async (eventNavigate, urlPassing) => {
-    console.log(137, urlPassing);
     await clearSession(urlPassing, authWindow);
     if (urlPassing.match(/^(http:\/\/localhost:4200\/\?via=github&code=)/) && !requested) {
       requested = true;

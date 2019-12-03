@@ -53,7 +53,6 @@ export class BranchMergeComponent implements OnInit {
         } else {
           this.infoMerge = 'Ok to proceed!';
         }
-        console.log(res);
       }
     );
   }
@@ -61,7 +60,6 @@ export class BranchMergeComponent implements OnInit {
   merge() {
     fromPromise(this.branchService.merge(this.repository, this.branchFrom))
     .subscribe(stat => {
-      console.log(stat);
       this.dialogRef.close(undefined);
     });
   }
