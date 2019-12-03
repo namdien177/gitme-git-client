@@ -70,7 +70,6 @@ export class RepoHistoryComponent implements OnInit {
       switchMap((log: ListLogLine) => {
         this.viewLogs = log;
         this.activeFile = null;
-        console.log(log);
         return fromPromise(this.statusService.filesFromCommit(this.repository, log.hash));
       }),
     )

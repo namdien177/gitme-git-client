@@ -304,6 +304,5 @@ export function parseShowFileHistory(rawText: string, isMerge: boolean = false) 
       });
     });
   }
-  console.log(showCommit);
   return showCommit;
 }
