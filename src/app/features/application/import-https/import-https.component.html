@@ -29,6 +29,15 @@
     </div>
   </ng-container>
 
+  <ng-container *ngIf="http.dirty && http.invalid">
+    <div *ngIf="http.hasError('http')"
+         class="info-dialog card bg-danger">
+      <div class="card-body text-white">
+        {{http.getError('http')}}
+      </div>
+    </div>
+  </ng-container>
+
   <div class="repository-information">
     <h2 class="weight-lighter mb-0">Remote Information</h2>
 
