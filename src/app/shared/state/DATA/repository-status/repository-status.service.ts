@@ -26,11 +26,20 @@ export class RepositoryStatusService {
   }
 
   async filesFromCommit(repository: Repository, commitSHA: string) {
-    const rawStatus = await this.git.showCommit(repository, commitSHA);
-    return parseShowFileHistory(rawStatus);
+    let rawStatus = await this.git.showCommit(repository, commitSHA);
+    let isMergeRequest = false;
+    if (rawStatus.match(/Merge:\s.+\s.+\nAuthor/g)) {
+      // in merge
+      isMergeRequest = true;
+      rawStatus = await this.git.showCommit(repository, '--first-parent', commitSHA);
+    }
+    return parseShowFileHistory(rawStatus, isMergeRequest);
   }
 
-  async diffOfFileFromCommit(repository: Repository, path: string, modificationType: diffChangeStatus, commitSHA: string) {
+  async diffOfFileFromCommit(
+    repository: Repository, path: string,
+    modificationType: diffChangeStatus, commitSHA: string
+  ) {
     const rawFileDiff = await this.git.diffsFromCommit(repository, path, commitSHA);
     return await this.diffService.setDiff(rawFileDiff, path, modificationType);
   }
