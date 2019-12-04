@@ -72,7 +72,7 @@ export class BranchOptionsComponent implements OnInit {
         remove: boolean;
         push: boolean;
       }) => {
-        this.ld.setLoading('Renaming branch');
+        this.ld.setLoading('Analyzing current branch');
         return fromPromise(
           this.repositoryBranchService.changeName(
             this.data.repository, this.data.branch, responseRename.name, responseRename.remove, responseRename.push
@@ -85,6 +85,9 @@ export class BranchOptionsComponent implements OnInit {
     .subscribe(() => {
       this.ld.setFinish();
       this._bottomSheetRef.dismiss('RELOAD');
+    }, err => {
+      console.log(err);
+      this.ld.setFinish();
     });
   }
 

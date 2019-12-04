@@ -207,15 +207,6 @@ export class GitService {
     const mergeTree = await this.gitInstance(repository.directory).raw([
       'merge-tree', baseTree, branchTo.name, nameFrom
     ]).then(text => text, error => error.toString());
-    // let executeCommand = `git merge-tree ${ baseTree } ${ branchTo.name } ${ nameFrom }`;
-    // if (executeCommand.includes('\n')) {
-    //   executeCommand = executeCommand.replace(/\n/g, '');
-    // }
-    // const promisifyScript = util.promisify(this.run_script);
-    // const mergePreviewRawText = await promisifyScript({
-    //   command: executeCommand,
-    //   directory: repository.directory,
-    // }).then(text => text, error => error.toString());
     return parseMergeResult(mergeTree);
   }
 
@@ -608,9 +599,10 @@ export class GitService {
 
   private async processingDynamicRemote(repository: Repository, branch: BranchModel, credentials: Account,
                                         mode: 'fetch' | 'push') {
-    const trackName = branch.tracking.name;
+    const trackName = branch.tracking ? branch.tracking.name : 'origin';
     let originalRemote = await this.gitInstance(repository.directory).remote(['get-url', trackName]);
-    originalRemote = this.utilities.fixRemote(originalRemote, branch.tracking[mode]);
+    const replaceTracking = branch.tracking ? branch.tracking[mode] : originalRemote ? originalRemote : '';
+    originalRemote = this.utilities.fixRemote(originalRemote, replaceTracking);
     const remoteFetch = this.utilities.getOAuthRemote(branch, repository, credentials, 'fetch');
     await this.gitInstance(repository.directory).remote(['set-url', trackName, remoteFetch]);
     return originalRemote;
