@@ -51,7 +51,7 @@
 </div>
 
 <div (click)="renameBranch()"
-     *ngIf="!isMaster"
+     *ngIf="!isMaster && !!data.status"
      class="card mb-1">
   <div class="card-body">
     Rename branch
@@ -62,7 +62,13 @@
 
 <div *ngIf="!isMaster && !data.status" class="card mb-1">
   <div class="card-body text-muted">
-    To delete branch, please checkout first
+    To rename the branch, please checkout first
+  </div>
+</div>
+
+<div *ngIf="!isMaster && !data.status" class="card mb-1">
+  <div class="card-body text-muted">
+    To delete the branch, please checkout first
   </div>
 </div>
 

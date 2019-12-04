@@ -19,6 +19,7 @@ export class BranchRenameComponent implements OnInit {
   currentData: RepositoryBranchSummary;
   branches: string[] = [];
   parseNameBranch: string = null;
+  correctnessName: string = null;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public emittedDataFromView: YesNoDialogModel<RepositoryBranchSummary>,
@@ -70,18 +71,18 @@ export class BranchRenameComponent implements OnInit {
     ).subscribe(value => {
       const safeValue = isValidNameGitBranch(value);
       if (safeValue.status) {
-        this.name.setValue(value);
         this.parseNameBranch = null;
       } else {
-        this.name.setValue(value);
         this.parseNameBranch = safeValue.msg;
       }
+      this.name.setValue(value);
+      this.correctnessName = safeValue.name;
     });
   }
 
   confirmAction() {
     const emitData = {
-      name: this.name.value,
+      name: this.correctnessName,
       remove: this.removeOnRemote.value,
       push: this.pushToRemote.value,
     };

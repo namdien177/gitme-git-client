@@ -11,6 +11,7 @@ import { FileStatusSummaryView, RepositoryStatusService } from '../repository-st
 import { Account, AccountListService } from '../accounts';
 import { UtilityService } from '../../../utilities/utility.service';
 import { FileStatusSummary } from '../../../model/FileStatusSummary';
+import { LoadingIndicatorService } from '../../UI/Loading-Indicator';
 
 @Injectable({ providedIn: 'root' })
 export class RepositoryBranchesService {
@@ -21,7 +22,8 @@ export class RepositoryBranchesService {
     private gitService: GitService,
     private repoStatus: RepositoryStatusService,
     private accountService: AccountListService,
-    private utilities: UtilityService
+    private utilities: UtilityService,
+    private ld: LoadingIndicatorService
   ) {
   }
 
@@ -155,27 +157,26 @@ export class RepositoryBranchesService {
     );
   }
 
-  async deleteBranch(repository: Repository, branch: RepositoryBranchSummary, force: boolean = true) {
+  async deleteBranch(repository: Repository, branch: RepositoryBranchSummary, force: boolean = true, checkoutFirst = true) {
     //  $ git push -d <remote_name> <branch_name>       <---- Delete remotely
     //  $ git branch -d <branch_name>                   <---- Delete locally
     const args = force ? '-D' : '-d';
     const argsRemote = { '-d': null };
-
     const removeStatus = {
       local: null,
       remote: null
     };
+    // get account
+    const credentials: Account = this.accountService.getOneSync(
+      repository.credential.id_credential
+    );
+
     const masterBranch = repository.branches.find(branchStored => branchStored.name === 'master');
     if (!masterBranch || masterBranch.name === branch.name) {
       // prevent deleting master branch
       return removeStatus;
     }
     if (branch.has_remote) {
-      // get account
-      const credentials: Account = this.accountService.getOneSync(
-        repository.credential.id_credential
-      );
-
       try {
         await this.gitService.push(
           repository,
@@ -192,8 +193,11 @@ export class RepositoryBranchesService {
 
     if (branch.has_local) {
       // delete on local
-      // Require to checkout first => default checkout to master
-      const switchBranchStatus = await this.gitService.checkoutBranch(repository, masterBranch.name);
+      let switchBranchStatus;
+      if (checkoutFirst) {
+        // Require to checkout first => default checkout to master
+        switchBranchStatus = await this.gitService.checkoutBranch(repository, masterBranch.name);
+      }
       if (!switchBranchStatus) {
         return removeStatus;
       }
@@ -220,7 +224,7 @@ export class RepositoryBranchesService {
     // git branch -m new-name
     // git push origin old-name -d
     // git push origin -u new-name
-    const optionOnLocal = ['-m', `${ newName }`];
+    const optionOnLocal = ['-m', `${ branch.name }`, `${ newName }`];
     const status = {
       changeName: null,
       removeRemote: null,
@@ -231,28 +235,23 @@ export class RepositoryBranchesService {
     const credentials: Account = this.accountService.getOneSync(
       repository.credential.id_credential
     );
-
+    this.ld.setLoading('Branch renaming...');
     status.changeName = await this.gitService.branch(repository.directory, ...optionOnLocal);
 
-    if (branch.has_remote) {
+    if (branch.has_remote && removeOnRemote) {
+      this.ld.setLoading('Removing old branch on remote and local');
       // Only if having remote branch
-      if (removeOnRemote) {
-        // Delete remote branch then push new branch
-        status.removeRemote = await this.gitService.push(
-          repository,
-          branch,
-          credentials,
-          ['-d']
-        );
-      }
-    } else {
-      if (pushToRemote) {
-        status.pushRemote = await this.gitService.pushUpStream(
-          repository,
-          Object.assign(branch, { name: newName }),
-          credentials
-        );
-      }
+      // Delete remote and local
+      const result = await this.deleteBranch(repository, branch, true, false);
+      status.removeRemote = result.remote;
+    }
+    if (pushToRemote) {
+      this.ld.setLoading('Pushing renamed branch to remote');
+      status.pushRemote = await this.gitService.pushUpStream(
+        repository,
+        Object.assign({}, branch, { name: newName }),
+        credentials
+      );
     }
     return status;
   }

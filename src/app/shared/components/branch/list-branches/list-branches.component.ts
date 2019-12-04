@@ -106,9 +106,9 @@ export class ListBranchesComponent implements OnInit, AfterViewInit {
         checkAvailable: StatusSummary) => checkAvailable.files.length > 0
       ),
       switchMap((needStash: boolean) => {
-        if (needStash) {
-          return this.openStashMenu();
-        }
+        // if (needStash) {
+        //   return this.openStashMenu();
+        // }
         return of(2);
       }),
       takeWhile(action => action !== 0),
