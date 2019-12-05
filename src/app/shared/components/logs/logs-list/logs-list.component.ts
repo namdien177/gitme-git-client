@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GitLogsService, ListLogLine } from '../../../state/DATA/logs';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { distinctUntilChanged, filter, skipWhile, switchMap, tap } from 'rxjs/operators';
 import { RepositoriesService, Repository } from '../../../state/DATA/repositories';
 import { RepositoryStatusService } from '../../../state/DATA/repository-status';
@@ -103,7 +103,10 @@ export class LogsListComponent implements OnInit {
     .pipe(
       filter(res => !!res),
       switchMap(() => fromPromise(this.statusState.status(repository))),
-      switchMap(() => this.logService.initialLogs(repository))
+      switchMap(() => this.logService.initialLogs(repository)),
+      switchMap(() => of(this.diffState.reset())),
+      switchMap(() => fromPromise(this.branchState.updateAll(repository))),
+      switchMap(branches => fromPromise(this.repositoryState.updateToDataBase(repository, branches)))
     )
     .subscribe(choice => {
       console.log(choice);

@@ -44,7 +44,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     private gitRepository: RepositoriesService,
     private gitDiffs: GitDiffService,
     private appMenu: RepositoriesMenuService,
-    private utilitiesService: UtilityService,
+    private utilities: UtilityService,
     public dialog: MatDialog,
     private ld: LoadingIndicatorService,
     private fb: FormBuilder,
@@ -139,7 +139,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const listFilesCommit: FileStatusSummaryView[] = this.files.value;
-    const paths: string[] = this.utilitiesService.extractFilePathFromGitStatus(listFilesCommit);
+    const paths: string[] = this.utilities.extractFilePathFromGitStatus(listFilesCommit);
     const activeRepository: Repository = this.gitRepository.getActive();
     let optionCommits = null;
     if (this.customOptionCommit) {

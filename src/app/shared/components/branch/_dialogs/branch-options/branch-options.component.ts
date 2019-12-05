@@ -14,6 +14,8 @@ import { Account, AccountListService } from '../../../../state/DATA/accounts';
 import { ComputedAction, MergeResult } from '../../../../model/merge.interface';
 import { LoadingIndicatorService } from '../../../../state/UI/Loading-Indicator';
 import { RepositoryStatusService } from '../../../../state/DATA/repository-status';
+import { GitLogsService } from '../../../../state/DATA/logs';
+import { GitDiffService } from '../../../../state/DATA/git-diff';
 
 @Component({
   selector: 'gitme-branch-options',
@@ -35,15 +37,17 @@ export class BranchOptionsComponent implements OnInit {
       repository: Repository
     },
     private matDialog: MatDialog,
-    private repositoryBranchService: RepositoryBranchesService,
-    private repositoriesService: RepositoriesService,
-    private accountService: AccountListService,
-    private statusService: RepositoryStatusService,
+    private branchState: RepositoryBranchesService,
+    private repositoryState: RepositoriesService,
+    private accountState: AccountListService,
+    private statusState: RepositoryStatusService,
+    private logState: GitLogsService,
+    private diffState: GitDiffService,
     private cb: ChangeDetectorRef,
     private ld: LoadingIndicatorService
   ) {
-    this.currentActiveBranch = this.repositoryBranchService.getActive();
-    this.currentAccount = this.accountService.getOneSync(this.data.repository.credential.id_credential);
+    this.currentActiveBranch = this.branchState.getActive();
+    this.currentAccount = this.accountState.getOneSync(this.data.repository.credential.id_credential);
   }
 
   get computedAction() {
@@ -74,13 +78,13 @@ export class BranchOptionsComponent implements OnInit {
       }) => {
         this.ld.setLoading('Analyzing current branch');
         return fromPromise(
-          this.repositoryBranchService.changeName(
+          this.branchState.changeName(
             this.data.repository, this.data.branch, responseRename.name, responseRename.remove, responseRename.push
           )
         );
       }),
-      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches))),
+      switchMap(() => fromPromise(this.branchState.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoryState.updateToDataBase(this.data.repository, branches))),
     )
     .subscribe(() => {
       this.ld.setFinish();
@@ -99,7 +103,7 @@ export class BranchOptionsComponent implements OnInit {
         switchMap((isDelete: boolean) => {
           if (isDelete) {
             this.ld.setLoading('Deleting branch. Please wait');
-            return fromPromise(this.repositoryBranchService.deleteBranch(this.data.repository, this.data.branch));
+            return fromPromise(this.branchState.deleteBranch(this.data.repository, this.data.branch));
           }
           return of(null);
         }),
@@ -108,7 +112,7 @@ export class BranchOptionsComponent implements OnInit {
       this.processAfterDeleteProcess(deleteProcess);
     } else {
       this.ld.setLoading('Deleting branch. Please wait');
-      const deleteProcess = fromPromise(this.repositoryBranchService.deleteBranch(this.data.repository, this.data.branch));
+      const deleteProcess = fromPromise(this.branchState.deleteBranch(this.data.repository, this.data.branch));
       this.processAfterDeleteProcess(deleteProcess);
     }
   }
@@ -136,8 +140,8 @@ export class BranchOptionsComponent implements OnInit {
   processAfterDeleteProcess(deleteStatus: Observable<{ remote, local }>) {
     deleteStatus.pipe(
       takeWhile((statusRemove) => !!statusRemove.remote || !!statusRemove.local),
-      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches)))
+      switchMap(() => fromPromise(this.branchState.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoryState.updateToDataBase(this.data.repository, branches)))
     ).subscribe(
       () => {
         this.ld.setFinish();
@@ -147,6 +151,12 @@ export class BranchOptionsComponent implements OnInit {
   }
 
   openMerge() {
+    if (
+      !!this.statusMerge || this.mergeStatusLoading &&
+      this.computedAction.Clean === this.statusMerge.kind && !this.statusMerge['entries']
+    ) {
+      return;
+    }
     const dataMerge: YesNoDialogModel = {
       title: 'Merge status',
       body: `Checking status of merge from branch ${ this.data.branch.name } to ${ this.currentActiveBranch.name }.`,
@@ -171,9 +181,11 @@ export class BranchOptionsComponent implements OnInit {
 
     dialogMerge.afterClosed()
     .pipe(
-      switchMap(() => fromPromise(this.repositoryBranchService.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoriesService.updateToDataBase(this.data.repository, branches))),
-      switchMap(() => fromPromise(this.statusService.status(this.data.repository)))
+      switchMap(() => of(this.diffState.reset())),
+      switchMap(() => this.logState.initialLogs(this.data.repository)),
+      switchMap(() => fromPromise(this.branchState.updateAll(this.data.repository))),
+      switchMap(branches => fromPromise(this.repositoryState.updateToDataBase(this.data.repository, branches))),
+      switchMap(() => fromPromise(this.statusState.status(this.data.repository)))
     )
     .subscribe(decision => {
     });
@@ -181,7 +193,7 @@ export class BranchOptionsComponent implements OnInit {
 
   checkMergeCondition() {
     this.mergeStatusLoading = true;
-    this.repositoryBranchService.getMergeStatus(
+    this.branchState.getMergeStatus(
       this.data.repository,
       this.data.branch,
       this.currentActiveBranch
