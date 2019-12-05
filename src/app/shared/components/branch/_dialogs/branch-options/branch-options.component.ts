@@ -152,7 +152,7 @@ export class BranchOptionsComponent implements OnInit {
 
   openMerge() {
     if (
-      !!this.statusMerge || this.mergeStatusLoading &&
+      (!!this.statusMerge || this.mergeStatusLoading) &&
       this.computedAction.Clean === this.statusMerge.kind && !this.statusMerge['entries']
     ) {
       return;
