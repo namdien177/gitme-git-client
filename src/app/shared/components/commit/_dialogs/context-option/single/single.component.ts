@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material';
-import { FileStatusSummaryView } from '../../../../../state/DATA/repository-status';
+import { FileStatusSummaryView, RepositoryStatusService } from '../../../../../state/DATA/repository-status';
 import { RepositoryBranchesService } from '../../../../../state/DATA/branches';
 import { RepositoriesService, Repository } from '../../../../../state/DATA/repositories';
 import { FileSystemService } from '../../../../../../services/system/fileSystem.service';
@@ -22,6 +22,7 @@ export class SingleComponent implements OnInit {
     private fileSystemService: FileSystemService,
     private branchServices: RepositoryBranchesService,
     private repositoryServices: RepositoriesService,
+    private statusState: RepositoryStatusService,
     private _bottomSheetRef: MatBottomSheetRef<SingleComponent>,
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: {
       file: FileStatusSummaryView[],
@@ -64,7 +65,8 @@ export class SingleComponent implements OnInit {
     fromPromise(this.branchServices.revertFiles(this.repository, singleFileArr))
     .pipe(
       switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+      switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches))),
+      switchMap(() => fromPromise(this.statusState.status(this.data.repository)))
     )
     .subscribe(
       () => {
@@ -95,7 +97,8 @@ export class SingleComponent implements OnInit {
       fromPromise(this.branchServices.ignoreFiles(this.repository, this.file[0]))
       .pipe(
         switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches))),
+        switchMap(() => fromPromise(this.statusState.status(this.data.repository)))
       )
       .subscribe(() => {
         this.dismissed('IGNORED');
@@ -108,7 +111,7 @@ export class SingleComponent implements OnInit {
       fromPromise(this.branchServices.ignoreExtension(this.repository, this.file[0]))
       .pipe(
         switchMap(() => fromPromise(this.branchServices.updateAll(this.data.repository))),
-        switchMap(branches => fromPromise(this.repositoryServices.updateToDataBase(this.data.repository, branches)))
+        switchMap(() => fromPromise(this.statusState.status(this.data.repository)))
       )
       .subscribe(() => {
         this.dismissed('IGNORED');
